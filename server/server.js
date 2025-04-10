@@ -22,19 +22,14 @@ app.use(cors({
 
 
 app.use(express.urlencoded({extended:true}))
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
 
 
-
-
-const clientId="921823961349-kruq5i3piva0gn015v20ftt2prkv2cm9.apps.googleusercontent.com"
-const clientSecret="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",redirectUri="http://localhost:2000/oauth2callback"; 
+const clientId=process.env.CLIENT_ID;
+const clientSecret=process.env.CLIENT_SECRET_KEY;
+const redirectUri= process.env.REDIRECT_URL;
 const SCOPE = "https://www.googleapis.com/auth/drive";
-const refresh_token="1//0gsxEjMXVgmt_CgYIARAAGBASNwF-L9IrugvXPL_nMyoN3V-n_-5SyH3hNEZPYBFvfMYUfnHcEWlQQBe1YcThPXd6F0xBBcQ5-7E";
-const accessToken="ya29.a0AZYkNZiYvG-F_MQ0Lw-XajUbCVuwfLsfD12OvUNeYWSe1fMUT3CSMX2VoMAXIic8a2MkI7MzqvkS5T9W8rhMpWtdryQ7kB_3CWMEhBEHuB_Ia8SZQrcB2XxmghNwDVGFYyxBSURHUnIZYtK2uEL4Cwq0kv0mZfeH1KmYQX9AaCgYKAdcSARASFQHGX2Mih89v983MgWSGCQkiU_XJag0175"
+const refresh_token=process.env.REFRESH_TOKEN
+const accessToken=process.env.ACCESSTOKEN;
 export const auth =new google.auth.OAuth2(clientId, clientSecret,redirectUri);
 auth.setCredentials({ refresh_token: refresh_token }); 
     // "https://www.googleapis.com/auth/drive.readonly",

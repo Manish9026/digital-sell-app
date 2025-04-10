@@ -46,6 +46,8 @@ const filelink = await DriveController.shareFileWithUser(fileId, email);
 //   res.json({ success: true });
     } catch (error) {
         res.status(400).json({ error: "Payment verification failed" });
+        console.log(error);
+        
     }
   }
 

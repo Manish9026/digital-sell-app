@@ -42,8 +42,8 @@ static async  shareFileWithUser(fileId, email) {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-          user: "manishmaurya11365@gmail.com", // 🔴 Replace with your email
-          pass: "mspzkmxexkojxdbu",
+          user:process.env.ADMIN_EMAIL, // 🔴 Replace with your email
+          pass:process.env.ADMIN_PASS,
       },
     });
   
