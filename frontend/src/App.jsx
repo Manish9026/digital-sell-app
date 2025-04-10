@@ -6,7 +6,7 @@ import { url } from './utils/service';
 import { useNavigate } from 'react-router-dom';
 export  function ProductCard() {
   const [showFullDescription, setShowFullDescription] = useState(false);
-  // const [email, setEmail] = useState("");
+  const [userEmail, setUserEmail] = useState("");
   const navigate = useNavigate();
   useEffect(() => {
     const script = document.createElement("script");
@@ -65,13 +65,13 @@ console.log(order,import.meta.env.VITE_RAZORPAY_KEY_ID);
   };
   const handleBuyNow = async () => {
     // const email = prompt("Please enter your email address:");
-    // if (!email) {
-    //   alert("Email is required to proceed.");
-    //   return;
-    // }
-    const email="ashishmaurya061155@gmail.com"
+    if (!userEmail) {
+      alert("Email is required to proceed.");
+      return;
+    }
+    // const email="ashishmaurya061155@gmail.com"
     try {
-      handlePayment(email,"candle_patern","148MIv8M7SpkB4b0NzD---xBREwR2M3Ey");
+      handlePayment(userEmail,"candle_patern","148MIv8M7SpkB4b0NzD---xBREwR2M3Ey");
     } catch (error) {
       console.error(error);
       alert("An error occurred while processing your request.");
@@ -149,7 +149,8 @@ console.log(order,import.meta.env.VITE_RAZORPAY_KEY_ID);
           <span className="text-green-600 text-sm font-semibold">30% OFF</span>
         </div>
 
-  
+  {/* <span className=""></span> */}
+  <input type="email" placeholder='Ex: username@gmail.com' className='bg-slate-600 w-full p-2 rounded-md' onChange={(e)=>setUserEmail(e.target.value)} value={userEmail} />
         {/* Buttons */}
         <div className="flex space-x-3">
   <motion.button
@@ -186,7 +187,7 @@ function App() {
 
   return (
     // <>
-    <div className="bg-slate-800 w-screen h-screen flex-1 center">
+    <div className="bg-slate-800 min-w-screen h-screen flex-1 center">
       
 <ProductCard />
     </div>
