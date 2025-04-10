@@ -14,8 +14,10 @@ const app=express();
 app.use(express.json()) 
 app.use(cookieParser());
 
+console.log(process.env.BASE_URL,process.env.BASE_URL2);
+
 app.use(cors({
-    origin:[process.env.BASE_URL,process.env.BASE_URL2,process.env.PORTFOLiO_URL],
+    origin:[process.env.BASE_URL,process.env.BASE_URL2,"https://digital-sell.vercel.app",process.env.PORTFOLiO_URL],
     credentials:true,
     methods:["POST","GET","DELETE","PATCH"]
 }))
