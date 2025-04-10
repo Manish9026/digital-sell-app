@@ -1,13 +1,15 @@
+
 import { useEffect, useState } from 'react'
-import './App.css'
 import { motion, AnimatePresence } from "framer-motion";
 import axios from 'axios';
-import { url } from './utils/service';
 import { useNavigate } from 'react-router-dom';
+import { url } from '../../utils/service';
+import { useThrottle } from '../../hooks/useThrottleClick';
 export  function ProductCard() {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const navigate = useNavigate();
+  const useThrottleClick=useThrottle(1000);
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
@@ -84,12 +86,12 @@ console.log(order,import.meta.env.VITE_RAZORPAY_KEY_ID);
     "  His expertise extends to market analysis and strategy, grounded in a strong academic background in Finance and Economics. As a Senior Writer, Steven offers valuable insights through his clear and practical financial reports on all things trading. Beyond work, he has a keen interest in digital currencies and financial history.";
 
   return (
-    <div className="max-w-[300px] flex-1 mx-auto mt-10 bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 transform transition-transform duration-300 hover:shadow-xl">
+    <div className="max-w-[300px] max-h-[500px] flex-1 mx-auto mt-10 bg-white rounded-2xl shadow-lg overflow-auto border border-gray-200 transform transition-transform duration-300 hover:shadow-xl">
       {/* Thumbnail */}
       <img
         src="https://www.morpher.com/blog/optimizedImages/httpsi0wpcommorpherhomewpcomstagingcomwpcontentuploads202407Untitleddesign6pngw600h380.webp"
         alt="Product Thumbnail"
-        className="w-full h-60 object-contain"
+        className="w-full h-[150px] object-fill"
       />
 
       <div className="p-4 space-y-4">
@@ -157,7 +159,7 @@ console.log(order,import.meta.env.VITE_RAZORPAY_KEY_ID);
     whileTap={{ scale: 0.95 }}
     whileHover={{ scale: 1.05 }}
     className="flex-1 inline-flex items-center justify-center bg-indigo-600 text-white py-2 px-4 rounded-xl transition-all duration-300 font-medium"
-    onClick={handleBuyNow}
+    onClick={()=>useThrottleClick(handleBuyNow)}
   >
     Buy Now
   </motion.button>
@@ -179,21 +181,14 @@ const RazorpayButton = () => {
 
   return <button onClick={handlePayment}>Pay with Razorpay</button>;
 };
-
-// export default RazorpayButton;
-
-function App() {
-  const [count, setCount] = useState(0)
-
+function Home() {
   return (
-    // <>
-    <div className="bg-slate-800 min-w-screen h-screen flex-1 center">
-      
-<ProductCard />
+    <div>
+        <h1 className='text-3xl  font-bold text-center mt-10'>Welcome to the Home Page</h1>
+
+        <ProductCard/>
     </div>
-  
-    // </>
   )
 }
 
-export default App
+export default Home
