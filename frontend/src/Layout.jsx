@@ -5,7 +5,7 @@ import Navbar from './component/Store/Navbar'
 function Layout({role}) {
   return (
     role=="store"?
-    <div className='bg-slate-100 overflow-auto  min-h-screen min-w-screen scroll-hide'>
+    <div className='bg-slate-100 flex flex-col overflow-auto  min-h-screen min-w-screen scroll-hide'>
 
     <Navbar/>
     <Outlet/>

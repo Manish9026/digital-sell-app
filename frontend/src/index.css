@@ -1,4 +1,11 @@
 @import "tailwindcss";
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities; */
+/* @import "tailwindcss"; */
+/* @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *)); */
+@custom-variant light (html:not(.dark) &);
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

@@ -1,8 +1,12 @@
 
+const { themeVariants, prefersLight, prefersDark } = require("tailwindcss-theme-variants");
 /** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: 'class',
+  darkMode: ['selector'],
     content: ["./index.html", "./src/**/*.{html,js,jsx,css}","./node_modules/react-tailwindcss-datepicker/dist/index.esm.{js,ts}"],
+    // corePlugins: {
+    //   preflight: true, // keep or remove if you want browser resets
+    // },
     theme: {
         extend: {
           animation: {
@@ -17,5 +21,16 @@ export default {
         }
       }
       ,
-    plugins: [],
+      plugins: [
+        themeVariants({
+          themes: {
+            light: {
+              selector: ".light-theme",
+            },
+            dark: {
+              selector: ".dark-theme",
+            },
+          },
+        }),
+      ],
   }
