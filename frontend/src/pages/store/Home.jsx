@@ -184,7 +184,7 @@ const RazorpayButton = () => {
 function Home() {
   return (
     <div>
-        <h1 className='text-3xl  font-bold text-center mt-10'>Welcome to the Home Page</h1>
+        <h1 className='text-3xl dark:bg-gray-900 font-bold text-center bg-white mt-10 dark:text-slate-700  text-sky-500'>Welcome to the Home Page</h1>
 
         <ProductCard/>
     </div>
