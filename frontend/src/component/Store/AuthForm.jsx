@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion,AnimatePresence } from 'framer-motion';
 import { FaGoogle, FaFacebookF, FaInstagram } from 'react-icons/fa';
-import { MdEmail, MdLock, MdPerson } from 'react-icons/md';
+import { MdEmail, MdLock, MdPerson, MdStarRate } from 'react-icons/md';
 import { Link } from 'react-router-dom';
 
 function RegistrationForm() {
@@ -56,8 +56,8 @@ function RegistrationForm() {
   };
 
   return (
-    <div  ref={formRef} className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-indigo-100 via-white to-indigo-200 dark:from-gray-800 dark:via-gray-900 dark:to-black">
-      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+    <div  ref={formRef} className="primary-p min-h-screen flex items-center justify-center relative overflow-hidden  bg-gradient-to-br from-gray-800 via-gray-900 to-black">
+      <div className="absolute text-slate-200 inset-0 z-0 pointer-events-none overflow-hidden">
           {stars.map((star, i) => (
             <motion.div
               key={i}
@@ -295,8 +295,8 @@ function LoginForm() {
   };
 
   return (
-    <div ref={formRef} className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-indigo-100 via-white to-indigo-200 dark:from-gray-800 dark:via-gray-900 dark:to-black">
-       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+    <div ref={formRef} className="min-h-screen flex items-center primary-p justify-center relative overflow-hidden bg-gradient-to-br from-gray-800 via-gray-900 to-black">
+       <div className="absolute text-slate-200 inset-0 z-0 pointer-events-none overflow-hidden">
           {stars.map((star, i) => (
             <motion.div
               key={i}
@@ -305,7 +305,9 @@ function LoginForm() {
               transition={{ duration: star.duration, repeat: Infinity, repeatType: 'mirror' }}
               className=" rounded-full absolute"
               style={{ left: 0, top: 0 }}
-              children={"*"}
+              children={
+
+              <MdStarRate />}
             />
           ))}
         </div>
@@ -332,7 +334,7 @@ function LoginForm() {
               onChange={(e) => setEmail(e.target.value)}
               className={`pl-10 pr-4 py-2 w-full rounded-lg border ${
                 errors.email ? 'border-red-500' : 'border-gray-300 light:border-gray-300 dark:border-gray-700'
-              } light:bg-slate-300 dark:bg-gray-800 light:text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-400`}
+              } light:bg-slate-300 light:border-slate-500 dark:bg-gray-800 light:text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-400`}
             />
             <AnimatePresence>
               {errors.email && (

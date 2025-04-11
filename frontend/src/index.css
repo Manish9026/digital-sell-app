@@ -5,13 +5,16 @@
 /* @import "tailwindcss"; */
 /* @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *)); */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+@custom-varient light (&:where([data-theme=light], [data-theme=light] *));
 @custom-variant light (html:not(.dark) &);
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
+  /* color-scheme: light dark; */
   /* color: rgb(37, 37, 49); */
   background-color: #242424;
 
@@ -25,7 +28,7 @@ html {
 }
 
 .primary-p{
-  @apply p-2 md:p-4 lg:p-6;
+  @apply p-4 md:p-6 lg:p-8;
 }
 a {
 
