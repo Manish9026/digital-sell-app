@@ -6,7 +6,10 @@ import App from './App'
 import PaymentSuccessPage, { PaymentWaiting } from './component/PaymentSuccess'
 import  Layout  from './Layout'
 import ProtectedRoute from './ProtectedRoute'
+// import { LoginForm, RegistrationForm } from './component/Store/AuthForm'
 const DashboardHome=lazy(()=>import('./pages/dasboard/Home'));
+const LoginForm =lazy(()=>import('./component/Store/AuthForm').then(module=>({default:module.LoginForm})));
+const RegistrationForm =lazy(()=>import('./component/Store/AuthForm').then(module=>({default:module.RegistrationForm})));
 const StoreHome=lazy(()=>import('./pages/store/Home'));
 // NotFoundPage
 const NotFoundPage=lazy(()=>import('./component/Shared/NotFoundPage'));
@@ -36,6 +39,14 @@ export function RoutesProvider() {
           children:[{
             path:"",
             element:<StoreHome/>
+          },
+          {
+            path:"/user/login",
+            element:<LoginForm/>
+          },
+          {
+            path:"/user/register",
+            element:<RegistrationForm/>
           },
           {
             path:"/user/payment-success",

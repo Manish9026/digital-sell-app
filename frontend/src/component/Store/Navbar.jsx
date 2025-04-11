@@ -2,9 +2,11 @@ import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuIt
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import ThemeToggleButton from '../Shared/ThemeToggleButton'
 import { LucideShoppingBag } from 'lucide-react'
-
+import { PiUserCircleDashedFill } from "react-icons/pi";
+import { Link, NavLink } from 'react-router-dom';
 const navigation = [
-  { name: 'My Course', href: '/cources', current: true },
+  { name: 'Home ', href: '/', current: true },
+  { name: 'My Course', href: '/cources', current: false },
   { name: 'Orders', href: '#', current: false },
   { name: 'Cources', href: '#', current: false },
   { name: 'Calendar', href: '#', current: false },
@@ -65,55 +67,98 @@ export default function Navbar() {
               <BellIcon aria-hidden="true" className="size-6" />
             </button>
 
-<span className='p-1 border-b border-l rounded gap-1 flex items-center justify-center bg-gray-800 cursor-pointer text-gray-400 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden'>
+            <span className='p-1 border-b border-l rounded gap-1 flex items-center justify-center bg-gray-800 cursor-pointer text-gray-400 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden'>
 
-<LucideShoppingBag className='size-[20px]'/>
-<p className='text-sm'>0</p>
-</span>
-                {/* <ThemeToggleButton/> */}
-            {/* Profile dropdown */}
-            <Menu as="div" className="relative ml-3">
-              <div>
-                <MenuButton className="relative flex rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
-                  <span className="absolute -inset-1.5" />
-                  <span className="sr-only">Open user menu</span>
-                  <img
-                    alt=""
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                    className="size-8 rounded-full"
-                  />
-                </MenuButton>
-              </div>
-              <MenuItems
-                transition
-                className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 transition focus:outline-hidden data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
-              >
-                <MenuItem>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+              <LucideShoppingBag className='size-[20px]' />
+              <p className='text-sm'>0</p>
+            </span>
+            {/* <ThemeToggleButton/> */}
+            {
+              //  {/* Profile dropdown */}
+
+              0 ? <Menu as="div" className="relative ml-3">
+                <div>
+                  <MenuButton className="relative flex rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
+                    <span className="absolute -inset-1.5" />
+                    <span className="sr-only">Open user menu</span>
+                    <img
+                      alt=""
+                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                      className="size-8 rounded-full"
+                    />
+                  </MenuButton>
+                </div>
+                <MenuItems
+                  transition
+                  className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 transition focus:outline-hidden data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
+                >
+                  <MenuItem>
+                    <a
+                      href="#"
+                      className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+                    >
+                      Your Profile
+                    </a>
+                  </MenuItem>
+                  <MenuItem>
+                    <a
+                      href="#"
+                      className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+                    >
+                      Settings
+                    </a>
+                  </MenuItem>
+                  <MenuItem>
+                    <a
+                      href="#"
+                      className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+                    >
+                      Sign out
+                    </a>
+                  </MenuItem>
+                </MenuItems>
+              </Menu>
+                :
+                // {/* login menu */}
+                <Menu as="div" className="relative ml-3">
+                  <div>
+                    <MenuButton className="relative flex rounded-full text-gray-400 bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 ">
+                      <span className="absolute -inset-1.5" />
+                      <span className="sr-only">Open user menu</span>
+
+
+                      <PiUserCircleDashedFill className='size-8 rounded-full' />
+
+                    </MenuButton>
+                  </div>
+                  <MenuItems
+                    transition
+                    className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 transition focus:outline-hidden data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in
+                    light:bg-white dark:bg-slate-800
+                    "
                   >
-                    Your Profile
-                  </a>
-                </MenuItem>
-                <MenuItem>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
-                  >
-                    Settings
-                  </a>
-                </MenuItem>
-                <MenuItem>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
-                  >
-                    Sign out
-                  </a>
-                </MenuItem>
-              </MenuItems>
-            </Menu>
+
+                    <MenuItem >
+                      <Link
+                        to={"/user/login"}
+                        className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+                      >
+🔐 Login
+                      </Link>
+                    </MenuItem>
+                    <MenuItem >
+                      <Link
+                        to={"/user/register"}
+                        className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+                      >
+🧾 Register
+                      </Link>
+                    </MenuItem>
+
+
+
+                  </MenuItems>
+                </Menu>}
           </div>
         </div>
       </div>
@@ -121,18 +166,22 @@ export default function Navbar() {
       <DisclosurePanel className="sm:hidden">
         <div className="space-y-1 px-2 pt-2 pb-3">
           {navigation.map((item) => (
-            <DisclosureButton
-              key={item.name}
-              as="a"
-              href={item.href}
-              aria-current={item.current ? 'page' : undefined}
-              className={classNames(
-                item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                'block rounded-md px-3 py-2 text-base font-medium',
-              )}
-            >
-              {item.name}
-            </DisclosureButton>
+            // <DisclosureButton
+             
+            // >
+              <NavLink
+               key={item.name}           
+               to={item.href}
+               aria-current={item.current ? 'page' : undefined}
+               className={classNames(
+                 item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                 'block rounded-md px-3 py-2 text-base font-medium',
+               )}
+              >
+
+                {item.name}
+              </NavLink>
+            // </DisclosureButton>
           ))}
         </div>
       </DisclosurePanel>

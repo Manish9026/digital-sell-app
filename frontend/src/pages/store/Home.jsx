@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { url } from '../../utils/service';
 import { useThrottle } from '../../hooks/useThrottleClick';
+import CustomText from '../../component/Shared/CustomText';
 export  function ProductCard() {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [userEmail, setUserEmail] = useState("");
@@ -94,11 +95,9 @@ console.log(order,import.meta.env.VITE_RAZORPAY_KEY_ID);
         className="w-full min-h-[100px] max-h-[50%] object-fill"
       />
 
-      <div className="p-4 flex-1 space-y-4">
+      <div className="p-4 flex-1 flex flex-col gap-2 md:max-xl:gap-4">
         {/* Title */}
-        <h2 className="sm:text-lg font-semibold text-start capitalize text-gray-800">
-         full candle pattern book
-        </h2>
+        <CustomText size='h5' title="full candle pattern book" className='text-start font-semibold capitalize text-gray-800'/>
 
         {/* Description (short with toggle) */}
         {/* <div className="text-sm  text-gray-600">
@@ -145,10 +144,11 @@ console.log(order,import.meta.env.VITE_RAZORPAY_KEY_ID);
         </div> */}
 
         {/* Price Section */}
-        <div className="flex items-center space-x-4">
-          <p className="text-xl font-bold text-indigo-600">₹899</p>
-          <p className="text-sm text-gray-400 line-through">₹1299</p>
-          <span className="text-green-600 text-sm font-semibold">30% OFF</span>
+        <div className="flex flex-wrap items-center justify-between ">
+          <CustomText size='h4' title="₹899" className='text-xl font-bold text-indigo-600'/>
+          <CustomText  title="₹1299" className='text-sm text-gray-400 line-through'/>
+          {/* <p className="text-sm text-gray-400 line-through">₹1299</p> */}
+          <CustomText  title="30% OFF" className='text-sm font-semibold text-green-600'/>
         </div>
 
   {/* <span className=""></span> */}
@@ -169,7 +169,7 @@ console.log(order,import.meta.env.VITE_RAZORPAY_KEY_ID);
     whileHover={{ scale: 1.03 }}
     className="flex-1 inline-flex items-center justify-center border border-indigo-600 text-indigo-600 py-2 px-4 rounded-xl transition-all duration-300 font-medium will-change-transform max-h-[50px]  bg-white hover:bg-indigo-50"
   >
-    Add to Cart
+   <CustomText title="Add to Cart" className='text-indigo-600 text-sm font-medium'/>
   </motion.button>
 </div>
       </div>
@@ -185,7 +185,9 @@ function Home() {
 
   return (
     <div className='flex-1 p-5 flex min-h-full flex-col pb-10 light:bg-white light:text-slate-400 dark:bg-gray-800 '>
-        <h1 className='text-1xl font-bold text-center  mt-10'>Welcome to the Home Page</h1>
+        <h1 className='text-2xl font-bold text-center  mt-10'>Welcome to the Home Page</h1>
+       
+ 
 
 <div className="flex flex-wrap gap-4 justify-center mt-10">
 <ProductCard/>
@@ -198,3 +200,13 @@ function Home() {
 }
 
 export default Home
+
+ 
+        {/* <span className='center flex-col gap-2'>
+          <h1 className='h1'>Lorem, ipsum dolor.</h1>
+          <h2 className='h2'>Lorem, ipsum dolor.</h2>
+          <h3 className='h3'>Lorem, ipsum dolor.</h3>
+          <h4 className='h4'>Lorem, ipsum dolor.</h4>
+          <h5 className='h5'>Lorem, ipsum dolor.</h5>
+          <h6 className='h6'>Lorem, ipsum dolor.</h6>
+        </span> */}

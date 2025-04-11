@@ -10,6 +10,7 @@ const ProtectedRoute = ({ allowedRoles ,children},) => {
   const { isAuthenticated, role } = getUser();
   const location = useLocation();
   const path = location.pathname.split("/")[1];
+console.log(path);
 
 
   if (!isAuthenticated) {
