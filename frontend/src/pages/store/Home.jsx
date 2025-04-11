@@ -67,14 +67,14 @@ console.log(order,import.meta.env.VITE_RAZORPAY_KEY_ID);
     rzp.open();
   };
   const handleBuyNow = async () => {
-    // const email = prompt("Please enter your email address:");
-    if (!userEmail) {
+    const email = prompt("Please enter your email address:");
+    if (!email) {
       alert("Email is required to proceed.");
       return;
     }
     // const email="ashishmaurya061155@gmail.com"
     try {
-      handlePayment(userEmail,"candle_patern","148MIv8M7SpkB4b0NzD---xBREwR2M3Ey");
+      handlePayment(email,"candle_patern","148MIv8M7SpkB4b0NzD---xBREwR2M3Ey");
     } catch (error) {
       console.error(error);
       alert("An error occurred while processing your request.");

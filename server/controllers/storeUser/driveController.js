@@ -1,8 +1,7 @@
 
 import nodemailer from 'nodemailer';
 import { google } from 'googleapis';
-import { auth } from '../server.js'; // Adjust the path as necessary
-
+import { auth } from '../../server.js'; // Adjust the path as necessary
 export class DriveController{
      SCOPE = "https://www.googleapis.com/auth/drive";
 

@@ -1,33 +1,50 @@
 import mongoose from "mongoose";
 
 
-const storeUserSchema = mongoose.Schema({
-
-    firstName:String,
-    lastName:String,
+const sessionSchema = new mongoose.Schema({
+    token: { type: String, required: true },
+    ip: String,
+    userAgent: String,
+    createdAt: { type: Date, default: Date.now },
+  });
+const storeUserSchema = new mongoose.Schema({
+    firstName: {
+      type: String,
+      required: true,
+      minlength: 2,
+      maxlength: 30,
+    },
+    lastName: {
+      type: String,
+      required: true,
+      minlength: 2,
+      maxlength: 30,
+    },
     userEmail: {
-        type: String,
-        required: true,
-        unique:true,
-        index: true,
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
+      lowercase: true,
     },
     password: {
-        type: String
+      type: String,
+      required: true,
+      minlength: 6,
     },
-    role:{
-        type:String,
-
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
     },
-
-    current_location: {
-        type: Object
+    current_location: Object,
+    userSetting: {
+      type: mongoose.Types.ObjectId,
+      ref: "userSetting",
     },
-    userSetting:{
-        type:mongoose.Types.ObjectId,
-        ref:"userSetting",
-    },
-    refreshToken:String
-})
+    sessions: [sessionSchema], 
+    refreshToken: String,
+  },{timestamps:true});
 
 const adminUserSchema=mongoose.Schema({
     userEmail: {
