@@ -15,20 +15,21 @@ import { badResponse, goodResponse } from '../../utils/response.js';
 export class Auth  {
 
     static registerUser = async (req, res) => {
-        const { firstName, lastName, userEmail, password } = req.body;
+        const { firstName, lastName, email:userEmail, password } = req.body;
+      console.log("register",req.body);
       
         try {
             if(!(firstName || lastName || userEmail || password)) {
                 return badResponse({res,message:"All fields are required"})
             }
-          const existingUser = await User.findOne({ userEmail });
+          const existingUser = await storeUserModel.findOne({ userEmail });
           if (existingUser) {
             return badResponse({res,status:409,message:"Email already in use"}) 
           }
       
           const hashedPassword = await bcrypt.hash(password, 10);
       
-          const newUser = await User.create({
+          const newUser = await storeUserModel.create({
             firstName,
             lastName,
             userEmail,
@@ -38,11 +39,19 @@ export class Auth  {
           goodResponse({res,statusCode:201,message:"User created successfully",data:newUser})
         //   res.status(201).json({ message: "User registered", userId: newUser._id });
         } catch (error) {
+          console.log(error);
+          
             badResponse({res,statusCode:500,message:"Server error",error:error.message})
+            
         }
       };
     static loginUser = async (req, res) => {
-        const { userEmail, password } = req.body;
+
+      try {
+      
+
+        const { email:userEmail, password } = req.body;
+        console.log("login,",req.body,"");
       
         if(!(userEmail || password))
             return res.status(400).json({ message: "Email and password are required" });
@@ -52,7 +61,7 @@ export class Auth  {
           return res.status(401).json({ message: "Invalid credentials" });
         }
       
-        const accessToken = generateToken({userId:user._id, userRole:user.role}, "15m");
+        const accessToken = generateToken({userId:user._id, userRole:user.role}, "30m");
         const refreshToken =generateToken({userId:user._id, userRole:user.role}, "7d");
       
         // Get IP and user agent
@@ -61,8 +70,12 @@ export class Auth  {
       
         // Store refresh token as session
         user.sessions.push({ token: refreshToken, ip, userAgent });
-        await user.save();
+        const newUser=await user.save();
+
+        const { password:hidePassword, ...insensitiveData } = newUser.toObject()
       
+      
+        
         // Send cookies
         res.cookie("accessToken", accessToken, {
           httpOnly: true,
@@ -78,7 +91,13 @@ export class Auth  {
           maxAge: 7 * 24 * 60 * 60 * 1000,
         });
       
-        res.status(200).json({ message: "Login successful" });
+        return goodResponse({res,statusCode:200,message:"User verified",data:{isAuthenticated:true,user:insensitiveData}})
+      } catch (error) {
+        console.log(error);
+
+            badResponse({res,statusCode:500,message:"Server error",error:error.message})
+        
+      }
       };
     static refreshToken = async (req, res) => {
   const token = req?.cookies?.refreshToken;
@@ -145,6 +164,23 @@ export class Auth  {
   
     res.status(200).json({ message: "Logged out successfully" });
   };
+  static verifyUser = async (req, res) => {
+    try {
+      const {user}=req;
+      console.log("verify user");
+      
+      if (!user) {
+        return badResponse({res,statusCode:401,message:"Unauthorized",data:{isAuthenticated:false}})
+      }
+
+      return goodResponse({res,statusCode:200,message:"User verified",data:{isAuthenticated:true,user}})
+      
+    } catch (error) {
+      console.log(error);
+      
+      return badResponse({res,statusCode:500,message:"Server error",error:error.message})
+    }
+  }
   
     static logout = async (req, res) => {
         try {

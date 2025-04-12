@@ -66,7 +66,7 @@ console.log(order,import.meta.env.VITE_RAZORPAY_KEY_ID);
     const rzp = new window.Razorpay(options);
     rzp.open();
   };
-  const handleBuyNow = async () => {
+  const handleBuyNow = async () => {``
     const email = prompt("Please enter your email address:");
     if (!email) {
       alert("Email is required to proceed.");

@@ -2,7 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion,AnimatePresence } from 'framer-motion';
 import { FaGoogle, FaFacebookF, FaInstagram } from 'react-icons/fa';
 import { MdEmail, MdLock, MdPerson, MdStarRate } from 'react-icons/md';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useLoginMutation, useRegisterMutation } from '../../services/store/authServices';
+import { useSelector } from 'react-redux';
 
 function RegistrationForm() {
   const [formData, setFormData] = useState({
@@ -12,10 +14,12 @@ function RegistrationForm() {
     password: '',
     confirmPassword: ''
   });
+
   const [errors, setErrors] = useState({});
   const [stars, setStars] = useState([]);
   const formRef = useRef(null);
-
+  const [register ,{isLoading,isError,isSuccess}]=useRegisterMutation();
+  const navigate=useNavigate()
   useEffect(() => {
     if (formRef.current) {
       const { offsetWidth, offsetHeight } = formRef.current;
@@ -44,9 +48,16 @@ function RegistrationForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
     if (validate()) {
+      const data= await register(formData).unwrap();
+      console.log(data);
+      if(data?.status){
+        navigate("/user/login")
+        alert(data.message);
+      }
+      
       alert('Registration successful');
     }
   };
@@ -79,7 +90,8 @@ function RegistrationForm() {
         
 
         <h2 className="text-3xl font-bold text-center text-gray-800 light:text-gray-800 dark:text-white mb-6">
-          Create Account
+          Create Account,{isLoading && <span className='text-sm text-gray-400'>Loading...</span>}
+
         </h2>
 
         <form className="space-y-4 relative z-10" onSubmit={handleSubmit} noValidate>
@@ -263,8 +275,10 @@ function LoginForm() {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [stars, setStars] = useState([]);
+  const [login, { isLoading, isError, isSuccess }] = useLoginMutation();
   const formRef = useRef(null);
-
+ const {isAuthenticated}=useSelector(state=>state.authReducer)
+ const navigate=useNavigate()
   useEffect(() => {
     if (formRef.current) {
       const { offsetWidth, offsetHeight } = formRef.current;
@@ -277,6 +291,12 @@ function LoginForm() {
     }
   }, []);
 
+  useEffect(()=>{
+
+    if(isAuthenticated){
+      navigate("/")
+    }
+  },[isAuthenticated])
   const validate = () => {
     const newErrors = {};
     if (!email) newErrors.email = 'Email is required';
@@ -287,9 +307,13 @@ function LoginForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
     if (validate()) {
+      const  user=await login({ email, password })
+        .unwrap()
+        // console.log(user);
+        
       alert('Login successful');
     }
   };

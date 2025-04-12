@@ -1,4 +1,8 @@
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useVerifyQuery } from "./services/store/authServices";
+import { useSelector } from "react-redux";
+import { LoggedUser } from "./slices/store/authSlice";
+import { useEffect } from "react";
 // import { getUser } from "../auth";
 export const getUser = () => {
   return {
@@ -7,15 +11,38 @@ export const getUser = () => {
   };
 };
 const ProtectedRoute = ({ allowedRoles ,children},) => {
-  const { isAuthenticated, role } = getUser();
+  // const { isAuthenticated, role } = getUser();
+  const { isAuthenticated, role } = useSelector(state=>state.authReducer);
+  // const verifyUser=useVerifyQuery();
+  const { data, refetch } = useVerifyQuery(undefined, {
+    refetchOnFocus: true,
+    refetchOnMountOrArgChange: false,
+  })
+  const navigate=useNavigate();
   const location = useLocation();
   const path = location.pathname.split("/")[1];
-console.log(path);
-
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace state={{ from: location }} />;
+// console.log("hello",data,isAuthenticated,role,path);
+// && !location?.pathname=="/user/login"
+useEffect(() => {
+   
+  if(isAuthenticated){
+    location.pathname=="/user/login" && navigate("/");
+    // navigate(`/user/login`,);
   }
+  else{
+    // location.pathname!=="/user/login" && navigate("/user/login");
+    // navigate(`/user/login`);
+  }
+  
+  console.log(data?.isAuthenticated,location,data);
+  return () => {
+
+  }
+}, [isAuthenticated])
+
+
+
+
 
   // if (!allowedRoles.includes(role)) {
   //   return <Navigate to="/" replace />;

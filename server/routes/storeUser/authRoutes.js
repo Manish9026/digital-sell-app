@@ -7,8 +7,9 @@ const router=express.Router();
 
 router.post('/login',Auth.loginUser);
 router.post('/register',Auth.registerUser);
-router.get('/verify',verifyUser)
-router.get('/logout',Auth.logoutUser)
+router.get('/refresh-token',Auth.refreshToken)
+router.get('/verify',verifyUser,Auth.verifyUser)
+router.post('/logout',Auth.logoutUser)
  
 
 export default router

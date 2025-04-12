@@ -4,6 +4,8 @@ import ThemeToggleButton from '../Shared/ThemeToggleButton'
 import { LucideShoppingBag } from 'lucide-react'
 import { PiUserCircleDashedFill } from "react-icons/pi";
 import { Link, NavLink } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import {  useLogoutMutation } from '../../services/store/authServices';
 const navigation = [
   { name: 'Home ', href: '/', current: true },
   { name: 'My Course', href: '/cources', current: false },
@@ -17,6 +19,8 @@ function classNames(...classes) {
 }
 
 export default function Navbar() {
+    const { isAuthenticated, role } = useSelector(state=>state.authReducer);
+   const [logout,{isLoading,isError,isSuccess}]=useLogoutMutation();
   return (
     <Disclosure as="nav" className="scroll-hide bg-gray-800 ">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -76,7 +80,7 @@ export default function Navbar() {
             {
               //  {/* Profile dropdown */}
 
-              0 ? <Menu as="div" className="relative ml-3">
+              isAuthenticated ? <Menu as="div" className="relative ml-3">
                 <div>
                   <MenuButton className="relative flex rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
                     <span className="absolute -inset-1.5" />
@@ -108,13 +112,14 @@ export default function Navbar() {
                       Settings
                     </a>
                   </MenuItem>
-                  <MenuItem>
-                    <a
-                      href="#"
-                      className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+                  <MenuItem >
+                    <button
+                      onClick={() => logout()}
+                      type='button'
+                      className="w-full px-4 py-2 flex text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
                     >
                       Sign out
-                    </a>
+                    </button>
                   </MenuItem>
                 </MenuItems>
               </Menu>
