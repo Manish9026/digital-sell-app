@@ -26,9 +26,43 @@
 html {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
+@theme {
 
+  --color-primary: oklch(12.9% 0.042 264.695);
+  --color-light:oklch(98.4% 0.003 247.858);
+  --color-thicksky: oklch(88.2% 0.059 254.128);
+}
 .primary-p{
   @apply p-4 md:p-6 lg:p-8;
+}
+
+.Toastify__toast-container {
+
+  @apply flex items-center justify-center;
+
+  .Toastify__toast-theme--light {
+      /* // background: #101029c2;
+      //     color: white; */
+  }
+
+  .Toastify__toast {
+      @media screen and (max-width: 768px) {
+        top: -20px;
+        width: 300px;
+        /* // left: 50%;
+        // transform: translate(-50%); */
+        border-radius: 10px;
+        background: #101029;
+        color: white;
+        text-transform: capitalize;
+        
+      }
+
+  }
+  .Toastify__close-button{
+      color: #e4fbff;
+
+  }
 }
 a {
 

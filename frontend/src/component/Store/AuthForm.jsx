@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { lazy, useEffect, useRef, useState } from 'react';
 import { motion,AnimatePresence } from 'framer-motion';
 import { FaGoogle, FaFacebookF, FaInstagram } from 'react-icons/fa';
 import { MdEmail, MdLock, MdPerson, MdStarRate } from 'react-icons/md';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLoginMutation, useRegisterMutation } from '../../services/store/authServices';
 import { useSelector } from 'react-redux';
-
+const LoadingScreen=lazy(()=>import('../Shared/LoadingComponent').then(module=>({default:module.LoadingScreen})));
 function RegistrationForm() {
   const [formData, setFormData] = useState({
     firstName: '',
@@ -52,13 +52,11 @@ function RegistrationForm() {
     e.preventDefault();
     if (validate()) {
       const data= await register(formData).unwrap();
-      console.log(data);
+
       if(data?.status){
         navigate("/user/login")
-        alert(data.message);
       }
-      
-      alert('Registration successful');
+
     }
   };
 
@@ -67,7 +65,7 @@ function RegistrationForm() {
   };
 
   return (
-    <div  ref={formRef} className="primary-p min-h-screen flex items-center justify-center relative overflow-hidden  bg-gradient-to-br from-gray-800 via-gray-900 to-black">
+    <div  ref={formRef} className="primary-p min-h-screen flex items-center justify-center relative overflow-hidden  bg-gradient-to-br from-primary via-gray-900 to-black">
       <div className="absolute text-slate-200 inset-0 z-0 pointer-events-none overflow-hidden">
           {stars.map((star, i) => (
             <motion.div
@@ -87,7 +85,7 @@ function RegistrationForm() {
         transition={{ duration: 0.5 }}
         className="relative z-10 shadow-2xl rounded-2xl p-8 w-full max-w-md bg-gradient-to-tr light:from-slate-500 light:via-indigo-100 light:to-slate-500 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 overflow-hidden"
       >
-        
+        {isLoading && <LoadingScreen title={"Adding detail, Kindly wait..."} />}
 
         <h2 className="text-3xl font-bold text-center text-gray-800 light:text-gray-800 dark:text-white mb-6">
           Create Account,{isLoading && <span className='text-sm text-gray-400'>Loading...</span>}
@@ -310,16 +308,16 @@ function LoginForm() {
   const handleSubmit = async(e) => {
     e.preventDefault();
     if (validate()) {
-      const  user=await login({ email, password })
+      await login({ email, password })
         .unwrap()
         // console.log(user);
         
-      alert('Login successful');
+      // alert('Login successful');
     }
   };
 
   return (
-    <div ref={formRef} className="min-h-screen flex items-center primary-p justify-center relative overflow-hidden bg-gradient-to-br from-gray-800 via-gray-900 to-black">
+    <div ref={formRef} className="min-h-screen flex items-center primary-p justify-center relative overflow-hidden bg-gradient-to-br from-primary via-gray-900 to-black">
        <div className="absolute text-slate-200 inset-0 z-0 pointer-events-none overflow-hidden">
           {stars.map((star, i) => (
             <motion.div
@@ -342,7 +340,7 @@ function LoginForm() {
         transition={{ duration: 0.5 }}
         className="relative z-10 shadow-2xl rounded-2xl p-8 w-full max-w-md bg-gradient-to-tr light:from-slate-500 light:via-indigo-100 light:to-slate-500  dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 overflow-hidden"
       >
-       
+       {isLoading && <LoadingScreen title={"Validating,Kindly wait..."} />}
 
         <h2 className="text-3xl font-bold text-center light:text-gray-800 dark:text-white mb-6">
           Welcome Back

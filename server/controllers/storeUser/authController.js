@@ -24,7 +24,7 @@ export class Auth  {
             }
           const existingUser = await storeUserModel.findOne({ userEmail });
           if (existingUser) {
-            return badResponse({res,status:409,message:"Email already in use"}) 
+            return badResponse({res,statusCode:409,message:"Email already in use"}) 
           }
       
           const hashedPassword = await bcrypt.hash(password, 10);
@@ -36,7 +36,7 @@ export class Auth  {
             password: hashedPassword,
           });
       
-          goodResponse({res,statusCode:201,message:"User created successfully",data:newUser})
+          goodResponse({res,statusCode:201,message:"Successfully registered",data:newUser})
         //   res.status(201).json({ message: "User registered", userId: newUser._id });
         } catch (error) {
           console.log(error);
@@ -54,11 +54,13 @@ export class Auth  {
         console.log("login,",req.body,"");
       
         if(!(userEmail || password))
-            return res.status(400).json({ message: "Email and password are required" });
+            return badResponse({res,message:"All fields are required",statusCode:400})
+         
 
         const user = await storeUserModel.findOne({ userEmail });
         if (!user || !(await bcrypt.compare(password, user.password))) {
-          return res.status(401).json({ message: "Invalid credentials" });
+          return badResponse({res,message:"Please fill valid credential",statusCode:400}) 
+          
         }
       
         const accessToken = generateToken({userId:user._id, userRole:user.role}, "30m");
@@ -162,7 +164,8 @@ export class Auth  {
     res.clearCookie("accessToken");
     res.clearCookie("refreshToken");
   
-    res.status(200).json({ message: "Logged out successfully" });
+    goodResponse({res,statusCode:200,message:"Logged out successfully",data:{isAuthenticated:false}})
+    // res.status(200).json({ message: "Logged out successfully" });
   };
   static verifyUser = async (req, res) => {
     try {

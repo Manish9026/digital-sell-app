@@ -6,6 +6,8 @@ import App from './App'
 import PaymentSuccessPage, { PaymentWaiting } from './component/PaymentSuccess'
 import  Layout  from './Layout'
 import ProtectedRoute from './ProtectedRoute'
+import LoadingScreen from './component/Shared/LoadingComponent'
+import ProductPage from './pages/store/ProductPage'
 // import { LoginForm, RegistrationForm } from './component/Store/AuthForm'
 const DashboardHome=lazy(()=>import('./pages/dasboard/Home'));
 const LoginForm =lazy(()=>import('./component/Store/AuthForm').then(module=>({default:module.LoginForm})));
@@ -55,7 +57,13 @@ export function RoutesProvider() {
           {
               path:"/user/payment-waiting",
               element:<PaymentWaiting/>
-            },{
+            },
+
+            {
+              path:'/loading',
+              element:<ProductPage/>
+            },
+            {
               path:"*",
               element:<NotFoundPage/>
             }]

@@ -3,6 +3,8 @@ import { createApi } from '@reduxjs/toolkit/query/react'
 import { fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { url } from '../../utils/service'
 import { logout, setCredentials } from '../../slices/store/authSlice'
+import { notify } from '../../utils/notification'
+import { toast } from 'react-toastify'
 
 const baseQuery = fetchBaseQuery({
   baseUrl: `${url}/api`, // ⬅️ update this to your API base
@@ -44,10 +46,12 @@ export const authApi = createApi({
       }),
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
-            const { data } = await queryFulfilled
+            const { data } = await queryFulfilled;
             dispatch(setCredentials(data?.['data']))
+            notify({message:data?.message, type:"success",status:data?.status})
         } catch (err) {
-          console.error('Login error:', err)
+            const {error} = err
+            notify({message:error?.data?.message, type:"error",status:error?.data?.status});
         }
       },
     }),
@@ -57,14 +61,17 @@ export const authApi = createApi({
           method: 'POST',
           body: credentials,
         }),
-        async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        // transformErrorResponse: (error) => {
+        //     notify({message:error?.data?.message, type:"error",status:error?.data?.status})
+        //     return error
+        //   },
+        async onQueryStarted(arg, { dispatch, queryFulfilled, }) {
           try {
-            // const { data } = await queryFulfilled
-            // console.log("service",data);
-            
-            // dispatch(setCredentials(data?.['data']))
+            const { data } = await queryFulfilled
+            notify({message:data?.message, type:"success",status:data?.status})
           } catch (err) {
-            console.error('Login error:', err)
+            const {error} = err
+            notify({message:error?.data?.message, type:"error",status:error?.data?.status})
           }
         },
       }),
@@ -76,10 +83,13 @@ export const authApi = createApi({
 
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
-
+            const { data } = await queryFulfilled
+            notify({message:data?.message, type:"success",status:data?.status})
           dispatch(logout());
         } catch (err) {
-          console.error('logout error:', err)
+            const {error} = err
+            notify({message:error?.data?.message, type:"error",status:error?.data?.status})
+        //   console.error('logout error:', err)
         }
       },
     }),

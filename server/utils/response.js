@@ -2,7 +2,7 @@ export const goodResponse = ({res, statusCode=201,status=true, message="successf
     return res.status(statusCode).json({
         message,
         statusCode,
-        data,
+        data:{isAuthenticated:true,...data},
         status
     })
 }
@@ -11,7 +11,7 @@ export const badResponse = ({res, statusCode=401,status=false,error=[], message=
         message,
         status,
         statusCode,
-        data,
+        data:{isAuthenticated:false,...data},
         error,
     })
 }

@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 import {  useLogoutMutation } from '../../services/store/authServices';
 const navigation = [
   { name: 'Home ', href: '/', current: true },
-  { name: 'My Course', href: '/cources', current: false },
+  { name: 'My Course', href: '/loading', current: false },
   { name: 'Orders', href: '#', current: false },
   { name: 'Cources', href: '#', current: false },
   { name: 'Calendar', href: '#', current: false },
@@ -22,7 +22,7 @@ export default function Navbar() {
     const { isAuthenticated, role } = useSelector(state=>state.authReducer);
    const [logout,{isLoading,isError,isSuccess}]=useLogoutMutation();
   return (
-    <Disclosure as="nav" className="scroll-hide bg-gray-800 ">
+    <Disclosure as="nav" className="scroll-hide border-b border-light light:bg-light dark:bg-primary bg-gray-800 ">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
@@ -64,14 +64,14 @@ export default function Navbar() {
           <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
             <button
               type="button"
-              className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden"
+              className="relative rounded-full light:bg-light dark:bg-primary hover:text-white light:hover:text-gray-900 light:text-gray-500  p-1  text-gray-300 focus:ring-1 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-900 focus:outline-hidden"
             >
               <span className="absolute -inset-1.5" />
               <span className="sr-only">View notifications</span>
               <BellIcon aria-hidden="true" className="size-6" />
             </button>
 
-            <span className='p-1 border-b border-l rounded gap-1 flex items-center justify-center bg-gray-800 cursor-pointer text-gray-400 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden'>
+            <span className='p-1 border-b border-l rounded gap-1 flex items-center justify-center light:bg-light dark:bg-primary hover:text-thicksky light:hover:text-gray-900 light:text-gray-500 cursor-pointer text-gray-300 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden'>
 
               <LucideShoppingBag className='size-[20px]' />
               <p className='text-sm'>0</p>
@@ -127,7 +127,7 @@ export default function Navbar() {
                 // {/* login menu */}
                 <Menu as="div" className="relative ml-3">
                   <div>
-                    <MenuButton className="relative flex rounded-full text-gray-400 bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 ">
+                    <MenuButton className="relative flex rounded-full light:bg-light dark:bg-primary hover:text-thicksky light:hover:text-gray-900 light:text-gray-500 text-gray-400 bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 ">
                       <span className="absolute -inset-1.5" />
                       <span className="sr-only">Open user menu</span>
 
@@ -146,7 +146,7 @@ export default function Navbar() {
                     <MenuItem >
                       <Link
                         to={"/user/login"}
-                        className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+                        className="block px-4 py-2 text-sm dark:text-sky-200 text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
                       >
 🔐 Login
                       </Link>
@@ -154,7 +154,7 @@ export default function Navbar() {
                     <MenuItem >
                       <Link
                         to={"/user/register"}
-                        className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+                        className="block px-4 py-2 text-sm dark:text-sky-200 text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
                       >
 🧾 Register
                       </Link>
