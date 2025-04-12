@@ -187,7 +187,7 @@ function Home() {
     <div className='flex-1 p-5 flex min-h-full flex-col pb-10 light:text-slate-800 light:bg-light dark:bg-primary dark:text-slate-200 '>
         <h1 className='text-2xl font-bold text-center  mt-10'>Welcome to the Home Page</h1>
        
- 
+ <img src='https://drive.google.com/thumbnail?id=148MIv8M7SpkB4b0NzD---xBREwR2M3Ey' className='flex'/>
 
 <div className="flex flex-wrap gap-4 justify-center mt-10">
 <ProductCard/>

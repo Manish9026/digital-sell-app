@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { connectDashboardDB, connectStoreUserDB } from "../DBconfig/DB.config.js";
 
 
 const sessionSchema = new mongoose.Schema({
@@ -66,5 +67,5 @@ const adminUserSchema=mongoose.Schema({
     accessToken:String,
 })
 
-export const adminUserModel=mongoose.model("adminUser",adminUserSchema)
-export const storeUserModel = mongoose.model("storeUser", storeUserSchema);
+export const adminUserModel=connectDashboardDB.model("adminUser",adminUserSchema)
+export const storeUserModel = connectStoreUserDB.model("storeUser", storeUserSchema);

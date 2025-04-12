@@ -12,7 +12,7 @@ function Layout({role}) {
 
     </div>
     :
-    <div className='bg-slate-100 scroll-auto min-h-screen min-w-screen'>
+    <div className='bg-slate-100 flex flex-col scroll-auto min-h-screen min-w-screen'>
     {/* <h1>dashboard</h1> */}
     <Navbar/>
         <Outlet/>
