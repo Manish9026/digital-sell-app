@@ -7,22 +7,23 @@ import { useNavigate } from 'react-router-dom';
 import { url } from '../../utils/service';
 import { useThrottle } from '../../hooks/useThrottleClick';
 import CustomText from '../../component/Shared/CustomText';
-export  function ProductCard() {
+import { useGetProductsQuery } from '../../services/store/productServices';
+export function ProductCard({product}) {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const navigate = useNavigate();
-  const useThrottleClick=useThrottle(1000);
+  const useThrottleClick = useThrottle(1000);
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.async = true;
     document.body.appendChild(script);
   }, []);
-  const handlePayment = async (email,productName,fileId) => {
+  const handlePayment = async (email, productName, fileId) => {
     const { data: order } = await axios.post(`${url}/api/payment/create-order`, {
       amount: 1,
-    },{withCredentials:true});
-console.log(order,import.meta.env.VITE_RAZORPAY_KEY_ID);
+    }, { withCredentials: true });
+    console.log(order, import.meta.env.VITE_RAZORPAY_KEY_ID);
 
     const options = {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID, // from env
@@ -32,10 +33,10 @@ console.log(order,import.meta.env.VITE_RAZORPAY_KEY_ID);
       description: "Test Transaction",
       order_id: order.id,
       handler: async function (response) {
-        navigate("/user/payment-waiting",{
-          loading:true
+        navigate("/user/payment-waiting", {
+          loading: true
         })
-       const result= await axios.post(`${url}/api/payment/verify-order`, {
+        const result = await axios.post(`${url}/api/payment/verify-order`, {
           paymentId: response.razorpay_payment_id,
           orderId: response.razorpay_order_id,
           signature: response.razorpay_signature,
@@ -43,11 +44,11 @@ console.log(order,import.meta.env.VITE_RAZORPAY_KEY_ID);
           productName,
           fileId
         });
-        if(result.data.status){
-          navigate("/user/payment-success",{
-            state:{
+        if (result.data.status) {
+          navigate("/user/payment-success", {
+            state: {
               email,
-              productName,orderId:response.razorpay_order_id,
+              productName, orderId: response.razorpay_order_id,
             }
           })
         }
@@ -67,7 +68,8 @@ console.log(order,import.meta.env.VITE_RAZORPAY_KEY_ID);
     const rzp = new window.Razorpay(options);
     rzp.open();
   };
-  const handleBuyNow = async () => {``
+  const handleBuyNow = async () => {
+
     const email = prompt("Please enter your email address:");
     if (!email) {
       alert("Email is required to proceed.");
@@ -75,7 +77,7 @@ console.log(order,import.meta.env.VITE_RAZORPAY_KEY_ID);
     }
     // const email="ashishmaurya061155@gmail.com"
     try {
-      handlePayment(email,"candle_patern","148MIv8M7SpkB4b0NzD---xBREwR2M3Ey");
+      handlePayment(email, product?.title,product?.files[0]?.id);
     } catch (error) {
       console.error(error);
       alert("An error occurred while processing your request.");
@@ -88,17 +90,18 @@ console.log(order,import.meta.env.VITE_RAZORPAY_KEY_ID);
     "  His expertise extends to market analysis and strategy, grounded in a strong academic background in Finance and Economics. As a Senior Writer, Steven offers valuable insights through his clear and practical financial reports on all things trading. Beyond work, he has a keen interest in digital currencies and financial history.";
 
   return (
-    <div className="max-w-[250px]  flex-col flex  md:max-h-[400px] max-h-[500px] flex-1 mx-auto mt-10 bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 transform transition-transform duration-300 hover:shadow-xl">
+    <div className="max-w-[250px] min-w-[160px] flex-col flex  md:max-h-[400px] max-h-[350px] flex-1 bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 transform transition-transform  duration-300 hover:shadow-xl">
       {/* Thumbnail */}
       <img
-        src="https://www.morpher.com/blog/optimizedImages/httpsi0wpcommorpherhomewpcomstagingcomwpcontentuploads202407Untitleddesign6pngw600h380.webp"
+        src={ `https://drive.google.com/thumbnail?id=${product?.thumbnails[0]?.id}` || "https://www.morpher.com/blog/optimizedImages/httpsi0wpcommorpherhomewpcomstagingcomwpcontentuploads202407Untitleddesign6pngw600h380.webp"}
         alt="Product Thumbnail"
-        className="w-full min-h-[100px] max-h-[50%] object-fill"
+        loading='lazy'
+        className="w-full md:max-h-[120px] max-h-[100px]  object-contain bg-gray-400/20"
       />
 
       <div className="p-4 flex-1 flex flex-col gap-2 md:max-xl:gap-4">
         {/* Title */}
-        <CustomText size='h5' title="full candle pattern book" className='text-start font-semibold capitalize text-gray-800'/>
+        <CustomText size='h5' title={product?.title} className='text-start font-semibold capitalize text-gray-800' />
 
         {/* Description (short with toggle) */}
         {/* <div className="text-sm  text-gray-600">
@@ -146,39 +149,39 @@ console.log(order,import.meta.env.VITE_RAZORPAY_KEY_ID);
 
         {/* Price Section */}
         <div className="flex flex-wrap items-center justify-between ">
-          <CustomText size='h4' title="₹899" className='text-xl font-bold text-indigo-600'/>
-          <CustomText  title="₹1299" className='text-sm text-gray-400 line-through'/>
+          <CustomText size='h4' title={`₹${product?.actualPrice}` || "₹899" }className='text-xl font-bold text-indigo-600' />
+          <CustomText title={`₹${product?.price}` || "₹1299"} className='text-sm text-gray-400 line-through' />
           {/* <p className="text-sm text-gray-400 line-through">₹1299</p> */}
-          <CustomText  title="30% OFF" className='text-sm font-semibold text-green-600'/>
+          <CustomText title={`${product?.discountPercent}% OFF` || "30% OFF"} className='text-sm font-semibold text-green-600' />
         </div>
 
-  {/* <span className=""></span> */}
-  {/* <input type="email" placeholder='Ex: username@gmail.com' className='placeholder:text-slate-200 text-slate-200 bg-slate-600 outline-hidden w-full p-2 rounded-md' onChange={(e)=>setUserEmail(e.target.value)} value={userEmail} /> */}
+        {/* <span className=""></span> */}
+        {/* <input type="email" placeholder='Ex: username@gmail.com' className='placeholder:text-slate-200 text-slate-200 bg-slate-600 outline-hidden w-full p-2 rounded-md' onChange={(e)=>setUserEmail(e.target.value)} value={userEmail} /> */}
         {/* Buttons */}
         <div className="flex gap-2 md:flex-row flex-col">
-  <motion.button
-    whileTap={{ scale: 0.95 }}
-    whileHover={{ scale: 1.05 }}
-    className="flex-1 inline-flex items-center justify-center bg-indigo-600 text-white py-2 px-4 max-h-[50px] rounded-xl transition-all duration-300 font-medium "
-    onClick={()=>useThrottleClick(handleBuyNow)}
-  >
-    Buy Now
-  </motion.button>
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.05 }}
+            className="flex-1 inline-flex items-center justify-center bg-indigo-600 text-white py-2 px-4 max-h-[50px] rounded-xl transition-all duration-300 font-medium "
+            onClick={() => useThrottleClick(handleBuyNow)}
+          >
+            Buy Now
+          </motion.button>
 
-  <motion.button
-    whileTap={{ scale: 0.97 }}
-    whileHover={{ scale: 1.03 }}
-    className="flex-1 inline-flex items-center justify-center border border-indigo-600 text-indigo-600 py-2 px-4 rounded-xl transition-all duration-300 font-medium will-change-transform max-h-[50px]  bg-white hover:bg-indigo-50"
-  >
-   <CustomText title="Add to Cart" className='text-indigo-600 text-sm font-medium'/>
-  </motion.button>
-</div>
+          <motion.button
+            whileTap={{ scale: 0.97 }}
+            whileHover={{ scale: 1.03 }}
+            className="flex-1 inline-flex items-center justify-center border border-indigo-600 text-indigo-600 py-2 px-4 rounded-xl transition-all duration-300 font-medium will-change-transform max-h-[50px]  bg-white hover:bg-indigo-50"
+          >
+            <CustomText title="Add to Cart" className='text-indigo-600 text-sm font-medium' />
+          </motion.button>
+        </div>
       </div>
     </div>
   );
 }
 const RazorpayButton = () => {
- 
+
 
   return <button onClick={handlePayment}>Pay with Razorpay</button>;
 };
@@ -188,10 +191,11 @@ const RazorpayButton = () => {
 // import { motion } from 'framer-motion';
 
 // const tabs = ['Overview', 'Courses', 'Reviews'];
-
 const tabs = ['Overview', 'Courses', 'Reviews'];
 
- function AnimatedTabs() {
+
+
+function AnimatedTabs() {
   const [activeTab, setActiveTab] = useState('Overview');
   const [darkMode, setDarkMode] = useState(false);
 
@@ -215,11 +219,10 @@ const tabs = ['Overview', 'Courses', 'Reviews'];
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`relative z-10 flex-1 text-center px-4 py-2 font-semibold transition-colors duration-300 rounded-lg ${
-                  activeTab === tab
+                className={`relative z-10 flex-1 text-center px-4 py-2 font-semibold transition-colors duration-300 rounded-lg ${activeTab === tab
                     ? 'text-white'
                     : 'text-gray-700 dark:text-gray-300'
-                }`}
+                  }`}
               >
                 {activeTab === tab && (
                   <motion.div
@@ -251,20 +254,47 @@ const tabs = ['Overview', 'Courses', 'Reviews'];
   );
 }
 
+
+const ProductSection=()=>{
+ const { data, refetch,isLoading } = useGetProductsQuery(undefined, {
+    refetchOnFocus: true,
+    refetchOnMountOrArgChange: false,
+  })
+
+  // console.log(data);
+  
+
+  return(
+    <section className=' flex overflow-hidden  flex-col w-full  gap-4'>
+
+  <h2 className='h2 capitalize '>products</h2>
+
+  <span className='flex gap-4 flex-1 w-full overflow-auto'>
+  { isLoading?<span className='flex-1 center w-full h-[200px]'> Loading ....</span>:
+     data && data?.data?.product.map((product,id)=>{
+
+        return <ProductCard key={id} product={product}/>
+      })
+    }
+  </span>
+   
+    </section>
+  )
+}
 function Home() {
 
   return (
     <div className='flex-1 p-5 flex min-h-full flex-col pb-10 light:text-slate-800 light:bg-light dark:bg-primary dark:text-slate-200 '>
-        <h1 className='text-2xl font-bold text-center  mt-10'>Welcome to the Home Page</h1>
-       
- {/* <img src='https://drive.google.com/thumbnail?id=148MIv8M7SpkB4b0NzD---xBREwR2M3Ey' className='flex'/> */}
+      <h1 className='text-2xl font-bold text-center  mt-10'>Welcome to the Home Page</h1>
 
-<div className="flex flex-wrap gap-4 justify-center mt-10">
-<ProductCard/>
-<ProductCard/>
-<AnimatedTabs/>
-</div>
-      
+      {/* <img src='https://drive.google.com/thumbnail?id=148MIv8M7SpkB4b0NzD---xBREwR2M3Ey' className='flex'/> */}
+
+      <div className="flex flex-wrap gap-4 justify-center mt-10">
+      <ProductSection/>
+        
+        {/* <AnimatedTabs /> */}
+      </div>
+
 
     </div>
   )
@@ -272,8 +302,8 @@ function Home() {
 
 export default Home
 
- 
-        {/* <span className='center flex-col gap-2'>
+
+{/* <span className='center flex-col gap-2'>
           <h1 className='h1'>Lorem, ipsum dolor.</h1>
           <h2 className='h2'>Lorem, ipsum dolor.</h2>
           <h3 className='h3'>Lorem, ipsum dolor.</h3>

@@ -5,6 +5,11 @@ import mongoose from "mongoose";
 
 
 const fileSchema = new mongoose.Schema({
+  id: {
+    type: String, // Google Drive file ID
+    required: true,
+  },
+  thumbnailLink: String,
   name: String,
   mimeType: String,
   driveFileId: String,
@@ -12,18 +17,36 @@ const fileSchema = new mongoose.Schema({
   downloadLink: String,
 });
 
-const courseSchema = new mongoose.Schema(
+const productSchema = new mongoose.Schema(
   {
+    prdId: {
+      type: mongoose.Schema.Types.ObjectId, default: () => new mongoose.Types.ObjectId,
+      require: true, alias: "_id"
+  },
     title: { type: String, required: true },
     description: String,
     category: String,
     price: { type: Number, required: true, default: 0 },
+    discountPrice: { type: Number, default: 0 },
+    discountPercent: { type: Number, default: 0 },
+    actualPrice:{ type: Number, default: 0 },
+    couponCode: { type:[
+      { code: String, discountPercentage: Number, expiryDate: Date }
+    ] 
+      , default: [] },
 
+    paidUser:{
+      type:[{
+        userId:mongoose.Schema.Types.ObjectId,
+        email:String,
+      }],
+      default: [],
+
+      },
     instructor: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
-
     folder: {
         name: String,
         id:{
@@ -43,4 +66,4 @@ const courseSchema = new mongoose.Schema(
   }
 );
 
-export const courseModel = connectDashboardDB.model('Course', courseSchema);
+export const productModel = connectDashboardDB.model('digital-product', productSchema);

@@ -7,7 +7,8 @@ import path from 'path';
 import fs from 'fs';
 import { GoogleApis ,google} from 'googleapis';
 import mime from 'mime-types';
-import { courseModel } from '../../models/dashboardModel.js';
+import { productModel } from '../../models/dashboardModel.js';
+import { badResponse, goodResponse } from '../../utils/response.js';
 
 const getDriveService =async () => {
 const SCOPE = "https://www.googleapis.com/auth/drive";
@@ -28,10 +29,10 @@ export class DriveController  {
   }
 
 
-  static createCourseFolder = async (courseName) => {
+  static createProductFolder = async (prdName) => {
     const drive = await getDriveService();
     const folderMetadata = {
-      name: courseName,
+      name: prdName,
       mimeType: 'application/vnd.google-apps.folder',
     };
   
@@ -42,6 +43,8 @@ export class DriveController  {
   
     return folder.data.id;
   };
+
+
   static uploadSingleFile = async (filePath, fileName, folderId, isPublic = false) => {
     const drive = await getDriveService();
     const fileMetadata = {
@@ -74,7 +77,7 @@ export class DriveController  {
   
     const result = await drive.files.get({
       fileId,
-      fields: 'id, name, mimeType, webViewLink, webContentLink',
+      fields: 'id, name, mimeType, webViewLink, webContentLink,thumbnailLink',
     });
   
     return {
@@ -82,15 +85,21 @@ export class DriveController  {
       name: result.data.name,
       mimeType: result.data.mimeType,
       viewLink: result.data.webViewLink,
+   thumbnailLink:isPublic && result.data.thumbnailLink,
       downloadLink: `https://drive.google.com/uc?export=download&id=${result.data.id}`,
     };
   };
   static uploadOnDrive=  async (req, res) => {
     try {
-      const { title, description, category, price } = req.body;
+      const { title, description, category, price ,discountPercent,discountPrice,actualPrice} = req.body;
+console.log(title, description, category, price);
 
+      // console.log('Request body:', req.body,name);
+      // console.log('Files:', req.files);
+      // return 
+      
       // 1. Create Google Drive folder
-      const folderId = await createCourseFolder(title);
+      const folderId = await this.createProductFolder(title);
 
       const thumbnails = [];
       const files = [];
@@ -98,7 +107,7 @@ export class DriveController  {
       // 2. Upload thumbnails (public)
       if (req.files['thumbnails']) {
         for (const file of req.files['thumbnails']) {
-          const meta = await uploadSingleFile(file.path, file.originalname, folderId, true);
+          const meta = await this.uploadSingleFile(file.path, file.originalname, folderId, true);
           thumbnails.push(meta);
           fs.unlinkSync(file.path);
         }
@@ -107,31 +116,47 @@ export class DriveController  {
       // 3. Upload course files (private)
       if (req.files['files']) {
         for (const file of req.files['files']) {
-          const meta = await uploadSingleFile(file.path, file.originalname, folderId, false);
+          const meta = await this.uploadSingleFile(file.path, file.originalname, folderId, false);
           files.push(meta);
           fs.unlinkSync(file.path);
         }
       }
 
+      console.log('Thumbnails:', thumbnails);
+      console.log('Files:', files);
+      
       // 4. Save to DB
-      const newCourse = await Course.create({
+      const newProduct = await productModel.create({
         title,
         description,
         category,
         price,
-        folderId,
+        'folder.id': folderId,
+        discountPercent,discountPrice,
         thumbnails,
         files,
+        actualPrice
         // instructor: req.user._id  // Add if using auth
       });
 
-      res.status(201).json({ success: true, course: newCourse });
+      res.status(201).json({ success: true, product: newProduct });
     } catch (err) {
       console.error('Error creating course:', err);
       res.status(500).json({ success: false, message: 'Server error' });
     }
   }
 
+  static getAllProducts=async(req,res)=>{
+    try {
+      const product=await productModel.find();
+      if(product.length>0){
+        return goodResponse({res,message:"record founded !!",data:{product},statusCode:200})
+      }
+      return badResponse({res,message:"no produsct are avalavial at this movement !!"})
+    } catch (error) {
+      return badResponse({res,statusCode:500,message:"sever error"})
+    }
+  }
   async getDriveData(req, res) {
     try {
       const driveData = await this.driveService.getDriveData();

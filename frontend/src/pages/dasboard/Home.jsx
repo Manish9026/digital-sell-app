@@ -5,7 +5,8 @@ import React, { useEffect, useState } from 'react';
 // import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ImageIcon, FileVideo2, FileAudio, FileText, Upload } from 'lucide-react';
-
+import axios from 'axios';
+import { url } from '../../utils/service';
 const FileTypeIcon = ({ type }) => {
   if (type.startsWith("image/")) return <ImageIcon className="text-blue-400" />;
   if (type.startsWith("video/")) return <FileVideo2 className="text-pink-400" />;
@@ -85,6 +86,8 @@ import {
   Plus,
   Trash2,
 } from "lucide-react";
+import { LoadingScreen } from '../../component/Shared/LoadingComponent';
+import { toast } from 'react-toastify';
 
 const AnimatedInput = ({ label, icon: Icon,inputClass,lableClass,containerClass ,...props }) => (
   <div className="space-y-1 w-full">
@@ -104,6 +107,7 @@ const CourseUploadForm = () => {
   const [courseFiles, setCourseFiles] = useState([]);
   const [coupons, setCoupons] = useState([]);
   const [couponInput, setCouponInput] = useState("");
+  const [isLoading,setIsLoading]=useState(false)
   const [form, setForm] = useState({
     name: "",
     category: "",
@@ -111,6 +115,7 @@ const CourseUploadForm = () => {
     price: "",
     discountPrice: "",
     discountPercent: "",
+    priceConvertType:null
   });
 
   useEffect(() => {
@@ -119,19 +124,28 @@ const CourseUploadForm = () => {
     const discountNum = parseFloat(discountPrice);
     const percentNum = parseFloat(discountPercent);
 
-    if (priceNum && discountNum && !discountPercent) {
-      const percent = ((priceNum - discountNum) / priceNum) * 100;
-      setForm((prev) => ({ ...prev, discountPercent: percent.toFixed(2) }));
-    }
 
-    if (priceNum && percentNum && !discountPrice) {
-      const discount = priceNum - (priceNum * percentNum) / 100;
-      setForm((prev) => ({ ...prev, discountPrice: discount.toFixed(2) }));
+    const timeout =setTimeout(()=>{
+      if (priceNum && form?.priceConvertType==="discountPrice") {
+        const percent = ((discountNum ) / priceNum) * 100;
+        setForm((prev) => ({ ...prev, discountPercent:percent? percent.toFixed(2):0 }));
+      }
+  
+      if (priceNum && form?.priceConvertType==="discountPercent") {
+      const discount = (( percentNum / 100) * priceNum );
+      setForm((prev) => ({ ...prev, discountPrice:discount? discount.toFixed(2) : 0 }));
     }
+    },1000)
+  
+    
+    return ()=>clearTimeout(timeout)
   }, [form.price, form.discountPrice, form.discountPercent]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log(name);
+    if(name === "discountPrice" | name=="discountPercent")
+      return setForm((prev) => ({ ...prev, [name]: value,priceConvertType:name }));
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -159,19 +173,44 @@ const CourseUploadForm = () => {
     setter((prev) => prev.filter((_, index) => index !== i));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
     console.log("Form:", form);
     console.log("Thumbnails:", thumbnails);
     console.log("Files:", courseFiles);
+    const formData = new FormData();
+    formData.append('title', form.name);
+    formData.append('description', form.description);
+    formData.append('category', form.category);
+    formData.append('price',  form.price);
+    formData.append('discountPrice',form.discountPrice);
+    formData.append("discountPercent",form.discountPercent)
+    formData.append("actualPrice",(form.price - form.discountPrice).toFixed(2))
+
+    for (const file of thumbnails) formData.append('thumbnails', file);
+    for (const file of courseFiles) formData.append('files', file);
+    setIsLoading(true)
+  await axios.post(`http://localhost:2000/api/dashboard/drive/upload-products`, formData,{headers: { 'Content-Type': 'multipart/form-data' }}).then((res)=>{
+      console.log(res.data);
+    setIsLoading(false)
+    toast.success("✅✅ Product detail uploaded !!")
+
+    }
+  ).catch((err)=>{
+    console.log(err);
+    setIsLoading(false)
+    toast.error("❌ Product not uploaded !!")
+    
+  })
+   
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-6xl flex flex-col w-full p-4 sm:p-6 lg:p-10 bg-white dark:bg-gray-900 shadow-xl rounded-xl space-y-6"
+      className="max-w-6xl flex flex-col w-full p-4 sm:p-6 lg:p-10 bg-white dark:bg-gray-900 shadow-xl rounded-xl space-y-6 relative overflow-hidden"
     >
-     
+   { isLoading && <LoadingScreen title={"Uploading on you drive, waiting...."}/>}
       <h2 className="text-2xl mb-10 font-bold text-center text-gray-800 dark:text-white">Create Course</h2>
 <div className="lg:grid lg:grid-cols-2 flex-1 gap-6">
 <div className="grid grid-cols2 gap-2 lg:max-h-[600px]   min-h-[500px]">

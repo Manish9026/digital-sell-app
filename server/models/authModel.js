@@ -67,5 +67,5 @@ const adminUserSchema=mongoose.Schema({
     accessToken:String,
 })
 
-export const adminUserModel=connectDashboardDB.model("adminUser",adminUserSchema)
+export const adminUserModel=connectDashboardDB.model("admin-User",adminUserSchema)
 export const storeUserModel = connectStoreUserDB.model("storeUser", storeUserSchema);
