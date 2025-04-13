@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from "framer-motion";
 import axios from 'axios';
+import { Moon, Sun } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { url } from '../../utils/service';
 import { useThrottle } from '../../hooks/useThrottleClick';
@@ -181,17 +182,87 @@ const RazorpayButton = () => {
 
   return <button onClick={handlePayment}>Pay with Razorpay</button>;
 };
+
+
+// import { useState } from 'react';
+// import { motion } from 'framer-motion';
+
+// const tabs = ['Overview', 'Courses', 'Reviews'];
+
+const tabs = ['Overview', 'Courses', 'Reviews'];
+
+ function AnimatedTabs() {
+  const [activeTab, setActiveTab] = useState('Overview');
+  const [darkMode, setDarkMode] = useState(false);
+
+  return (
+    <div className={darkMode ? 'dark' : ''}>
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-300 p-6">
+        {/* Theme Toggle */}
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className="p-2 rounded-full bg-gray-200 dark:bg-gray-800 hover:scale-105 transition"
+          >
+            {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
+        </div>
+
+        <div className="w-full max-w-md mx-auto">
+          {/* Tabs */}
+          <div className="relative flex bg-gray-200 dark:bg-gray-800 p-1 rounded-xl">
+            {tabs.map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`relative z-10 flex-1 text-center px-4 py-2 font-semibold transition-colors duration-300 rounded-lg ${
+                  activeTab === tab
+                    ? 'text-white'
+                    : 'text-gray-700 dark:text-gray-300'
+                }`}
+              >
+                {activeTab === tab && (
+                  <motion.div
+                    layoutId="tab-indicator"
+                    className="absolute inset-0 bg-blue-600 dark:bg-blue-500 rounded-lg z-0"
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  />
+                )}
+                <span className="relative z-10">{tab}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Content */}
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="mt-6 p-5 rounded-xl shadow bg-white dark:bg-gray-800"
+          >
+            {activeTab === 'Overview' && <p>This is the Overview tab content.</p>}
+            {activeTab === 'Courses' && <p>All your Courses are listed here.</p>}
+            {activeTab === 'Reviews' && <p>Check out Reviews here.</p>}
+          </motion.div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Home() {
 
   return (
     <div className='flex-1 p-5 flex min-h-full flex-col pb-10 light:text-slate-800 light:bg-light dark:bg-primary dark:text-slate-200 '>
         <h1 className='text-2xl font-bold text-center  mt-10'>Welcome to the Home Page</h1>
        
- <img src='https://drive.google.com/thumbnail?id=148MIv8M7SpkB4b0NzD---xBREwR2M3Ey' className='flex'/>
+ {/* <img src='https://drive.google.com/thumbnail?id=148MIv8M7SpkB4b0NzD---xBREwR2M3Ey' className='flex'/> */}
 
 <div className="flex flex-wrap gap-4 justify-center mt-10">
 <ProductCard/>
 <ProductCard/>
+<AnimatedTabs/>
 </div>
       
 
