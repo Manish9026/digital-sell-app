@@ -190,7 +190,9 @@ const CourseUploadForm = () => {
     for (const file of thumbnails) formData.append('thumbnails', file);
     for (const file of courseFiles) formData.append('files', file);
     setIsLoading(true)
-  await axios.post(`http://localhost:2000/api/dashboard/drive/upload-products`, formData,{headers: { 'Content-Type': 'multipart/form-data' }}).then((res)=>{
+    // console.log(url);
+    
+  await axios.post(`${url}/api/dashboard/drive/upload-products`, formData,{headers: { 'Content-Type': 'multipart/form-data' }}).then((res)=>{
       console.log(res.data);
     setIsLoading(false)
     toast.success("✅✅ Product detail uploaded !!")
