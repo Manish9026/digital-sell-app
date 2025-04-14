@@ -105,14 +105,18 @@ export class Auth  {
   const token = req?.cookies?.refreshToken;
   const ip = req?.ip;
   const userAgent = req.headers['user-agent'];
+console.log(token,ip,userAgent);
 
   if (!token) {
     return res.status(401).json({ message: "Refresh token missing" });
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.REFRESH_SECRET);
-    const user = await storeUserModel.findById(decoded.id);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(decoded);
+    if(!decoded) 
+    return res.status(403).json({ message: "Invalid or expired refresh token" });
+    const user = await storeUserModel.findById(decoded?.userId);
 
     const session = user.sessions.find(
       (s) => s.token === token && s.ip === ip && s.userAgent === userAgent
@@ -148,6 +152,9 @@ export class Auth  {
 
     res.status(200).json({ message: "Token refreshed" });
   } catch (err) {
+
+    console.log(err);
+    
     res.status(403).json({ message: "Invalid or expired refresh token" });
   }
 };

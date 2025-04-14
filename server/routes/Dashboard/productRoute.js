@@ -3,5 +3,7 @@ import { ProductController } from '../../controllers/dashboard/productController
 const productRoutes = express.Router();
 
 productRoutes.get("",ProductController.getAllProducts)
+productRoutes.get("/:id",ProductController.getSingleProduct);
+productRoutes.get("/files/:id",ProductController.getProductFiles)
 
 export default productRoutes

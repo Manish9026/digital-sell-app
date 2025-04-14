@@ -1,7 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Star, StarHalf, ImagePlus, ShoppingCart, BadgeDollarSign, TicketPercent } from "lucide-react";
 import { motion } from "framer-motion";
-
+import { useLoaderData ,useLocation, useNavigate, useParams} from "react-router-dom";
+import { useGetSingleProductQuery } from "../../services/store/productServices";
+import LoadingComponent, { LoadingScreen } from "../../component/Shared/LoadingComponent";
+import Image from "../../component/Shared/ImageLoading";
+import { url } from "../../utils/service";
+import { usePaymentOrderMutation } from "../../services/store/paymentServices";
 const Button = ({
   children,
   variant = "default",
@@ -43,6 +48,65 @@ const ProductPage = () => {
     const [userRating, setUserRating] = useState(0);
     const [reviewText, setReviewText] = useState("");
     const [coupon, setCoupon] = useState("");
+    const { prdId } = useParams();
+  const navigate = useNavigate();
+
+  const [paymentOrder,{isLoading:paymentLoading}]=usePaymentOrderMutation();
+    const handlePayment = async (email, productName, fileId) => {
+      const { data: order } = await axios.post(`${url}/api/payment/create-order`, {
+        amount: 1,
+      }, { withCredentials: true });
+      console.log(order, import.meta.env.VITE_RAZORPAY_KEY_ID);
+  
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID, // from env
+        amount: order.amount,
+        currency: "INR",
+        name: "My Store",
+        description: "Test Transaction",
+        order_id: order.id,
+        handler: async function (response) {
+          navigate("/user/payment-waiting", {
+            loading: true
+          })
+          const result = await axios.post(`${url}/api/payment/verify-order`, {
+            paymentId: response.razorpay_payment_id,
+            orderId: response.razorpay_order_id,
+            signature: response.razorpay_signature,
+            email,
+            productName,
+            fileId
+          });
+          if (result.data.status) {
+            navigate("/user/payment-success", {
+              state: {
+                email,
+                productName, orderId: response.razorpay_order_id,
+              }
+            })
+          }
+          // alert("Payment successful. Check your email.");
+        },
+        // callbackurl: "http://localhost:2000/api/payment/verify-order",
+        prefill: {
+          name: "John Doe",
+          email: email,
+          contact: "9999999999",
+        },
+        // method: {
+        //   upi: true, // ✅ explicitly enable UPI (optional)
+        // },
+      };
+  
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    };
+    const {data, refetch, isLoading } = useGetSingleProductQuery(prdId, {
+      refetchOnFocus: true,
+      refetchOnMountOrArgChange: false,
+    })
+    const product = data?.['data']?.product;
+
     const [showCoupons, setShowCoupons] = useState(false);
     const availableCoupons = ["SAVE10", "FREESHIP", "WELCOME25"];
   
@@ -73,9 +137,15 @@ const ProductPage = () => {
     const handleApplyCoupon = () => {
       alert(`Coupon Applied: ${coupon}`);
     };
+
+    const handleBuyNow = async () => {
+      paymentOrder({productId:prdId,fileId:product?.files[0]?.id,amount:parseInt(product?.actualPrice),productName:product?.title,navigate}).unwrap()
+    }
+
   
     return (
       <section className="light:bg-light dark:bg-primary min-h-screen flex items-center justify-center">
+      {isLoading &&  <LoadingScreen/>}
         <div className="p-4 md:p-8 max-w-6xl light:text-slate-800 bg-transparent w-full">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -83,23 +153,24 @@ const ProductPage = () => {
             transition={{ duration: 0.5 }}
             className="grid md:grid-cols-2 gap-8"
           >
-            <div className="rounded-2xl overflow-hidden shadow-lg">
-              <img
+            <div className="rounded-2xl  overflow-hidden shadow-lg">
+              {/* <img
                 src="https://www.morpher.com/blog/optimizedImages/httpsi0wpcommorpherhomewpcomstagingcomwpcontentuploads202407Untitleddesign6pngw600h380.webp"
                 alt="Product"
                 className="w-full object-cover"
-              />
+              /> */}
+              <Image containerClassName={"min-h-[200px] flex md:max-h-[500px] max-h-[300px]"} src={`${url}/api/dashboard/product/files/${product?.thumbnails[0]?.id}?mimeType=${product?.thumbnails[0]?.mimeType}`} imageClassName={"w-full md:object-fill  object-contain bg-gray-400/20"}/>
             </div>
   
             <div className="space-y-4">
-              <h1 className="text-3xl font-bold dark:text-gray-300 light:text-slate-800">Awesome Gadget 3000</h1>
+              <h1 className="text-3xl font-bold dark:text-gray-300 light:text-slate-800">{product?.title || "Awesome Gadget 3000"}</h1>
               <p className="text-gray-600 text-base dark:text-sky-100">
-                This is a revolutionary gadget that will make your life easier. With a sleek design,
-                powerful performance, and unbeatable price, it's a must-have!
+                {product?.description || "This is a great product that you will love. It has all the features you need and more."}
               </p>
   
               <div className="text-2xl font-semibold text-green-600">
-                $299 <span className="text-gray-400 line-through text-base ml-2">$399</span>
+                
+                ₹{product?.actualPrice} <span className="text-gray-400 line-through text-base ml-2">₹{product?.price}</span>
               </div>
   
               <div className="flex items-center gap-2">
@@ -147,7 +218,7 @@ const ProductPage = () => {
                 <Button className="flex items-center gap-2">
                   <ShoppingCart size={18} /> Add to Cart
                 </Button>
-                <Button variant="secondary" className="flex items-center gap-2">
+                <Button onClick={()=>handleBuyNow()} variant="secondary" className="flex items-center gap-2">
                   <BadgeDollarSign size={18} /> Buy Now
                 </Button>
               </div>

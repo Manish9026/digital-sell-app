@@ -10,7 +10,7 @@ import mime from 'mime-types';
 import { productModel } from '../../models/dashboardModel.js';
 import { badResponse, goodResponse } from '../../utils/response.js';
 
-const getDriveService =async () => {
+export const getDriveService =async () => {
 const SCOPE = "https://www.googleapis.com/auth/drive";
 //  const auth = new google.auth.OAuth2(process.env.CLIENT_ID, process.env.CLIENT_SECRET_KEY, process.env.REDIRECT_URL);
 // auth.setCredentials({ refresh_token: process.env.REFRESH_TOKEN,scope: SCOPE });
@@ -44,7 +44,7 @@ export class DriveController  {
     return folder.data.id;
   };
 
-
+ 
   static uploadSingleFile = async (filePath, fileName, folderId, isPublic = false) => {
     const drive = await getDriveService();
     const fileMetadata = {

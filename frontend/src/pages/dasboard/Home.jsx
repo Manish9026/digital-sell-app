@@ -88,6 +88,7 @@ import {
 } from "lucide-react";
 import { LoadingScreen } from '../../component/Shared/LoadingComponent';
 import { toast } from 'react-toastify';
+import { useUploadPoductOnDriveMutation } from '../../services/dashboad/driveServices';
 
 const AnimatedInput = ({ label, icon: Icon,inputClass,lableClass,containerClass ,...props }) => (
   <div className="space-y-1 w-full">
@@ -107,7 +108,7 @@ const CourseUploadForm = () => {
   const [courseFiles, setCourseFiles] = useState([]);
   const [coupons, setCoupons] = useState([]);
   const [couponInput, setCouponInput] = useState("");
-  const [isLoading,setIsLoading]=useState(false)
+  // const [isLoading,setIsLoading]=useState(false)
   const [form, setForm] = useState({
     name: "",
     category: "",
@@ -117,6 +118,7 @@ const CourseUploadForm = () => {
     discountPercent: "",
     priceConvertType:null
   });
+  const [uploadFiles,{isLoading,isError,isSuccess}]=useUploadPoductOnDriveMutation();
 
   useEffect(() => {
     const { price, discountPrice, discountPercent } = form;
@@ -189,21 +191,22 @@ const CourseUploadForm = () => {
 
     for (const file of thumbnails) formData.append('thumbnails', file);
     for (const file of courseFiles) formData.append('files', file);
-    setIsLoading(true)
+    // setIsLoading(true)
     // console.log(url);
+    uploadFiles(formData);
     
-  await axios.post(`${url}/api/dashboard/drive/upload-products`, formData,{headers: { 'Content-Type': 'multipart/form-data' }}).then((res)=>{
-      console.log(res.data);
-    setIsLoading(false)
-    toast.success("✅✅ Product detail uploaded !!")
+  // await axios.post(`${url}/api/dashboard/drive/upload-products`, formData,{headers: { 'Content-Type': 'multipart/form-data' }}).then((res)=>{
+  //     console.log(res.data);
+  //   // setIsLoading(false)
+  //   toast.success("✅✅ Product detail uploaded !!")
 
-    }
-  ).catch((err)=>{
-    console.log(err);
-    setIsLoading(false)
-    toast.error("❌ Product not uploaded !!")
+  //   }
+  // ).catch((err)=>{
+  //   console.log(err);
+  //   setIsLoading(false)
+  //   toast.error("❌ Product not uploaded !!")
     
-  })
+  // })
    
   };
 

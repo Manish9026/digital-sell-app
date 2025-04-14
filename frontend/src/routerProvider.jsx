@@ -1,13 +1,17 @@
 
 
 import React, { lazy, Suspense } from 'react'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider, useLocation } from 'react-router-dom'
 import App from './App'
+
 import PaymentSuccessPage, { PaymentWaiting } from './component/PaymentSuccess'
 import  Layout  from './Layout'
 import ProtectedRoute from './ProtectedRoute'
 import LoadingScreen from './component/Shared/LoadingComponent'
 import ProductPage from './pages/store/ProductPage'
+import { productApi, useGetSingleProductQuery } from './services/store/productServices'
+import { store } from './store'
+
 // import { LoginForm, RegistrationForm } from './component/Store/AuthForm'
 const DashboardHome=lazy(()=>import('./pages/dasboard/Home'));
 const LoginForm =lazy(()=>import('./component/Store/AuthForm').then(module=>({default:module.LoginForm})));
@@ -29,8 +33,25 @@ const StoreProtectedLayout = () => {
     </ProtectedRoute>
   );
 };
+
+export async function userLoader({ params }) {
+  const promise = store.dispatch(
+    productApi.endpoints.getSingleProduct.initiate(params.prdId)
+  );
+
+  try {
+    const result = await promise.unwrap();
+    console.log(result, "result");
+    
+    return result;
+  } finally {
+    store.dispatch(productApi.util.resetApiState()); // optional: clean up
+  }
+}
+
 export function RoutesProvider() {
 
+  // const loaction=useLocation();
       const router=createBrowserRouter([{
         path:"",
         children:[
@@ -51,6 +72,11 @@ export function RoutesProvider() {
             element:<RegistrationForm/>
           },
           {
+            path:"/product/:prdId",
+            element:<ProductPage/>,
+            // loader:()=>userLoader
+          },
+          {
             path:"/user/payment-success",
             element:<PaymentSuccessPage/>
           },
@@ -60,8 +86,15 @@ export function RoutesProvider() {
             },
 
             {
-              path:'/loading',
-              element:<ProductPage/>
+              path:'/loading/:prdId',
+              element:<ProductPage/>,
+              loader:async ({params})=>{
+
+                console.log(params,"data");
+                
+              }
+
+
             },
             {
               path:"*",

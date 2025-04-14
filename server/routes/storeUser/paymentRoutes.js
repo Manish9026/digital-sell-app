@@ -1,9 +1,10 @@
 import express from 'express';
 import { paymentController } from '../../controllers/storeUser/paymentController.js';
-const router = express.Router();
+import { verifyUser } from '../../middlewares/storeUser/verifyUser.js';
+const paymentRoutes = express.Router();
 // import { createPayment, verifyPayment } from '../controllers/paymentController.js'
 // paymentController
-router.post("/create-order", paymentController.createPayment);
-router.post("/verify-order", paymentController.verifyPayment);
+paymentRoutes.post("/create-order",verifyUser, paymentController.createPayment);
+paymentRoutes.post("/verify-order", paymentController.verifyPayment);
 
-export default router
+export default paymentRoutes

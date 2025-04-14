@@ -3,81 +3,31 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from "framer-motion";
 import axios from 'axios';
 import { Moon, Sun } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { url } from '../../utils/service';
 import { useThrottle } from '../../hooks/useThrottleClick';
 import CustomText from '../../component/Shared/CustomText';
-import { useGetProductsQuery } from '../../services/store/productServices';
+import { useGetProductsQuery, useGetSingleProductQuery } from '../../services/store/productServices';
+import Image from '../../component/Shared/ImageLoading';
+import { usePaymentOrderMutation } from '../../services/store/paymentServices';
 export function ProductCard({product}) {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const navigate = useNavigate();
   const useThrottleClick = useThrottle(1000);
+  const [paymentOrder,{isLoading,}]=usePaymentOrderMutation();
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.async = true;
     document.body.appendChild(script);
   }, []);
-  const handlePayment = async (email, productName, fileId) => {
-    const { data: order } = await axios.post(`${url}/api/payment/create-order`, {
-      amount: 1,
-    }, { withCredentials: true });
-    console.log(order, import.meta.env.VITE_RAZORPAY_KEY_ID);
 
-    const options = {
-      key: import.meta.env.VITE_RAZORPAY_KEY_ID, // from env
-      amount: order.amount,
-      currency: "INR",
-      name: "My Store",
-      description: "Test Transaction",
-      order_id: order.id,
-      handler: async function (response) {
-        navigate("/user/payment-waiting", {
-          loading: true
-        })
-        const result = await axios.post(`${url}/api/payment/verify-order`, {
-          paymentId: response.razorpay_payment_id,
-          orderId: response.razorpay_order_id,
-          signature: response.razorpay_signature,
-          email,
-          productName,
-          fileId
-        });
-        if (result.data.status) {
-          navigate("/user/payment-success", {
-            state: {
-              email,
-              productName, orderId: response.razorpay_order_id,
-            }
-          })
-        }
-        // alert("Payment successful. Check your email.");
-      },
-      // callbackurl: "http://localhost:2000/api/payment/verify-order",
-      prefill: {
-        name: "John Doe",
-        email: email,
-        contact: "9999999999",
-      },
-      // method: {
-      //   upi: true, // ✅ explicitly enable UPI (optional)
-      // },
-    };
-
-    const rzp = new window.Razorpay(options);
-    rzp.open();
-  };
   const handleBuyNow = async () => {
 
-    const email = prompt("Please enter your email address:");
-    if (!email) {
-      alert("Email is required to proceed.");
-      return;
-    }
-    // const email="ashishmaurya061155@gmail.com"
+
     try {
-      handlePayment(email, product?.title,product?.files[0]?.id);
+      paymentOrder({productId:product?._id,fileId:product?.files[0]?.id,amount:parseInt(product?.actualPrice),productName:product?.title,navigate}).unwrap()
     } catch (error) {
       console.error(error);
       alert("An error occurred while processing your request.");
@@ -90,14 +40,22 @@ export function ProductCard({product}) {
     "  His expertise extends to market analysis and strategy, grounded in a strong academic background in Finance and Economics. As a Senior Writer, Steven offers valuable insights through his clear and practical financial reports on all things trading. Beyond work, he has a keen interest in digital currencies and financial history.";
 
   return (
-    <div className="max-w-[250px] min-w-[160px] flex-col flex  md:max-h-[400px] max-h-[350px] flex-1 bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 transform transition-transform  duration-300 hover:shadow-xl">
+    <Link to={{
+      pathname:`/product/${product?._id}`,
+      // search:`?prdId=${product?._id}`
+      
+    }} state={{prdId:product?._id}} className="max-w-[250px] min-w-[160px] flex-col flex  md:max-h-[400px] max-h-[350px] flex-1 bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 transform transition-transform  duration-300 hover:shadow-xl">
       {/* Thumbnail */}
-      <img
-        src={ `https://drive.google.com/thumbnail?id=${product?.thumbnails[0]?.id}` || "https://www.morpher.com/blog/optimizedImages/httpsi0wpcommorpherhomewpcomstagingcomwpcontentuploads202407Untitleddesign6pngw600h380.webp"}
+      {/* <img
+        src={ `${url}/api/dashboard/product/files/${product?.thumbnails[0]?.id}?mimeType=${product?.thumbnails[0]?.mimeType}` || `https://drive.google.com/thumbnail?id=${product?.thumbnails[0]?.id}` || "https://www.morpher.com/blog/optimizedImages/httpsi0wpcommorpherhomewpcomstagingcomwpcontentuploads202407Untitleddesign6pngw600h380.webp"}
         alt="Product Thumbnail"
         loading='lazy'
         className="w-full md:max-h-[120px] max-h-[100px]  object-contain bg-gray-400/20"
-      />
+        onLoad={(e)=>{console.log(e)
+        }}
+      /> */}
+      <Image containerClassName={'w-full md:max-h-[120px] max-h-[100px] min-h-[100px]'} imageClassName={"w-full h-full object-contain bg-gray-400/20"} src={ `${url}/api/dashboard/product/files/${product?.thumbnails[0]?.id}?mimeType=${product?.thumbnails[0]?.mimeType}` || `https://drive.google.com/thumbnail?id=${product?.thumbnails[0]?.id}` || "https://www.morpher.com/blog/optimizedImages/httpsi0wpcommorpherhomewpcomstagingcomwpcontentuploads202407Untitleddesign6pngw600h380.webp"} alt="Product Thumbnail"
+        loading='lazy'/>
 
       <div className="p-4 flex-1 flex flex-col gap-2 md:max-xl:gap-4">
         {/* Title */}
@@ -177,7 +135,7 @@ export function ProductCard({product}) {
           </motion.button>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 const RazorpayButton = () => {
@@ -261,6 +219,7 @@ const ProductSection=()=>{
     refetchOnMountOrArgChange: false,
   })
 
+
   // console.log(data);
   
 
@@ -282,11 +241,15 @@ const ProductSection=()=>{
   )
 }
 function Home() {
-
+// const {data}=useGetSingleProductQuery("67fc44645889c2c5950b7fd1", {
+//   refetchOnFocus: true,
+//   refetchOnMountOrArgChange: false,
+// })
   return (
     <div className='flex-1 p-5 flex min-h-full flex-col pb-10 light:text-slate-800 light:bg-light dark:bg-primary dark:text-slate-200 '>
       <h1 className='text-2xl font-bold text-center  mt-10'>Welcome to the Home Page</h1>
 
+<button onClick={()=>window.location.assign("/dashboard")}>go dashboard</button>
       {/* <img src='https://drive.google.com/thumbnail?id=148MIv8M7SpkB4b0NzD---xBREwR2M3Ey' className='flex'/> */}
 
       <div className="flex flex-wrap gap-4 justify-center mt-10">

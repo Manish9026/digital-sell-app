@@ -1,13 +1,13 @@
 // src/services/storeUserApi.js
 import { createApi } from '@reduxjs/toolkit/query/react'
 import { fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { url } from '../../utils/service'
+import { storeUserBaseUrl, url } from '../../utils/service'
 import { logout, setCredentials } from '../../slices/store/authSlice'
 import { notify } from '../../utils/notification'
 import { toast } from 'react-toastify'
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: `${url}/api`, // ⬅️ update this to your API base
+  baseUrl: `${storeUserBaseUrl}/auth`, // ⬅️ update this to your API base
   credentials: 'include', // ⬅️ required to send cookies with every request
 })
 
@@ -18,7 +18,7 @@ export const baseQueryWithReauth = async (args, api, extraOptions) => {
     console.log('Access token expired. Attempting to refresh...')
 
     // Attempt refresh using cookie-stored refresh token
-    const refreshResult = await baseQuery('/user/refresh-token', api, extraOptions)
+    const refreshResult = await baseQuery('/refresh-token', api, extraOptions)
 
     if (refreshResult.data) {
       console.log('Token refreshed. Retrying original request...')
@@ -40,7 +40,7 @@ export const authApi = createApi({
   endpoints: (builder) => ({
     login: builder.mutation({
       query: (credentials) => ({
-        url: '/user/login',
+        url: '/login',
         method: 'POST',
         body: credentials,
       }),
@@ -57,7 +57,7 @@ export const authApi = createApi({
     }),
     register: builder.mutation({
         query: (credentials) => ({
-          url: '/user/register',
+          url: '/register',
           method: 'POST',
           body: credentials,
         }),
@@ -77,7 +77,7 @@ export const authApi = createApi({
       }),
     logout: builder.mutation({
       query: () => ({
-        url: '/user/logout',
+        url: '/logout',
         method: 'POST',
       }),
 
@@ -95,7 +95,7 @@ export const authApi = createApi({
     }),
     verify: builder.query({
       query: () => ({
-        url: '/user/verify',
+        url: '/verify',
         method: 'GET',
         // credentials: 'include'
     }),

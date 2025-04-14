@@ -26,8 +26,24 @@ export const productApi=createApi({
                             console.error('Login error:', err)
                           }
                         },
+        }),
+        getSingleProduct:builder.query({
+            query: (id) => ({
+                    url: `/product/${id}`,
+                    method: 'GET',
+                    // credentials: 'include'
+                }),
+                async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+                          try {
+                          //  const data=await queryFulfilled;
+                          //  console.log(data,data);
+                           
+                          } catch (err) {
+                            console.error('Login error:', err)
+                          }
+                        },
         })
     })
 })
 
-export const {useGetProductsQuery} =productApi
+export const {useGetProductsQuery,useGetSingleProductQuery} =productApi

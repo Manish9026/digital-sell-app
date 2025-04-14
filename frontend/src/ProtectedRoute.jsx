@@ -18,6 +18,7 @@ const ProtectedRoute = ({ allowedRoles ,children},) => {
     refetchOnFocus: true,
     refetchOnMountOrArgChange: false,
   })
+  
   const navigate=useNavigate();
   const location = useLocation();
   const path = location.pathname.split("/")[1];

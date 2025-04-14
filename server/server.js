@@ -12,6 +12,7 @@ import paymentRouter from './routes/storeUser/paymentRoutes.js'
 import { DriveController } from './controllers/storeUser/driveController.js'
 import userAuthRoutes from './routes/storeUser/authRoutes.js'
 import dashboardRoutes from './routes/Dashboard/index.js'
+import storeUserRoutes from './routes/storeUser/index.js'
 const port = process.env.PORT;
 const app = express();
 
@@ -91,7 +92,7 @@ app.get("/oauth2callback", async (req, res) => {
 app.use("/api/payment", paymentRouter)
 // store-user-auth-apis
 app.use("/api/user", userAuthRoutes)
-// 
+app.use("/api/store/user", storeUserRoutes);
 // dashboard-apis
 app.use("/api/dashboard", dashboardRoutes)
 Promise.all([

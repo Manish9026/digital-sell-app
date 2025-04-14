@@ -11,13 +11,14 @@ export class paymentController {
   }
 
   static async createPayment(req, res) {
-    const { amount } = req.body;
+    const { amount ,productId,productName,fileId} = req.body;
+    const {user}=req;
     try {
 
           
         console.log(amount);
               const order = await razorpayInstance.orders.create({ amount: Number(amount * 100), currency: "INR" ,receipt: "receipt#1"});
-      res.json(order);
+      res.json({order:{...order,productId,productName,fileId,email:user?.userEmail,userName:`${user?.firstName} ${user?.lastName}`}, status: true });
     } catch (err) {
       res.status(500).json({ error: "Failed to create order" });
       console.log(err);
@@ -27,6 +28,7 @@ export class paymentController {
   static async verifyPayment(req, res) {
     try {
         const { paymentId, orderId, signature, email, productName ,fileId} = req.body;
+console.log(paymentId, orderId, signature, email, productName ,fileId);
 
   if (!verifySignature(orderId, paymentId, signature)) {
     return res.status(400).json({ error: "Invalid signature" });
