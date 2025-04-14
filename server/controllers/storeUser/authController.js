@@ -82,14 +82,14 @@ export class Auth  {
         res.cookie("accessToken", accessToken, {
           httpOnly: true,
           secure: true,
-          sameSite: "Strict",
+          sameSite: "None",
           maxAge: 15 * 60 * 1000,
         });
       
         res.cookie("refreshToken", refreshToken, {
           httpOnly: true,
           secure: true,
-          sameSite: "Strict",
+          sameSite: "None",
           maxAge: 7 * 24 * 60 * 60 * 1000,
         });
       
@@ -139,14 +139,14 @@ console.log(token,ip,userAgent);
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "none",
+      sameSite: "None",
       maxAge: 15 * 60 * 1000,
     });
 
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "none",
+      sameSite: "None",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
