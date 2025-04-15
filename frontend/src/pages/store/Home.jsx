@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from "framer-motion";
 import axios from 'axios';
 import { Moon, Sun } from 'lucide-react';
@@ -10,7 +10,7 @@ import CustomText from '../../component/Shared/CustomText';
 import { useGetProductsQuery, useGetSingleProductQuery } from '../../services/store/productServices';
 import Image from '../../component/Shared/ImageLoading';
 import { usePaymentOrderMutation } from '../../services/store/paymentServices';
-export function ProductCard({product}) {
+export function ProductCard({product,className}) {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const navigate = useNavigate();
@@ -44,7 +44,7 @@ export function ProductCard({product}) {
       pathname:`/product/${product?._id}`,
       // search:`?prdId=${product?._id}`
       
-    }} state={{prdId:product?._id}} className="max-w-[250px] min-w-[160px] flex-col flex  md:max-h-[400px] max-h-[350px] flex-1 bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 transform transition-transform  duration-300 hover:shadow-xl">
+    }} state={{prdId:product?._id}} className={className +"max-w-[250px] min-w-[160px] flex-col flex  md:max-h-[400px] max-h-[350px] flex-1 bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 transform transition-transform  duration-300 hover:shadow-xl"}>
       {/* Thumbnail */}
       {/* <img
         src={ `${url}/api/dashboard/product/files/${product?.thumbnails[0]?.id}?mimeType=${product?.thumbnails[0]?.mimeType}` || `https://drive.google.com/thumbnail?id=${product?.thumbnails[0]?.id}` || "https://www.morpher.com/blog/optimizedImages/httpsi0wpcommorpherhomewpcomstagingcomwpcontentuploads202407Untitleddesign6pngw600h380.webp"}
@@ -219,20 +219,34 @@ const ProductSection=()=>{
     refetchOnMountOrArgChange: false,
   })
 
-
+  const [sliderRef, instanceRef] = useKeenSlider({
+    loop: true,
+    slides: { perView: 1.2, spacing: 15 },
+    breakpoints: {
+      "(min-width: 768px)": {
+        slides: { perView: 2.5, spacing: 20 },
+      },
+    },
+  });
   // console.log(data);
   
 
   return(
-    <section className=' flex overflow-hidden  flex-col w-full  gap-4'>
-
-  <h2 className='h2 capitalize '>products</h2>
-
-  <span className='flex gap-4 flex-1 w-full overflow-auto'>
-  { isLoading?<span className='flex-1 center w-full h-[200px]'> Loading ....</span>:
+    <section className=' flex relative  overflow-hidden primary-p flex-col w-full my-10  gap-4'>
+ <motion.h2
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="text-2xl md:text-4xl font-semibold text-center mb-10"
+        >
+          Our Exclusive Products
+        </motion.h2>
+  <span ref={sliderRef} className='flex gap-4 flex-1 w-full flex-wrap '>
+  { isLoading?<span   className=' keen-slider flex-1 center w-full h-[200px]'> Loading ....</span>:
      data && data?.data?.product.map((product,id)=>{
 
-        return <ProductCard key={id} product={product}/>
+        return <ProductCard key={id}  product={product}/>
       })
     }
   </span>
@@ -246,22 +260,247 @@ function Home() {
 //   refetchOnMountOrArgChange: false,
 // })
   return (
-    <div className='flex-1 p-5 flex min-h-full flex-col pb-10 light:text-slate-800 light:bg-light dark:bg-primary dark:text-slate-200 '>
-      <h1 className='text-2xl font-bold text-center  mt-10'>Welcome to the Home Page</h1>
+    <div className='flex-1  flex min-h-full flex-col pb-10 light:text-slate-800 light:bg-light dark:bg-primary dark:text-slate-200 '>
+      {/* <h1 className='text-2xl font-bold text-center  mt-10'>Welcome to the Home Page</h1>
 
-<button onClick={()=>window.location.assign("/dashboard")}>go dashboard</button>
+<button onClick={()=>window.location.assign("/dashboard")}>go dashboard</button> */}
       {/* <img src='https://drive.google.com/thumbnail?id=148MIv8M7SpkB4b0NzD---xBREwR2M3Ey' className='flex'/> */}
 
-      <div className="flex flex-wrap gap-4 justify-center mt-10">
+      {/* <div className="flex flex-wrap gap-4 justify-center mt-10">
       <ProductSection/>
         
-        {/* <AnimatedTabs /> */}
-      </div>
+        <AnimatedTabs />
+      </div> */}
 
+<HomePage/>
 
     </div>
   )
 }
+
+// Install dependencies before using:
+// npm install keen-slider framer-motion
+// import 'keen-slider/keen-slider.min.css';
+
+// import React, { useEffect, useRef } from "react";
+// import { motion } from "framer-motion";
+// Install dependencies before using:
+// npm install keen-slider framer-motion
+// import 'keen-slider/keen-slider.min.css';
+
+// import React, { useEffect, useRef } from "react";
+// import { motion } from "framer-motion";
+import "keen-slider/keen-slider.min.css";
+import { useKeenSlider } from "keen-slider/react";
+
+const products = [
+  { title: "Mastering React", type: "eBook", image: "/images/ebook1.jpg" },
+  { title: "UI Design Kit", type: "Design File", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD2vG-s87IN3CaLkDF1jmPlFpN_TQzoTeERg&s" },
+  { title: "Pro Coding Course", type: "Video", image: "/images/video1.jpg" },
+  { title: "Ultimate Templates", type: "File Bundle", image: "/images/file1.jpg" },
+];
+
+function HomePage() {
+  const [sliderRef, instanceRef] = useKeenSlider({
+    loop: true,
+    slides: { perView: 1.2, spacing: 15 },
+    breakpoints: {
+      "(min-width: 768px)": {
+        slides: { perView: 2.5, spacing: 20 },
+      },
+    },
+  });
+
+  const cursorRef = useRef(null);
+
+  useEffect(() => {
+  
+    const cursor = cursorRef.current;
+  let mouseX = 0;
+  let mouseY = 0;
+  let currentX = 0;
+  let currentY = 0;
+
+  const moveCursor = (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  };
+
+  const animate = () => {
+    // Lerp toward mouse position
+    currentX += (mouseX - currentX) * 0.1;
+    currentY += (mouseY - currentY) * 0.1;
+
+    if (cursor) {
+      cursor.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translate(-50%, -50%)`;
+    }
+    requestAnimationFrame(animate);
+  };
+
+  // window.addEventListener("mousemove", moveCursor);
+    const interval = setInterval(() => {
+      instanceRef.current?.next();
+    }, 5000);
+
+    window.addEventListener("mousemove", moveCursor);
+  animate();
+
+    return () =>{ window.removeEventListener("mousemove", moveCursor);
+      clearInterval(interval); // Cleanup the interval on component unmount
+    }
+  }, []);
+
+  return (
+    <div className="light:bg-light  text-gray-900 dark:text-white min-h-screen overflow-x-hidden relative">
+      {/* Custom Cursor */}
+      <div
+        ref={cursorRef}
+        className="pointer-events-none  fixed z-0 h-50 w-50 rounded-full bg-indigo-500/20 backdrop-blur-lg transform -translate-x-0  -translate-y-1/2 transition-transform duration-300 ease-out"
+      ></div>
+
+      {/* Hero Section */}
+      <section className="flex flex-col items-center justify-center text-center px-6 py-24 relative z-10">
+        <motion.h1
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-4xl md:text-6xl font-bold mb-4"
+        >
+          Discover, Buy & Download Digital Products
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="text-lg md:text-xl mb-6 max-w-2xl"
+        >
+          From eBooks to design kits – everything you need in one place.
+        </motion.p>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl text-lg shadow-md">
+            Browse Products
+          </button>
+        </motion.div>
+      </section>
+
+      {/* Carousel Section */}
+      <section className="px-6 pb-5 relative z-10">
+        <motion.h2
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="text-2xl md:text-4xl font-semibold text-center mb-10"
+        >
+          Featured Products
+        </motion.h2>
+
+        <div ref={sliderRef} className="keen-slider">
+          {products.map((product, index) => (
+            <motion.div
+              key={index}
+              className="keen-slider__slide bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-lg text-center"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: index * 0.2 }}
+              viewport={{ once: true }}
+            >
+              <img
+                src={product.image}
+                alt={product.title}
+                className="w-full h-48 object-cover rounded-xl mb-4"
+              />
+              <h3 className="text-xl font-bold mb-1">{product.title}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-300">{product.type}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+<ProductSection/>
+
+      {/* How It Works Section */}
+      <motion.section className="px-6 py-20 bg-sky-100 overflow-hidden dark:bg-primary/70 relative z-10">
+
+      <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.6 }} 
+          className='absolute bg-pink-500 hover:scale-[500%] top-0 left-0 w-[100px] h-[100px] rounded-br-[100%] z-[-10] tansition-all duration-300 ease-out'
+          >
+
+          </motion.div>
+        <motion.h2
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="text-2xl md:text-4xl font-semibold text-center mb-12"
+        >
+          How It Works
+        </motion.h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          {["Choose", "Pay", "Download"].map((step, idx) => (
+            <motion.div
+              key={step}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: idx * 0.2 }}
+              viewport={{ once: true }}
+              className="bg-white dark:bg-slate-700 p-8 rounded-xl shadow-lg text-center"
+            >
+              <h3 className="text-xl font-bold mb-3">Step {idx + 1}: {step}</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                {step === "Choose" && "Select your favorite digital item."}
+                {step === "Pay" && "Securely checkout using preferred methods."}
+                {step === "Download" && "Instantly download your purchase."}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </motion.section>
+
+      {/* Newsletter Section */}
+      <section className="px-6 py-20 relative z-10">
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="bg-indigo-600 text-white p-10 rounded-2xl shadow-lg text-center"
+        >
+          <h2 className="text-2xl md:text-3xl font-semibold mb-4">Stay Updated</h2>
+          <p className="mb-6">Get the latest updates and exclusive deals directly to your inbox.</p>
+          <form
+            action="https://formspree.io/f/xwkgnznl"
+            method="POST"
+            className="flex flex-col md:flex-row justify-center gap-4"
+          >
+            <input
+              type="email"
+              name="email"
+              required
+              placeholder="Enter your email"
+              className="px-4 py-2 rounded-md text-black focus:outline-none"
+            />
+            <button
+              type="submit"
+              className="bg-white text-indigo-600 px-6 py-2 rounded-md font-semibold hover:bg-gray-100"
+            >
+              Subscribe
+            </button>
+          </form>
+        </motion.div>
+      </section>
+    </div>
+  );
+}
+
+
 
 export default Home
 

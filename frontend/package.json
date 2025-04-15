@@ -17,6 +17,7 @@
     "axios": "^1.8.4",
     "btoa": "^1.2.1",
     "framer-motion": "^12.6.3",
+    "keen-slider": "^6.8.6",
     "lucide-react": "^0.487.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

@@ -29,13 +29,17 @@ html {
 @theme {
 
   --color-primary: oklch(12.9% 0.042 264.695);
-  --color-light:oklch(98.4% 0.003 247.858);
+  --color-light:oklch(88.2% 0.059 254.128);
   --color-thicksky: oklch(88.2% 0.059 254.128);
+  --drop-shadow-cursor: 0 35px 35px rgba(0, 0, 0, 0.25); 
 }
 .primary-p{
   @apply p-4 md:p-6 lg:p-8;
 }
-
+:root{
+  
+  --cursorColor: #b8e3e7;
+}
 .Toastify__toast-container {
 
   @apply flex items-center justify-center;
@@ -104,7 +108,17 @@ body {
   min-width: 320px;
   min-height: 100vh;
 }
+.cursor-glow-light {
+  filter: drop-shadow(0 0 10px #24ecff)
+          drop-shadow(0 0 30px #24ecff)
+          drop-shadow(0 0 50px #24ecff);
+}
 
+.cursor-glow-dark {
+  filter: drop-shadow(0 0 10px #7fdbff)
+          drop-shadow(0 0 30px #39c7ff)
+          drop-shadow(0 0 50px #00bfff);
+}
 h1 {
   font-size: 3.2em;
   line-height: 1.1;

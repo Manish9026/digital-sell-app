@@ -1,17 +1,19 @@
+import { lazy } from 'react'
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import ThemeToggleButton from '../Shared/ThemeToggleButton'
+// import ThemeToggleButton from '../Shared/ThemeToggleButton'
+const ThemeToggleButton=lazy(() => import('../Shared/ThemeToggleButton'))
 import { LucideShoppingBag } from 'lucide-react'
 import { PiUserCircleDashedFill } from "react-icons/pi";
 import { Link, NavLink } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import {  useLogoutMutation } from '../../services/store/authServices';
 const navigation = [
-  { name: 'Home ', href: '/', current: true },
-  { name: 'My Course', href: '/loading', current: false },
-  { name: 'Orders', href: '#', current: false },
-  { name: 'Cources', href: '#', current: false },
-  { name: 'Calendar', href: '#', current: false },
+  { name: 'Home ', href: '/', current: false },
+  { name: 'Cart', href: '/user/cart', current: false },
+  { name: 'My Course', href: '/Course', current: false },
+  { name: 'Cources', href: '/Cources', current: false },
+  { name: 'Calendar', href: '/Calendar', current: false },
 ]
 
 function classNames(...classes) {
@@ -22,7 +24,7 @@ export default function Navbar() {
     const { isAuthenticated, role } = useSelector(state=>state.authReducer);
    const [logout,{isLoading,isError,isSuccess}]=useLogoutMutation();
   return (
-    <Disclosure as="nav" className="scroll-hide border-b border-light light:bg-light dark:bg-primary bg-gray-800 ">
+    <Disclosure as="nav" className="scroll-hide z-50 border-b dark:border-light light:bg-light light:border-slate-400 drop-shadow-lg dark:bg-primary bg-gray-800 ">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
@@ -56,6 +58,7 @@ export default function Navbar() {
                     )}
                   >
                     {item.name}
+                    
                   </a>
                 ))}
               </div>
@@ -71,11 +74,15 @@ export default function Navbar() {
               <BellIcon aria-hidden="true" className="size-6" />
             </button>
 
-            <span className='p-1 border-b border-l rounded gap-1 flex items-center justify-center light:bg-light dark:bg-primary hover:text-thicksky light:hover:text-gray-900 light:text-gray-500 cursor-pointer text-gray-300 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden'>
+            <NavLink to={'/user/cart'} className={({ isActive }) =>
+   ` ${isActive
+      ? "ring-1"
+      : "" } " p-1 ml-2 border-b border-l rounded gap-1 flex items-center justify-center light:bg-light dark:bg-primary hover:text-thicksky light:hover:text-gray-900 light:text-gray-500 cursor-pointer text-gray-300 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden"`
+  }>
 
               <LucideShoppingBag className='size-[20px]' />
               <p className='text-sm'>0</p>
-            </span>
+            </NavLink>
             {/* <ThemeToggleButton/> */}
             {
               //  {/* Profile dropdown */}
@@ -170,18 +177,20 @@ export default function Navbar() {
 
       <DisclosurePanel className="sm:hidden">
         <div className="space-y-1 px-2 pt-2 pb-3">
-          {navigation.map((item) => (
+          {navigation.map((item,index) => (
             // <DisclosureButton
              
             // >
               <NavLink
-               key={item.name}           
+               key={index}           
                to={item.href}
                aria-current={item.current ? 'page' : undefined}
-               className={classNames(
-                 item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                 'block rounded-md px-3 py-2 text-base font-medium',
-               )}
+               className={({isActive})=>
+                 `block hover:light:text-white light:text-slate-600 dark:text-light rounded-md px-3 py-2 text-base font-medium  ${isActive ?' bg-gray-900 light:text-white' : ' text-gray-300 hover:bg-gray-700 '} 
+                 `
+               }
+
+              // className={({isActive})=>`${isActive?"bg-blue-200 ":""} flex flex-col p-2`}
               >
 
                 {item.name}

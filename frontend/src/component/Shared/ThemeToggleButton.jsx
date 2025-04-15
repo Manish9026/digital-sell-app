@@ -109,7 +109,7 @@ export default function ThemeToggleButton() {
     return (
       <button
         onClick={toggleTheme}
-        className="p-2 rounded-full light:bg-gray-200 dark:bg-gray-800 light:text-black dark:text-white transition"
+        className="p-2 rounded-full light:bg-light dark:bg-primary light:text-gray-500 dark:text-white transition"
       >
         <AnimatePresence mode="wait" initial={false}>
           {themes[themeIndex] === "dark" ? (

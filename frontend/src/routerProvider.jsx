@@ -3,7 +3,7 @@
 import React, { lazy, Suspense } from 'react'
 import { createBrowserRouter, RouterProvider, useLocation } from 'react-router-dom'
 import App from './App'
-
+import 'keen-slider/keen-slider.min.css';
 import PaymentSuccessPage, { PaymentWaiting } from './component/PaymentSuccess'
 import  Layout  from './Layout'
 import ProtectedRoute from './ProtectedRoute'
@@ -11,7 +11,8 @@ import LoadingScreen from './component/Shared/LoadingComponent'
 import ProductPage from './pages/store/ProductPage'
 import { productApi, useGetSingleProductQuery } from './services/store/productServices'
 import { store } from './store'
-
+// import CartPage from './pages/store/CartPage';
+const CartPage=lazy(()=>import('./pages/store/CartPage'));
 // import { LoginForm, RegistrationForm } from './component/Store/AuthForm'
 const DashboardHome=lazy(()=>import('./pages/dasboard/Home'));
 const LoginForm =lazy(()=>import('./component/Store/AuthForm').then(module=>({default:module.LoginForm})));
@@ -62,6 +63,11 @@ export function RoutesProvider() {
           children:[{
             path:"",
             element:<StoreHome/>
+          },
+          {
+            path:"user/cart",
+            element:<CartPage/>,
+
           },
           {
             path:"/user/login",
