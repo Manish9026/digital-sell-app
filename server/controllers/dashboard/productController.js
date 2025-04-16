@@ -50,6 +50,7 @@ export class ProductController{
           res.setHeader("Content-Type", mimeType);
           result.data.pipe(res);
         } catch (error) {
+          console.error("Error fetching image:", error);  
           res.status(500).send("Error fetching image");
         }
       }

@@ -294,10 +294,10 @@ import "keen-slider/keen-slider.min.css";
 import { useKeenSlider } from "keen-slider/react";
 
 const products = [
-  { title: "Mastering React", type: "eBook", image: "/images/ebook1.jpg" },
+  { title: "Mastering React", type: "eBook", image: "https://m.media-amazon.com/images/I/613i1dMgs1L._UF1000,1000_QL80_.jpg" },
   { title: "UI Design Kit", type: "Design File", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD2vG-s87IN3CaLkDF1jmPlFpN_TQzoTeERg&s" },
-  { title: "Pro Coding Course", type: "Video", image: "/images/video1.jpg" },
-  { title: "Ultimate Templates", type: "File Bundle", image: "/images/file1.jpg" },
+  { title: "Pro Coding Course", type: "Video", image: "https://royaledu.co.in/wp-content/uploads/2022/08/programming-language-2-1024x483.png" },
+  { title: "Ultimate Templates", type: "File Bundle", image: "https://designshack.net/wp-content/uploads/mobile-app-template-368x246.jpg" },
 ];
 
 function HomePage() {
