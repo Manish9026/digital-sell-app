@@ -3,14 +3,17 @@ import { storeUserBaseUrl, url } from "../../utils/service";
 import axios from "axios";
 // import { btoa } from "buffer";
 
-
-export const createCustomBaseQuery = ({ defaultBaseUrl }) => {
+ const baseQuery = fetchBaseQuery({
+  baseUrl: `${storeUserBaseUrl}/auth`, // ⬅️ update this to your API base
+  credentials: 'include', // ⬅️ required to send cookies with every request
+})
+export const authBaseQuery = ({ defaultBaseUrl }) => {
     return async (args, api, extraOptions) => {
       // Optional: path override via meta
       const path = args.meta?.baseUrl || '';
       const baseUrl = `${defaultBaseUrl}${path}`.replace(/\/+$/, '') + '/';
   
-      console.log(baseUrl, "baseUrl");
+      // console.log(baseUrl, "baseUrl");
       
       const rawBaseQuery = fetchBaseQuery({
         baseUrl,
@@ -31,16 +34,27 @@ export const createCustomBaseQuery = ({ defaultBaseUrl }) => {
   
       const result = await rawBaseQuery(cleanedArgs, api, extraOptions);
   
-      if (result.error?.status === 401) {
-        api.dispatch({ type: 'auth/logout' });
-        window.location.href = '/user/login';
+      if (result.error && result.error.status === 401) {
+        const refreshResult = await baseQuery('/refresh-token', api, extraOptions)
+
+        if (refreshResult?.data) {
+          console.log('Token refreshed. Retrying original request...')
+          // Retry the original request
+         result = await rawBaseQuery(cleanedArgs, api, extraOptions);
+        } else {
+          api.dispatch({ type: 'auth/logout' });
+          window.location.href = '/user/login';
+          console.warn('Token refresh failed. Consider redirecting to login.')
+          // Optional: api.dispatch(logout())
+        }
+     
       }
   
       return result;
     };
   };
 
-  const customBaseQuery = createCustomBaseQuery({
+  const customBaseQuery = authBaseQuery({
     defaultBaseUrl: `${storeUserBaseUrl}/payment`, // e.g. http://localhost:5000
   });
   

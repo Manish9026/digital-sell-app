@@ -21,7 +21,9 @@ const productSchema = new mongoose.Schema(
   {
     prdId: {
       type: mongoose.Schema.Types.ObjectId, default: () => new mongoose.Types.ObjectId,
-      require: true, alias: "_id"
+      require: true,
+      index: true,
+      unique: true,
   },
     title: { type: String, required: true },
     description: String,

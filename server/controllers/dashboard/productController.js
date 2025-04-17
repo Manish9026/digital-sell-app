@@ -22,7 +22,7 @@ export class ProductController{
         console.log(prdId);
         
         if(!prdId) return badResponse({res,message:"product id is required !!"})
-        const product=await productModel.findById(prdId);
+        const product=await productModel.findOne({prdId});
         if(!product) return badResponse({res,message:"product not found !!"})
           return goodResponse({res,message:"product found !!",data:{product}})
         
@@ -35,7 +35,7 @@ export class ProductController{
         try {
           const fileId = req.params.id;
           const mimeType = req.query.mimeType;
-          // console.log(mimeType,fileId);
+          console.log(mimeType,fileId);
 
           if(!fileId) {
             return badResponse({res,message:"file id is required !!"})
@@ -50,7 +50,7 @@ export class ProductController{
           res.setHeader("Content-Type", mimeType);
           result.data.pipe(res);
         } catch (error) {
-          console.error("Error fetching image:", error);  
+          // console.error("Error fetching image:", error);  
           res.status(500).send("Error fetching image");
         }
       }

@@ -4,7 +4,11 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ShoppingCartIcon, TrashIcon } from "@heroicons/react/24/outline";
-
+import { useFetchCartQuery, useRemoveCartMutation } from "../../services/store/cartServices";
+import { useSelector } from "react-redux";
+import Image from "../../component/Shared/ImageLoading";
+import { url } from "../../utils/service";
+import { ImSpinner2 } from 'react-icons/im';
 const sampleCart = [
   {
     id: 1,
@@ -24,18 +28,30 @@ const sampleCart = [
 
 export default function CartPage() {
   const [cart, setCart] = useState([]);
-  const [loading, setLoading] = useState(true);
 
+  const [loading, setLoading] = useState(false);
+  // const 
+
+  const {data,isLoading,refetch}=useFetchCartQuery(undefined,{
+    refetchOnFocus: true,
+    refetchOnMountOrArgChange: true,
+  })
+  const cards=data?.data?.products;
   useEffect(() => {
-    setTimeout(() => {
-      setCart(sampleCart);
-      setLoading(false);
-    }, 1500);
-  }, []);
+  
+    // setCart(cart);
+    // console.log(data);
 
-  const removeFromCart = (id) => {
-    setCart((prev) => prev.filter((item) => item.id !== id));
-  };
+    // console.log(cart);
+    
+    // setTimeout(() => {
+    //   setCart(sampleCart);
+    //   setLoading(false);
+    // }, 1500);
+  }, [data]);
+// console.log(cards);
+
+
 
   return (
     <div className="min-h-screen bg-light dark:bg-primary text-gray-900 dark:text-white p-6">
@@ -43,13 +59,13 @@ export default function CartPage() {
         <ShoppingCartIcon className="h-7 w-7" /> Your Cart
       </h1>
 
-      {loading ? (
+      {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-pulse">
           {[1, 2].map((i) => (
             <div key={i} className="bg-gray-200 dark:bg-slate-700 rounded-xl h-36" />
           ))}
         </div>
-      ) : cart.length === 0 ? (
+      ) : cards?.length === 0 ? (
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -60,34 +76,58 @@ export default function CartPage() {
         </motion.div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {cart.map((item) => (
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className="flex bg-white dark:bg-slate-800 p-4 rounded-xl shadow-md items-center gap-4"
-            >
-              <img
-                src={item.image}
-                alt={item.title}
-                className="w-24 h-24 rounded-lg object-cover"
-              />
-              <div className="flex-1">
-                <h3 className="text-lg font-bold">{item.title}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">{item.type}</p>
-                <p className="text-indigo-600 dark:text-indigo-400 font-semibold mt-1">${item.price}</p>
-              </div>
-              <button
-                onClick={() => removeFromCart(item.id)}
-                className="text-red-500 hover:text-red-600 transition"
-              >
-                <TrashIcon className="h-6 w-6" />
-              </button>
-            </motion.div>
+          {cards?.map((item,indx) => (
+            <ProductCard key={indx} item={item} refetch={refetch}/>
           ))}
         </div>
       )}
     </div>
   );
+}
+
+
+const ProductCard=({item,refetch})=>{
+  const [removeCart,{isLoading:removeLoading}]=useRemoveCartMutation();
+ 
+  const removeFromCart = async(productId) => {
+    const res=await removeCart({productId}).unwrap();
+    console.log(res,'res');
+    if(res?.status){
+      await refetch()
+    }
+    
+  };
+  return(
+    <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="flex relative overflow-hidden bg-white dark:bg-slate-800 p-4 rounded-xl shadow-md items-center gap-4"
+            >
+              <Image src={ `${url}/api/dashboard/product/files/${item?.thumbnails[0]?.id}?mimeType=${item?.thumbnails[0]?.mimeType}`} imageClassName={'w-24 h-24 rounded-lg object-contain'}/>
+              {/* <img
+                src={item?.thumbnail[0]}
+                alt={item?.title}
+                className="w-24 h-24 rounded-lg object-cover"
+              /> */}
+              <div className="flex-1 capitalize">
+                <h3 className="text-lg font-bold">{item?.title}</h3>
+                <p className="text-sm uppercase text-gray-600 dark:text-gray-300">{item?.category}</p>
+                <span className="text-indigo-600 dark:text-indigo-400 font-semibold mt-1">${item?.actualPrice}</span>
+                <span className="text-green-600 ml-4 dark:text-green-400 font-semibold text-xs mt-1 line-through">${item?.price}</span>
+              </div>
+              <button
+                onClick={() => removeFromCart(item?.prdId)}
+                className="text-red-500 hover:text-red-600 transition"
+              >
+                <TrashIcon className="h-6 w-6" />
+              </button>
+
+             {removeLoading && <motion.span
+              className="absolute center top-0 left-0 w-full h-full light:bg-slate-200/80 dark:bg-slate-400/60"
+              >
+                 <ImSpinner2 className="animate-spin text-white mr-2" /> Deleting...
+              </motion.span>}
+            </motion.div>
+  )
 }

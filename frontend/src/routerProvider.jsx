@@ -11,6 +11,7 @@ import LoadingScreen from './component/Shared/LoadingComponent'
 import ProductPage from './pages/store/ProductPage'
 import { productApi, useGetSingleProductQuery } from './services/store/productServices'
 import { store } from './store'
+import ScrollToTop from './component/Shared/ScrollTop';
 // import CartPage from './pages/store/CartPage';
 const CartPage=lazy(()=>import('./pages/store/CartPage'));
 // import { LoginForm, RegistrationForm } from './component/Store/AuthForm'
@@ -30,6 +31,7 @@ const DashboardProtectedLayout = () => {
 const StoreProtectedLayout = () => {
   return (
     <ProtectedRoute allowedRoles={["store"]}>
+      <ScrollToTop/>
       <Layout role="store" />
     </ProtectedRoute>
   );

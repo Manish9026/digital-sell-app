@@ -40,7 +40,11 @@ useEffect(() => {
 
   }
 }, [isAuthenticated])
+// const { pathname } = useLocation();
 
+useEffect(() => {
+  window.scrollTo({ top: 0, behavior: 'smooth' }); // or remove behavior for instant scroll
+}, [location?.pathname]);
 
 
 
