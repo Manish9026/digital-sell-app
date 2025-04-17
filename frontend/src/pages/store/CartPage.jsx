@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import Image from "../../component/Shared/ImageLoading";
 import { url } from "../../utils/service";
 import { ImSpinner2 } from 'react-icons/im';
+import { useNavigate } from "react-router-dom";
 const sampleCart = [
   {
     id: 1,
@@ -88,7 +89,7 @@ export default function CartPage() {
 
 const ProductCard=({item,refetch})=>{
   const [removeCart,{isLoading:removeLoading}]=useRemoveCartMutation();
- 
+ const navigate=useNavigate();
   const removeFromCart = async(productId) => {
     const res=await removeCart({productId}).unwrap();
     console.log(res,'res');
@@ -103,6 +104,7 @@ const ProductCard=({item,refetch})=>{
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
               className="flex relative overflow-hidden bg-white dark:bg-slate-800 p-4 rounded-xl shadow-md items-center gap-4"
+              onClick={()=>navigate({pathname:`/product/${item?.prdId}`,})}
             >
               <Image src={ `${url}/api/dashboard/product/files/${item?.thumbnails[0]?.id}?mimeType=${item?.thumbnails[0]?.mimeType}`} imageClassName={'w-24 h-24 rounded-lg object-contain'}/>
               {/* <img
@@ -117,7 +119,7 @@ const ProductCard=({item,refetch})=>{
                 <span className="text-green-600 ml-4 dark:text-green-400 font-semibold text-xs mt-1 line-through">${item?.price}</span>
               </div>
               <button
-                onClick={() => removeFromCart(item?.prdId)}
+                onClick={(e) =>{e.stopPropagation(); removeFromCart(item?.prdId)}}
                 className="text-red-500 hover:text-red-600 transition"
               >
                 <TrashIcon className="h-6 w-6" />
