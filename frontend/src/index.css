@@ -32,6 +32,7 @@ html {
   --color-light:oklch(88.2% 0.059 254.128);
   --color-thicksky: oklch(88.2% 0.059 254.128);
   --drop-shadow-cursor: 0 35px 35px rgba(0, 0, 0, 0.25); 
+  --breakpoint-xs: 400px;
 }
 .primary-p{
   @apply p-4 md:p-6 lg:p-8;

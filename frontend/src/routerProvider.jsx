@@ -12,6 +12,8 @@ import ProductPage from './pages/store/ProductPage'
 import { productApi, useGetSingleProductQuery } from './services/store/productServices'
 import { store } from './store'
 import ScrollToTop from './component/Shared/ScrollTop';
+// import ProfileTabs from './pages/store/ProfilePage';
+const ProfilePage=lazy(()=>import('./pages/store/ProfilePage'));
 // import CartPage from './pages/store/CartPage';
 const CartPage=lazy(()=>import('./pages/store/CartPage'));
 // import { LoginForm, RegistrationForm } from './component/Store/AuthForm'
@@ -70,6 +72,10 @@ export function RoutesProvider() {
             path:"user/cart",
             element:<CartPage/>,
 
+          },
+          {
+            path:"/user/profile",
+            element:<ProfilePage/>,
           },
           {
             path:"/user/login",

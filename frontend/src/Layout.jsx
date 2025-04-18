@@ -12,7 +12,7 @@ function Layout({role}) {
     }, []);
   return (
     role=="store"?
-    <div className='light:bg-slate-900 flex flex-col overflow-auto  min-h-screen min-w-screen max-w-screen  scroll-hide'>
+    <div className='light:bg-light flex  flex-col overflow-auto  min-h-screen min-w-screen max-w-screen dark:bg-primary  scroll-hide'>
 
     <Navbar/>
     <Outlet/>

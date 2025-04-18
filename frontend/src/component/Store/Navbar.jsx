@@ -1,5 +1,5 @@
 import { lazy } from 'react'
-import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
+import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems  } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 // import ThemeToggleButton from '../Shared/ThemeToggleButton'
 const ThemeToggleButton=lazy(() => import('../Shared/ThemeToggleButton'))
@@ -22,6 +22,7 @@ function classNames(...classes) {
 
 export default function Navbar() {
     const { isAuthenticated, role } = useSelector(state=>state.authReducer);
+    // const { close } = useDisclosureContext();
    const [logout,{isLoading,isError,isSuccess}]=useLogoutMutation();
   return (
     <Disclosure as="nav" className="scroll-hide z-50 border-b dark:border-light light:bg-light light:border-slate-400 drop-shadow-lg dark:bg-primary bg-gray-800 ">
@@ -53,7 +54,7 @@ export default function Navbar() {
                     to={item.href}
                     aria-current={item.current ? 'page' : undefined}
                     className={({isActive})=>classNames(
-                      isActive ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                      isActive ? 'bg-gray-900 text-white' : 'light:text-gray-600 hover:bg-gray-700 light:hover:text-white dark:text-light font-semibold',
                       'rounded-md px-3 py-2 text-sm font-medium',
                     )}
                   >
@@ -104,12 +105,12 @@ export default function Navbar() {
                   className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 transition focus:outline-hidden data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
                 >
                   <MenuItem>
-                    <a
-                      href="#"
+                    <Link
+                      to={"/user/profile"}
                       className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
                     >
                       Your Profile
-                    </a>
+                    </Link>
                   </MenuItem>
                   <MenuItem>
                     <a
@@ -176,11 +177,14 @@ export default function Navbar() {
       </div>
 
       <DisclosurePanel className="sm:hidden">
-        <div className="space-y-1 px-2 pt-2 pb-3">
+        <div className="group space-y-1 px-2 pt-2 pb-3">
           {navigation.map((item,index) => (
-            // <DisclosureButton
+          
              
-            // >
+            
+        
+
+
               <NavLink
                key={index}           
                to={item.href}
@@ -190,7 +194,6 @@ export default function Navbar() {
                  `
                }
 
-              // className={({isActive})=>`${isActive?"bg-blue-200 ":""} flex flex-col p-2`}
               >
 
                 {item.name}
