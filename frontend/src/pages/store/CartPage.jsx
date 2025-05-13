@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { ShoppingCartIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { useFetchCartQuery, useRemoveCartMutation } from "../../services/store/cartServices";
 import { useSelector } from "react-redux";
-import Image from "../../component/Shared/ImageLoading";
+import Image from "../../components/Shared/ImageLoading";
 import { url } from "../../utils/service";
 import { ImSpinner2 } from 'react-icons/im';
 import { useNavigate } from "react-router-dom";
@@ -55,8 +55,8 @@ export default function CartPage() {
 
 
   return (
-    <div className="min-h-screen bg-light dark:bg-primary text-gray-900 dark:text-white p-6">
-      <h1 className="text-3xl font-bold mb-8 text-center flex items-center justify-center gap-2">
+    <div className="flex flex-col min-h-full  bg-light dark:bg-primary text-gray-900 dark:text-white p-6">
+      <h1 className="text-3xl font-bold mb-8 text-center light:text-primary flex items-center justify-center gap-2">
         <ShoppingCartIcon className="h-7 w-7" /> Your Cart
       </h1>
 
@@ -71,7 +71,7 @@ export default function CartPage() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="text-center mt-20"
+          className="flex-1 text-color center   text-center"
         >
           <p className="text-xl">Your cart is empty.</p>
         </motion.div>
@@ -103,7 +103,7 @@ const ProductCard=({item,refetch})=>{
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
-              className="flex relative overflow-hidden bg-white dark:bg-slate-800 p-4 rounded-xl shadow-md items-center gap-4"
+              className="flex relative overflow-hidden light:bg-linear-to-br light:from-indigo-300/90 light:to-sky-500/30 dark:bg-slate-800 p-4 rounded-xl shadow-md items-center gap-4"
               onClick={()=>navigate({pathname:`/product/${item?.prdId}`,})}
             >
               <Image src={ `${url}/api/dashboard/product/files/${item?.thumbnails[0]?.id}?mimeType=${item?.thumbnails[0]?.mimeType}`} imageClassName={'w-24 h-24 rounded-lg object-contain'}/>
@@ -113,7 +113,7 @@ const ProductCard=({item,refetch})=>{
                 className="w-24 h-24 rounded-lg object-cover"
               /> */}
               <div className="flex-1 capitalize">
-                <h3 className="text-lg font-bold">{item?.title}</h3>
+                <h3 className="text-lg  font-bold">{item?.title}</h3>
                 <p className="text-sm uppercase text-gray-600 dark:text-gray-300">{item?.category}</p>
                 <span className="text-indigo-600 dark:text-indigo-400 font-semibold mt-1">${item?.actualPrice}</span>
                 <span className="text-green-600 ml-4 dark:text-green-400 font-semibold text-xs mt-1 line-through">${item?.price}</span>

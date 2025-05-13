@@ -2,13 +2,14 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from "framer-motion";
 import axios from 'axios';
+import { AspectRatio } from "@/components/ui/aspect-ratio"
 import { Moon, Sun } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { url } from '../../utils/service';
 import { useThrottle } from '../../hooks/useThrottleClick';
-import CustomText from '../../component/Shared/CustomText';
+import CustomText from '../../components/Shared/CustomText';
 import { useGetProductsQuery, useGetSingleProductQuery } from '../../services/store/productServices';
-import Image from '../../component/Shared/ImageLoading';
+import Image from '../../components/Shared/ImageLoading';
 import { usePaymentOrderMutation } from '../../services/store/paymentServices';
 export function ProductCard({product,className}) {
   const [showFullDescription, setShowFullDescription] = useState(false);
@@ -237,7 +238,7 @@ const ProductSection=()=>{
   
 
   return(
-    <section className=' flex relative  overflow-hidden primary-p flex-col w-full my-10  gap-4'>
+    <section className=' flex relative  overflow-hidden primary-p  flex-col w-full my-10  gap-4'>
  <motion.h2
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -259,42 +260,21 @@ const ProductSection=()=>{
     </section>
   )
 }
-function Home() {
-// const {data}=useGetSingleProductQuery("67fc44645889c2c5950b7fd1", {
-//   refetchOnFocus: true,
-//   refetchOnMountOrArgChange: false,
-// })
-  return (
-    <div className='flex-1  flex min-h-full flex-col pb-10 light:text-slate-800 light:bg-light dark:bg-primary dark:text-slate-200 '>
-      {/* <h1 className='text-2xl font-bold text-center  mt-10'>Welcome to the Home Page</h1>
+// function Home() {
+// // const {data}=useGetSingleProductQuery("67fc44645889c2c5950b7fd1", {
+// //   refetchOnFocus: true,
+// //   refetchOnMountOrArgChange: false,
+// // })
+//   return (
+//     <div className='flex-1  flex min-h-full flex-col pb-10 light:text-slate-800 light:bg-light dark:bg-primary dark:text-slate-200 '>
 
-<button onClick={()=>window.location.assign("/dashboard")}>go dashboard</button> */}
-      {/* <img src='https://drive.google.com/thumbnail?id=148MIv8M7SpkB4b0NzD---xBREwR2M3Ey' className='flex'/> */}
 
-      {/* <div className="flex flex-wrap gap-4 justify-center mt-10">
-      <ProductSection/>
-        
-        <AnimatedTabs />
-      </div> */}
+// <HomePage/>
 
-<HomePage/>
+//     </div>
+//   )
+// }
 
-    </div>
-  )
-}
-
-// Install dependencies before using:
-// npm install keen-slider framer-motion
-// import 'keen-slider/keen-slider.min.css';
-
-// import React, { useEffect, useRef } from "react";
-// import { motion } from "framer-motion";
-// Install dependencies before using:
-// npm install keen-slider framer-motion
-// import 'keen-slider/keen-slider.min.css';
-
-// import React, { useEffect, useRef } from "react";
-// import { motion } from "framer-motion";
 import "keen-slider/keen-slider.min.css";
 import { useKeenSlider } from "keen-slider/react";
 import { useAddToCartMutation } from '../../services/store/cartServices';
@@ -306,13 +286,14 @@ const products = [
   { title: "Ultimate Templates", type: "File Bundle", image: "https://designshack.net/wp-content/uploads/mobile-app-template-368x246.jpg" },
 ];
 
-function HomePage() {
+function Home() {
   const [sliderRef, instanceRef] = useKeenSlider({
     loop: true,
-    slides: { perView: 1.2, spacing: 15 },
+    slides: { perView: 1.6, spacing: 16,},
+  
     breakpoints: {
       "(min-width: 768px)": {
-        slides: { perView: 2.5, spacing: 20 },
+        slides: { perView: 'auto', spacing: 24 },
       },
     },
   });
@@ -357,7 +338,7 @@ function HomePage() {
   }, []);
 
   return (
-    <div className="light:bg-light  text-gray-900 dark:text-white min-h-screen overflow-x-hidden relative">
+    <div className="light:bg-light  light:text-slate-900 dark:text-white min-h-screen overflow-x-hidden relative ">
       {/* Custom Cursor */}
       <div
         ref={cursorRef}
@@ -365,12 +346,13 @@ function HomePage() {
       ></div>
 
       {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center text-center px-6 py-24 relative z-10">
-        <motion.h1
+      <section className="primary-p  flex flex-col items-center justify-center    light:text-gray-900  text-center px-6  relative z-10 ">
+        <span className='py-24 '>
+<motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-4xl md:text-6xl font-bold mb-4"
+          className="text-4xl  md:text-6xl font-bold mb-4"
         >
           Discover, Buy & Download Digital Products
         </motion.h1>
@@ -391,10 +373,13 @@ function HomePage() {
             Browse Products
           </button>
         </motion.div>
+        </span>
+        
+        
       </section>
 
       {/* Carousel Section */}
-      <section className="px-6 pb-5 relative z-10">
+      <section className="primary-p relative z-10">
         <motion.h2
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -405,23 +390,35 @@ function HomePage() {
           Featured Products
         </motion.h2>
 
-        <div ref={sliderRef} className="keen-slider">
+       
+
+        <div ref={sliderRef} className="keen-slider overflow-hidden py-2 ">
           {products.map((product, index) => (
             <motion.div
               key={index}
-              className="keen-slider__slide bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-lg text-center"
+              className="keen-slider__slide light:bg-white dark:bg-slate-800 p-6 rounded-2xl drop-shadow-md  dark:border-1 drop-shadow-neon text-center md:min-w-[350px] max-w-[400px] w-full flex-1   center flex-col"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.2 }}
               viewport={{ once: true }}
+              
             >
-              <img
+          
+              <span className="relative max-w-[350px] flex-1 w-full  flex flex-col">
+
+                <AspectRatio ratio={16 / 9}  >
+<img
                 src={product.image}
                 alt={product.title}
-                className="w-full h-48 object-cover rounded-xl mb-4"
+                className="w-full h-full   object-fill rounded-xl mb-4"
               />
-              <h3 className="text-xl font-bold mb-1">{product.title}</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-300">{product.type}</p>
+
+          </AspectRatio>
+          
+              </span>
+ <h3 className="text-xl font-bold mb-1">{product.title}</h3>
+              <p className="text-sm light:text-gray-500 dark:text-gray-300">{product.type}</p>
+             
             </motion.div>
           ))}
         </div>
@@ -430,7 +427,7 @@ function HomePage() {
 <ProductSection/>
 
       {/* How It Works Section */}
-      <motion.section className="px-6 py-20 bg-sky-100 overflow-hidden dark:bg-primary/70 relative z-10">
+      <motion.section className="px-6 py-20 light:bg-sky-100 overflow-hidden dark:bg-primary/70 relative z-10">
 
       <motion.div
           initial={{ opacity: 0 }}
@@ -457,7 +454,7 @@ function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: idx * 0.2 }}
               viewport={{ once: true }}
-              className="bg-white dark:bg-slate-700 p-8 rounded-xl shadow-lg text-center"
+              className="bg-white dark:bg-slate-700 p-8 rounded-xl text-light shadow-lg text-center"
             >
               <h3 className="text-xl font-bold mb-3">Step {idx + 1}: {step}</h3>
               <p className="text-sm text-gray-600 dark:text-gray-300">
@@ -491,7 +488,7 @@ function HomePage() {
               name="email"
               required
               placeholder="Enter your email"
-              className="px-4 py-2 rounded-md text-black focus:outline-none"
+              className="  px-4 py-2 rounded-md text-black placeholder:text-white placeholder:capitalize focus:outline-none border-b-1 dark:border-white light:border-gray-700  text-white"
             />
             <button
               type="submit"

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import './App.css'
+// import './App.css'
 import { motion, AnimatePresence } from "framer-motion";
 import axios from 'axios';
 import { url } from './utils/service';

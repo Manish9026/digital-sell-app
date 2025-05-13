@@ -1,0 +1,27 @@
+{
+  "name": "digital-sell-project",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm run dev",
+    "client": "cd frontend && npm run dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Manish9026/digital-sell-app.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Manish9026/digital-sell-app/issues"
+  },
+  "homepage": "https://github.com/Manish9026/digital-sell-app#readme",
+  "description": "",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "dependencies": {
+    "tailwindcss-theme-variants": "^2.0.0-beta.0"
+  }
+}

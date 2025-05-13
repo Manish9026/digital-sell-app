@@ -3,8 +3,8 @@ import { Star, StarHalf, ImagePlus, ShoppingCart, BadgeDollarSign, TicketPercent
 import { motion } from "framer-motion";
 import { useLoaderData ,useLocation, useNavigate, useParams} from "react-router-dom";
 import { useGetSingleProductQuery } from "../../services/store/productServices";
-import LoadingComponent, { LoadingScreen } from "../../component/Shared/LoadingComponent";
-import Image from "../../component/Shared/ImageLoading";
+import LoadingComponent, { LoadingScreen } from "../../components/Shared/LoadingComponent";
+import Image from "../../components/Shared/ImageLoading";
 import { url } from "../../utils/service";
 import { usePaymentOrderMutation } from "../../services/store/paymentServices";
 const Button = ({
@@ -164,7 +164,7 @@ const ProductPage = () => {
   
             <div className="space-y-4">
               <h1 className="text-3xl font-bold dark:text-gray-300 light:text-slate-800">{product?.title || "Awesome Gadget 3000"}</h1>
-              <p className="text-gray-600 text-base dark:text-sky-100">
+              <p className="light:text-gray-600 text-base dark:text-sky-100">
                 {product?.description || "This is a great product that you will love. It has all the features you need and more."}
               </p>
   
@@ -199,7 +199,7 @@ const ProductPage = () => {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="bg-white dark:bg-gray-800 border mt-2 rounded-lg p-2 shadow-lg space-y-1"
+                    className="light:bg-white dark:bg-gray-800 border mt-2 rounded-lg p-2 shadow-lg space-y-1"
                   >
                     {availableCoupons.map((c, index) => (
                       <li
@@ -229,13 +229,13 @@ const ProductPage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.5 }}
-            className="mt-12 bg-white/30 dark:bg-slate-800/30 backdrop-blur-lg p-6 rounded-2xl shadow-md"
+            className="mt-12 light:bg-white/30 dark:bg-slate-800/30 backdrop-blur-lg p-6 rounded-2xl shadow-md"
           >
-            <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-slate-200">Leave a Review</h2>
+            <h2 className="text-2xl font-semibold mb-4 light:text-gray-800 dark:text-slate-200">Leave a Review</h2>
   
             <form className="space-y-4 dark:text-slate-300" onSubmit={handleReviewSubmit}>
               <div>
-                <label className="block text-gray-700 font-medium mb-1 dark:text-slate-300">Your Rating</label>
+                <label className="block light:text-gray-700 font-medium mb-1 dark:text-slate-300">Your Rating</label>
                 <div className="flex gap-1">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
@@ -253,9 +253,12 @@ const ProductPage = () => {
               </div>
   
               <div>
-                <label className="block text-gray-700 font-medium mb-1 dark:text-slate-300">Your Review</label>
+                <label className="block light:text-gray-700 font-medium mb-1 dark:text-slate-300">Your Review</label>
                 <textarea
-                  className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  className="w-full border dark:border-gray-300 light:border-gray-600 rounded-lg p-2 focus:outline-none 
+                  light:placeholder:text-slate-500
+                  light:placeholder:text-sky-300
+                  focus:ring-2 focus:ring-blue-400"
                   rows={4}
                   placeholder="Write your thoughts..."
                   value={reviewText}
@@ -264,10 +267,10 @@ const ProductPage = () => {
               </div>
   
               <div>
-                <label className="block text-gray-700 font-medium mb-1 dark:text-slate-300">Attach Images</label>
+                <label className="block light:text-gray-700 font-medium mb-1 dark:text-slate-300">Attach Images</label>
                 <div className="flex items-center gap-2">
                   <input type="file" accept="image/*" multiple className="hidden" id="upload" />
-                  <label htmlFor="upload" className="cursor-pointer p-2 border rounded-lg hover:bg-gray-100 flex items-center gap-2">
+                  <label htmlFor="upload" className="cursor-pointer p-2 border rounded-lg hover:bg-gray-100 flex items-center gap- light:border-primary light:text-primary">
                     <ImagePlus size={20} /> Upload
                   </label>
                 </div>

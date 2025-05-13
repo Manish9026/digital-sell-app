@@ -1,0 +1,14 @@
+{
+
+  "compilerOptions": {
+    // ...
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
+    // ...
+  }
+}
+// Use --legacy-peer-deps

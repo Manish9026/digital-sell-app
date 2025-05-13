@@ -75,6 +75,13 @@ const themeCollection = ["light", "dark"];
 // import { useEffect, useState } from "react";
 
 const themes = ["light", "dark"];
+export const classSwitch=(theme)=>{
+const html = document.documentElement;
+
+html.className="";
+html.className=theme;
+}
+
 
 export default function ThemeToggleButton() {
     const [themeIndex, setThemeIndex] = useState(0);
@@ -82,16 +89,21 @@ export default function ThemeToggleButton() {
     // Load theme from localStorage or fallback to light
     useEffect(() => {
       const saved = localStorage.getItem("theme");
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      // const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      // const prefersDark
   
-      const initialTheme = saved || (prefersDark ? "dark" : "light");
+      // const initialTheme = saved || (prefersDark ? "dark" : "light");
+
+      
+      const initialTheme=saved || "dark"
       const index = themes.indexOf(initialTheme);
   
       setThemeIndex(index >= 0 ? index : 0);
       document.documentElement.setAttribute("data-theme", themes[index >= 0 ? index : 0]);
   
       // if using Tailwind "darkMode: 'class'"
-      document.documentElement.classList.toggle("dark", initialTheme === "dark");
+      // document.documentElement.classList.toggle("dark", initialTheme === "dark");
+      classSwitch(themes[index >= 0 ? index : 0]);
     }, []);
   
     const toggleTheme = () => {
@@ -103,13 +115,15 @@ export default function ThemeToggleButton() {
       document.documentElement.setAttribute("data-theme", newTheme);
   
       // toggle Tailwind dark mode class
-      document.documentElement.classList.toggle("dark", newTheme === "dark");
+
+      classSwitch(newTheme)
+      // document.documentElement.classList.toggle("dark", newTheme === "dark");
     };
   
     return (
       <button
         onClick={toggleTheme}
-        className="p-2 rounded-full light:bg-light dark:bg-primary light:text-gray-500 dark:text-white transition"
+        className="p-2 rounded-full text-color transition"
       >
         <AnimatePresence mode="wait" initial={false}>
           {themes[themeIndex] === "dark" ? (

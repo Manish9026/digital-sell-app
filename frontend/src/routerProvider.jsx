@@ -4,25 +4,26 @@ import React, { lazy, Suspense } from 'react'
 import { createBrowserRouter, RouterProvider, useLocation } from 'react-router-dom'
 import App from './App'
 import 'keen-slider/keen-slider.min.css';
-import PaymentSuccessPage, { PaymentWaiting } from './component/PaymentSuccess'
+import PaymentSuccessPage, { PaymentWaiting } from './components/PaymentSuccess'
 import  Layout  from './Layout'
 import ProtectedRoute from './ProtectedRoute'
-import LoadingScreen from './component/Shared/LoadingComponent'
+import LoadingScreen from './components/Shared/LoadingComponent'
 import ProductPage from './pages/store/ProductPage'
 import { productApi, useGetSingleProductQuery } from './services/store/productServices'
 import { store } from './store'
-import ScrollToTop from './component/Shared/ScrollTop';
+import ScrollToTop from './components/Shared/ScrollTop';
+import AddProduct from './pages/dasboard/AddProduct';
 // import ProfileTabs from './pages/store/ProfilePage';
 const ProfilePage=lazy(()=>import('./pages/store/ProfilePage'));
 // import CartPage from './pages/store/CartPage';
 const CartPage=lazy(()=>import('./pages/store/CartPage'));
 // import { LoginForm, RegistrationForm } from './component/Store/AuthForm'
 const DashboardHome=lazy(()=>import('./pages/dasboard/Home'));
-const LoginForm =lazy(()=>import('./component/Store/AuthForm').then(module=>({default:module.LoginForm})));
-const RegistrationForm =lazy(()=>import('./component/Store/AuthForm').then(module=>({default:module.RegistrationForm})));
+const LoginForm =lazy(()=>import('./components/Store/AuthForm').then(module=>({default:module.LoginForm})));
+const RegistrationForm =lazy(()=>import('./components/Store/AuthForm').then(module=>({default:module.RegistrationForm})));
 const StoreHome=lazy(()=>import('./pages/store/Home'));
 // NotFoundPage
-const NotFoundPage=lazy(()=>import('./component/Shared/NotFoundPage'));
+const NotFoundPage=lazy(()=>import('./components/Shared/NotFoundPage'));
 const DashboardProtectedLayout = () => {
   return (
     <ProtectedRoute allowedRoles={["dashboard"]}>
@@ -123,7 +124,14 @@ export function RoutesProvider() {
             {
               path:'',
               element:<DashboardHome/>
-            },{
+            },
+            {
+              path:"product",
+              element:<AddProduct/>
+            },
+
+            
+            {
               path:"*",
               element:<NotFoundPage/>
             }

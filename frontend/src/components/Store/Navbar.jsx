@@ -25,12 +25,12 @@ export default function Navbar() {
     // const { close } = useDisclosureContext();
    const [logout,{isLoading,isError,isSuccess}]=useLogoutMutation();
   return (
-    <Disclosure as="nav" className="scroll-hide z-50 border-b dark:border-light light:bg-light light:border-slate-400 drop-shadow-lg dark:bg-primary bg-gray-800 ">
+    <Disclosure as="nav" className="scroll-hide z-50 border-b dark:border-light light:bg-light light:border-slate-400 drop-shadow-lg dark:bg-primary ">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
             {/* Mobile menu button*/}
-            <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:ring-2 focus:ring-white focus:outline-hidden focus:ring-inset">
+            <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-2 text-color hover:bg-gray-700  focus:ring-2 focus:ring-white focus:outline-hidden focus:ring-inset">
               <span className="absolute -inset-0.5" />
               <span className="sr-only">Open main menu</span>
               <Bars3Icon aria-hidden="true" className="block size-6 group-data-open:hidden" />
@@ -68,7 +68,7 @@ export default function Navbar() {
           <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
             <button
               type="button"
-              className="relative rounded-full light:bg-light dark:bg-primary hover:text-white light:hover:text-gray-900 light:text-gray-500  p-1  text-gray-300 focus:ring-1 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-900 focus:outline-hidden"
+              className="text-color focus:ring-1 rounded-full light:ring-gray-600 dark:ring-gray-300 p-1"
             >
               <span className="absolute -inset-1.5" />
               <span className="sr-only">View notifications</span>
@@ -78,7 +78,8 @@ export default function Navbar() {
             <NavLink to={'/user/cart'} className={({ isActive }) =>
    ` ${isActive
       ? "ring-1"
-      : "" } " p-1 ml-2 border-b border-l rounded gap-1 flex items-center justify-center light:bg-light dark:bg-primary hover:text-thicksky light:hover:text-gray-900 light:text-gray-500 cursor-pointer text-gray-300 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden"`
+      : "" } " p-1 ml-2 border-b border-l rounded gap-1 flex items-center justify-center    cursor-pointer text-color 
+      "`
   }>
 
               <LucideShoppingBag className='size-[20px]' />
