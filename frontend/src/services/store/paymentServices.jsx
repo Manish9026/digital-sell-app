@@ -32,7 +32,7 @@ export const authBaseQuery = ({ defaultBaseUrl }) => {
         ? { ...args, meta: undefined }
         : args;
   
-      const result = await rawBaseQuery(cleanedArgs, api, extraOptions);
+      let result = await rawBaseQuery(cleanedArgs, api, extraOptions);
   
       if (result.error && result.error.status === 401) {
         const refreshResult = await baseQuery('/refresh-token', api, extraOptions)

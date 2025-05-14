@@ -1,4 +1,4 @@
-import { IconCirclePlusFilled, IconMail, type Icon } from "@tabler/icons-react"
+import { IconCirclePlusFilled, IconMail } from "@tabler/icons-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -12,12 +12,6 @@ import { Link, NavLink } from "react-router-dom"
 
 export function NavMain({
   items,
-}: {
-  items: {
-    title: string
-    url: string
-    icon?: Icon
-  }[]
 }) {
   return (
     <SidebarGroup>

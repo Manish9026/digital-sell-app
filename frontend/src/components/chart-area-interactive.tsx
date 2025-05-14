@@ -132,11 +132,11 @@ const chartConfig = {
   },
   desktop: {
     label: "Desktop",
-    color: "var(--primary)",
+    color: "white",
   },
   mobile: {
     label: "Mobile",
-    color: "var(--primary)",
+    color: "blue",
   },
 } satisfies ChartConfig
 
@@ -240,12 +240,14 @@ export function ChartAreaInteractive() {
                 />
               </linearGradient>
             </defs>
-            <CartesianGrid vertical={false} />
+            <CartesianGrid vertical={false} className="" />
             <XAxis
               dataKey="date"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
+             
+          
               minTickGap={32}
               tickFormatter={(value) => {
                 const date = new Date(value)
@@ -257,6 +259,7 @@ export function ChartAreaInteractive() {
             />
             <ChartTooltip
               cursor={false}
+
               defaultIndex={isMobile ? -1 : 10}
               content={
                 <ChartTooltipContent
