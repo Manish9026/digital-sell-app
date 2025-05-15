@@ -13,6 +13,7 @@ import { productApi, useGetSingleProductQuery } from './services/store/productSe
 import { store } from './store'
 import ScrollToTop from './components/Shared/ScrollTop';
 import AddProduct from './pages/dasboard/AddProduct';
+import AuthPage from './pages/dasboard/AuthPage';
 // import ProfileTabs from './pages/store/ProfilePage';
 const ProfilePage=lazy(()=>import('./pages/store/ProfilePage'));
 // import CartPage from './pages/store/CartPage';
@@ -129,7 +130,11 @@ export function RoutesProvider() {
               path:"product",
               element:<AddProduct/>
             },
-
+            {
+              path:"auth",
+              element:<AuthPage/>
+            }
+,
             
             {
               path:"*",
