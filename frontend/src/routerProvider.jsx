@@ -14,6 +14,9 @@ import { store } from './store'
 import ScrollToTop from './components/Shared/ScrollTop';
 import AddProduct from './pages/dasboard/AddProduct';
 import AuthPage from './pages/dasboard/AuthPage';
+// import  { ForgotPasswordForm, TwoFactorForm ,LoginLayout} from './components/Dashboard/LoginLayout';
+import AuthDashboard from './components/Dashboard/LoginLayout';
+
 // import ProfileTabs from './pages/store/ProfilePage';
 const ProfilePage=lazy(()=>import('./pages/store/ProfilePage'));
 // import CartPage from './pages/store/CartPage';
@@ -41,20 +44,20 @@ const StoreProtectedLayout = () => {
   );
 };
 
-export async function userLoader({ params }) {
-  const promise = store.dispatch(
-    productApi.endpoints.getSingleProduct.initiate(params.prdId)
-  );
+// export async function userLoader({ params }) {
+//   const promise = store.dispatch(
+//     productApi.endpoints.getSingleProduct.initiate(params.prdId)
+//   );
 
-  try {
-    const result = await promise.unwrap();
-    console.log(result, "result");
+//   try {
+//     const result = await promise.unwrap();
+//     console.log(result, "result");
     
-    return result;
-  } finally {
-    store.dispatch(productApi.util.resetApiState()); // optional: clean up
-  }
-}
+//     return result;
+//   } finally {
+//     store.dispatch(productApi.util.resetApiState()); // optional: clean up
+//   }
+// }
 
 export function RoutesProvider() {
 
@@ -130,10 +133,7 @@ export function RoutesProvider() {
               path:"product",
               element:<AddProduct/>
             },
-            {
-              path:"auth",
-              element:<AuthPage/>
-            }
+            
 ,
             
             {
@@ -141,7 +141,26 @@ export function RoutesProvider() {
               element:<NotFoundPage/>
             }
           ]
-        }
+        },{
+              path:"dashboard/admin-auth",
+              element:<AuthPage/>,
+              children:[{
+                path:"",
+                element:<AuthDashboard.LoginForm/>,
+              },{
+                path:"2fa-verify",
+                element:<AuthDashboard.TwoFactorForm/>
+              },
+              {
+                path:"reset-password",
+                element:<AuthDashboard.ForgotPasswordForm/>
+              },
+              {
+                path:"new-password",
+                element:<AuthDashboard.NewPasswordForm/>
+              }
+            ]
+            }
         
         ]
       

@@ -1,10 +1,5 @@
 @import "tailwindcss";
-/* @tailwind base;
-@tailwind components;
-@tailwind utilities; */
-/* @import "tailwindcss"; */
-/* @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
-@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *)); */
+
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @custom-variant light (&:where([data-theme=light], [data-theme=light] *));
@@ -25,13 +20,18 @@
 }
 html {
   transition: background-color 0.3s ease, color 0.3s ease;
+  color: #6cc6e4a2;
 }
+
 @theme {
 
   --color-primary: oklch(12.9% 0.042 264.695);
   --color-light:oklch(88.2% 0.059 254.128);
   --color-thicksky: oklch(88.2% 0.059 254.128);
   --drop-shadow-cursor: 0 35px 35px rgba(0, 0, 0, 0.25);
+
+  /* login color */
+
   /* --color-dark:;  */
   --breakpoint-xs: 400px;
 }
@@ -121,10 +121,10 @@ body {
           drop-shadow(0 0 30px #39c7ff)
           drop-shadow(0 0 50px #00bfff);
 }
-h1 {
+/* h1 {
   font-size: 3.2em;
   line-height: 1.1;
-}
+} */
 
 button {
 
@@ -177,10 +177,15 @@ scrollbar-width: none;  /* Firefox */
 
 
 #root {
-  max-width: 1280px;
+  /* max-width: 1280px; */
   /* margin: 0 auto; */
   /* padding: 2rem; */
   /* text-align: center; */
+  /* display: flex; */
+  width: 100vw;
+  height: 100%;
+  min-height: 100vh;
+  flex: 1;
 }
 
 .center{
@@ -189,3 +194,31 @@ scrollbar-width: none;  /* Firefox */
   align-items: center;
 }
 
+.conic-border {
+  /* padding: 4px; acts as border */
+  @apply border-2 dark:border-blue-500 light:border-slate-500;
+  /* border-radius: 12px;
+  background-color: transparent; */
+}
+
+.conic-border > *{
+  
+  /* z-index: 4; */
+  /* @apply light:bg-light dark:bg-primary  ;
+   */
+   /* background-color: red; */
+
+  
+ 
+}
+/* .conic-border::after{
+content: "";
+position: absolute;
+width: 110%;
+height: 100%;
+top: 0;
+left:0;
+background-image: conic-gradient(from 0deg ,red, yellow, green);
+z-index: -1;
+padding: 20px;
+  } */

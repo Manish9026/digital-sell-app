@@ -9,42 +9,58 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner"
 
 
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useNavigate, useLocation, Link, Outlet } from "react-router-dom";
 import { Smartphone, Key, QrCode } from "lucide-react";
 import { Mail, Lock } from "lucide-react";
+import {motion }from 'framer-motion'
 
 // This is the login layout component
 
-const LoginLayout = ({ children, title, subtitle }) => {
+const LoginLayout = ({ children, title, subtitle,activeChildren="2fa" }) => {
+
+
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-gray-50 light:from-slate-200  light:to-gray-100 dark:from-gray-900 dark:to-gray-950 p-4">
-      <div className="absolute top-0 left-0 w-full h-64 bg-shield-primary/20 dark:bg-shield-primary/10 -z-10" />
+    <motion.div 
+      initial={{ opacity: 0, y: -30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+     className="flex  w-full items-center justify-center  p-4">
+      {/* <div className="absolute top-0 left-0 w-full h-64 bg-shield-primary/20 dark:bg-shield-primary/10 -z-10" /> */}
       
       <div className="absolute top-4 right-4">
         {/* <ThemeToggle /> */}
       </div>
 
-      <div className="w-full max-w-md">
-        <div className="flex flex-col items-center mb-6">
+    <div className="w-full  relative conic-border  p-2 rounded-xl max-w-md">
+{ <div className="flex flex-col items-center mb-6">
           <div className="p-3  rounded-full dark:bg-shield-primary/20 bg-shield-light/50  mb-4">
             <Shield className="h-8 w-8 text-shield-primary" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{title}</h1>
-          {subtitle && <p className="text-gray-500 dark:text-gray-400 mt-1 text-center">{subtitle}</p>}
-        </div>
+          <h1 className="text-2xl font-bold  dark:text-gray-100 light:text-gray-900">{title}</h1>
+          {subtitle && <p className="light:text-gray-500 dark:text-gray-400 mt-1 text-center">{subtitle}</p>}
+        </div>}
         
         <div className="relative overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-md animate-fade-in">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 dark:via-white/5 to-transparent -translate-x-full animate-shimmer" />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 dark:via-white/5 to-transparent -translate-x-full animate-shimmer z-10" />
           <div className="p-6 light:bg-light dark:bg-primary dark:text-light light:text-black">
-            {children}
+        
+            {/* <LoginForm/> */}
+            <span className="relative z-50">
+
+           {children}
+            </span>
+             
+           
           </div>
         </div>
 
-        <div className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
+        <div className="mt-6 text-center text-sm light:text-gray-500  dark:text-gray-400">
           <p>Protected by Login Shield &copy; {new Date().getFullYear()}</p>
         </div>
       </div>
-    </div>
+
+      
+    </motion.div>
   );
 };
 
@@ -83,7 +99,7 @@ const LoginForm = () => {
         });
         
         // Since login was successful, navigate to 2FA page
-        navigate("/2fa", { state: { email } });
+        navigate("/dashboard/admin-auth/2fa-verify", { state: { email } });
       } else {
         toast({
           title: "Login failed",
@@ -95,10 +111,13 @@ const LoginForm = () => {
   };
 
   return (
+
+    <LoginLayout  title="Welcome Back" subtitle="Sign in to access your account">
+
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="email" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-          <Mail className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+        <Label htmlFor="email" className="flex items-center gap-2 light:text-gray-700 dark:text-gray-300">
+          <Mail className="h-4 w-4 light:text-gray-500 dark:text-gray-400" />
           Email
         </Label>
         <Input
@@ -113,8 +132,8 @@ const LoginForm = () => {
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="password" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-          <Lock className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+        <Label htmlFor="password" className="flex items-center gap-2 light:text-gray-700 dark:text-gray-300">
+          <Lock className="h-4 w-4 light:text-gray-500 dark:text-gray-400" />
           Password
         </Label>
         <Input
@@ -128,9 +147,9 @@ const LoginForm = () => {
         />
       </div>
       
-      <div className="flex items-center justify-between pt-2">
+      <div className="flex relative items-center justify-between pt-2 z-50">
         <Link 
-          to="/forgot-password"
+          to="/dashboard/admin-auth/reset-password"
           className="text-sm text-shield-primary hover:text-shield-secondary transition-colors"
         >
           Forgot password?
@@ -152,6 +171,7 @@ const LoginForm = () => {
         </Button>
       </div>
     </form>
+    </LoginLayout>
   );
 };
 
@@ -230,14 +250,17 @@ const TwoFactorForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+
+    <LoginLayout title={"Two-Factor Authentication"} subtitle={"Verify your identity to continue"}
+    >
+      <form  onSubmit={handleSubmit} className="space-y-6">
       <div className="flex items-center justify-center mb-4">
-        <div className="h-12 w-12 rounded-full bg-shield-light/50 flex items-center justify-center">
+        <div className="p-3  rounded-full dark:bg-shield-primary/20 bg-shield-light/50  h-12 w-12">
           <Smartphone className="h-6 w-6 text-shield-primary" />
         </div>
       </div>
       
-      <p className="text-center text-gray-600 dark:text-gray-400">
+      <p className="text-center light:text-gray-600 dark:text-gray-400">
         We've sent a verification code to {email}. Please enter it below.
       </p>
       
@@ -253,7 +276,7 @@ const TwoFactorForm = () => {
           value={code}
           onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
           required
-          className="text-center text-lg font-mono tracking-widest border-gray-300 focus:border-shield-primary focus:ring-shield-primary/20"
+          className="text-center text-lg font-mono tracking-widest border-gray-300 light:border-gray-900  focus:border-shield-primary focus:ring-shield-primary/20"
           maxLength={6}
         />
       </div>
@@ -262,7 +285,7 @@ const TwoFactorForm = () => {
         <Button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-shield-primary hover:bg-shield-secondary"
+          className="w-full text-light bg-shield-primary hover:bg-shield-secondary"
         >
           {isLoading ? (
             <>
@@ -294,7 +317,7 @@ const TwoFactorForm = () => {
             <QrCode className="h-4 w-4" />
             Set up authenticator app
           </Button>
-          <p className="mt-2 text-xs text-center text-gray-500 dark:text-gray-400">
+          <p className="mt-2 text-xs text-center light:text-gray-500 dark:text-gray-400">
             Don't want to receive SMS codes? Set up an authenticator app instead.
           </p>
         </div>
@@ -303,15 +326,16 @@ const TwoFactorForm = () => {
           type="button"
           variant="outline"
           className="w-full"
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/dashboard/admin-auth")}
         >
           Back to login
         </Button>
       </div>
     </form>
+    </LoginLayout>
+    
   );
 };
-
 
 
 
@@ -357,7 +381,7 @@ const ForgotPasswordForm = () => {
   };
 
   return (
-    <>
+   <LoginLayout title={"Reset Your Password"} subtitle={"We'll send you instructions to reset your password"}>
       {isSubmitted ? (
         <div className="space-y-4 animate-fade-in">
           <Alert className="bg-shield-light/20 border-shield-light">
@@ -428,7 +452,7 @@ const ForgotPasswordForm = () => {
               type="button"
               variant="ghost"
               className="flex items-center gap-2 text-gray-600"
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/dashboard/admin-auth")}
             >
               <ArrowLeft className="h-4 w-4" />
               Back to login
@@ -436,12 +460,451 @@ const ForgotPasswordForm = () => {
           </div>
         </form>
       )}
-    </>
+   </LoginLayout>
+  );
+};
+
+import {  Eye, EyeOff, CheckCircle } from "lucide-react";
+const passwordStrengthLevels = [
+  { level: "weak", color: "bg-red-500" },
+  { level: "fair", color: "bg-orange-500" },
+  { level: "good", color: "bg-yellow-500" },
+  { level: "strong", color: "bg-green-500" },
+];
+
+const NewPasswordForm = () => {
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  // const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const toggleShowPassword = () => setShowPassword(!showPassword);
+  const toggleShowConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
+
+  const getPasswordStrength = (pass) => {
+    if (!pass) return { strength: 0, level: "" };
+    
+    let strength = 0;
+    if (pass.length > 6) strength += 1;
+    if (pass.length > 10) strength += 1;
+    if (/[A-Z]/.test(pass)) strength += 1;
+    if (/[0-9]/.test(pass)) strength += 1;
+    if (/[^A-Za-z0-9]/.test(pass)) strength += 1;
+    
+    const level = passwordStrengthLevels[Math.min(3, Math.floor(strength / 2))];
+    return { 
+      strength: Math.min(100, strength * 25), 
+      level: level?.level || "", 
+      color: level?.color || "" 
+    };
+  };
+
+  const passwordStrength = getPasswordStrength(password);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!password || !confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Please fill in both password fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Passwords do not match",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (passwordStrength.strength < 50) {
+      toast({
+        title: "Weak Password",
+        description: "Please choose a stronger password",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      setIsLoading(false);
+      setIsSuccess(true);
+      
+      toast({
+        title: "Success",
+        description: "Your password has been reset successfully",
+      });
+
+      // Redirect after 3 seconds
+      setTimeout(() => {
+        navigate("/");
+      }, 3000);
+    }, 1500);
+  };
+
+  return (
+    <LoginLayout title={"Set New Password"} subtitle={"Create a secure password for your account"}>
+      {isSuccess ? (
+        <div className="space-y-4 animate-bounce-in">
+          <div className="flex flex-col items-center justify-center gap-4 py-6">
+            <div className="rounded-full bg-green-100 p-3">
+              <CheckCircle className="h-8 w-8 text-green-600" />
+            </div>
+            <h3 className="text-xl font-semibold text-center">Password Reset Complete!</h3>
+          </div>
+          
+          <Alert className="bg-shield-light/20 border-shield-light">
+            <AlertDescription className="text-center">
+              Your password has been reset successfully. You will be redirected to the login page in a few seconds.
+            </AlertDescription>
+          </Alert>
+          
+          <Button
+            type="button"
+            onClick={() => navigate("/")}
+            className="w-full bg-shield-primary hover:bg-shield-secondary"
+          >
+            Return to login
+          </Button>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-4 animate-fade-in">
+          <div className="space-y-2">
+            <Label htmlFor="password" className="flex items-center gap-2">
+              <Lock className="h-4 w-4 text-gray-500" />
+              New Password
+            </Label>
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
+                className="pr-10 border-gray-300 focus:border-shield-primary focus:ring-shield-primary/20"
+              />
+              <button
+                type="button"
+                onClick={toggleShowPassword}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            
+            {password && (
+              <div className="space-y-1 mt-2 animate-fade-in">
+                <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
+                  <div 
+                    className={`h-full ${passwordStrength.color} transition-all duration-300 ease-in-out`}
+                    style={{ width: `${passwordStrength.strength}%` }}
+                  />
+                </div>
+                <p className="text-xs text-gray-500 capitalize">
+                  {passwordStrength.level ? `Password strength: ${passwordStrength.level}` : "Enter password"}
+                </p>
+              </div>
+            )}
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword" className="flex items-center gap-2">
+              <Shield className="h-4 w-4 text-gray-500" />
+              Confirm Password
+            </Label>
+            <div className="relative">
+              <Input
+                id="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="••••••••••••"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                autoComplete="new-password"
+                className="pr-10 border-gray-300 focus:border-shield-primary focus:ring-shield-primary/20"
+              />
+              <button
+                type="button"
+                onClick={toggleShowConfirmPassword}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              >
+                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            
+            {password && confirmPassword && (
+              <div className="mt-1 text-xs">
+                {password === confirmPassword ? (
+                  <p className="text-green-600 flex items-center gap-1">
+                    <CheckCircle className="h-3 w-3" /> Passwords match
+                  </p>
+                ) : (
+                  <p className="text-red-600">Passwords don't match</p>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="pt-4">
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-shield-primary hover:bg-shield-secondary"
+            >
+              {isLoading ? (
+                <>
+                  <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                  Setting password...
+                </>
+              ) : (
+                "Set New Password"
+              )}
+            </Button>
+          </div>
+          
+          <div className="pt-2">
+            <p className="text-xs text-gray-500">
+              <span className="font-medium">Password requirements:</span> At least 8 characters with a mix of 
+              uppercase, lowercase, numbers, and special characters.
+            </p>
+          </div>
+        </form>
+      )}
+    </LoginLayout>
   );
 };
 
 
-export { LoginForm, LoginLayout,TwoFactorForm ,ForgotPasswordForm};
-export default {LoginForm,LoginLayout,TwoFactorForm,ForgotPasswordForm};
+
+import {  Copy,  ArrowRight } from "lucide-react";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+
+const OTPSetupForm = () => {
+  const [verificationCode, setVerificationCode] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [step, setStep] = useState(1); // 1: Setup, 2: Verification, 3: Success
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  // In a real app, these would come from your backend
+  const secretKey = "JBSWY3DPEHPK3PXP";
+  const qrCodeUrl = `https://chart.googleapis.com/chart?chs=200x200&chld=M|0&cht=qr&chl=otpauth://totp/Lovable:user@example.com?secret=${secretKey}&issuer=Lovable`;
+
+  const handleCopySecret = () => {
+    navigator.clipboard.writeText(secretKey);
+    toast({
+      title: "Secret copied",
+      description: "Authentication secret has been copied to clipboard",
+    });
+  };
+
+  const handleVerify = () => {
+    setIsLoading(true);
+    
+    // In a real app, you would validate this with your backend
+    setTimeout(() => {
+      setIsLoading(false);
+      
+      // Demo validation - pretend "123456" is a valid code
+      if (verificationCode === "123456") {
+        setStep(3);
+        toast({
+          title: "Success",
+          description: "Two-factor authentication has been enabled",
+        });
+      } else {
+        toast({
+          title: "Verification failed",
+          description: "Invalid code. Please try again",
+          variant: "destructive",
+        });
+      }
+    }, 1500);
+  };
+
+  const handleComplete = () => {
+    navigate("/dashboard");
+  };
+
+  if (step === 3) {
+    return (
+      <div className="space-y-6 animate-fade-in">
+        <div className="flex items-center justify-center mb-4">
+          <div className="h-16 w-16 rounded-full bg-shield-light flex items-center justify-center animate-bounce-in">
+            <Shield className="h-8 w-8 text-shield-primary" />
+          </div>
+        </div>
+        
+        <h3 className="text-xl font-semibold text-center">Two-Factor Authentication Enabled</h3>
+        <p className="text-center text-gray-600 dark:text-gray-400">
+          Your account is now more secure with two-factor authentication.
+        </p>
+        
+        <Button 
+          onClick={handleComplete}
+          className="w-full bg-shield-primary hover:bg-shield-secondary"
+        >
+          Continue to Dashboard
+          <ArrowRight className="ml-2 h-4 w-4" />
+        </Button>
+      </div>
+    );
+  }
+
+  if (step === 2) {
+    return (
+      <div className="space-y-6 animate-fade-in">
+        <h3 className="text-lg font-medium">Verify Setup</h3>
+        <p className="text-gray-600 dark:text-gray-400">
+          Enter the verification code from your authenticator app to confirm setup
+        </p>
+        
+        <div className="space-y-2">
+          <Label htmlFor="otp">Verification Code</Label>
+          <div className="flex justify-center">
+            <InputOTP 
+              maxLength={6}
+              value={verificationCode}
+              onChange={setVerificationCode}
+              render={({ slots }) => (
+                <InputOTPGroup>
+                  {slots.map((slot, i) => (
+                    <InputOTPSlot key={i} {...slot} />
+                  ))}
+                </InputOTPGroup>
+              )}
+            />
+          </div>
+        </div>
+        
+        <div className="space-y-4">
+          <Button
+            type="button"
+            disabled={isLoading || verificationCode.length < 6}
+            className="w-full bg-shield-primary hover:bg-shield-secondary"
+            onClick={handleVerify}
+          >
+            {isLoading ? (
+              <>
+                <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                Verifying...
+              </>
+            ) : (
+              "Verify Setup"
+            )}
+          </Button>
+          
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={() => setStep(1)}
+          >
+            Back to Setup
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <form className="space-y-6">
+      <div className="flex items-center justify-center mb-4">
+        <div className="h-12 w-12 rounded-full bg-shield-light/50 flex items-center justify-center">
+          <QrCode className="h-6 w-6 text-shield-primary" />
+        </div>
+      </div>
+      
+      <p className="text-center text-gray-600 dark:text-gray-400">
+        Scan this QR code with your authenticator app or enter the setup key manually
+      </p>
+      
+      <Card className="overflow-hidden border-gray-200 dark:border-gray-700">
+        <CardContent className="p-4">
+          <div className="bg-white rounded-md p-4 flex items-center justify-center">
+            <AspectRatio ratio={1 / 1} className="w-48 mx-auto">
+              <img 
+                src={qrCodeUrl}
+                alt="QR Code for TOTP setup" 
+                className="rounded-md"
+              />
+            </AspectRatio>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <div className="space-y-2">
+        <Label htmlFor="secret" className="flex items-center gap-2">
+          <Lock className="h-4 w-4 text-gray-500" />
+          Manual Setup Key
+        </Label>
+        <div className="flex items-center space-x-2">
+          <Input
+            id="secret"
+            value={secretKey}
+            readOnly
+            className="font-mono bg-gray-50 dark:bg-gray-800"
+          />
+          <Button 
+            type="button" 
+            size="icon" 
+            variant="outline" 
+            onClick={handleCopySecret}
+          >
+            <Copy className="h-4 w-4" />
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          If you can't scan the QR code, you can manually enter this secret key into your app
+        </p>
+      </div>
+      
+      <div className="space-y-2">
+        <h3 className="text-sm font-medium">Setup Instructions:</h3>
+        <ol className="list-decimal list-inside space-y-1 text-sm text-gray-600 dark:text-gray-400">
+          <li>Install an authenticator app like Google Authenticator, Authy, or Microsoft Authenticator</li>
+          <li>Scan the QR code or manually enter the secret key</li>
+          <li>Enter the 6-digit code shown in your app to verify setup</li>
+        </ol>
+      </div>
+      
+      <Button
+        type="button"
+        className="w-full bg-shield-primary hover:bg-shield-secondary"
+        onClick={() => setStep(2)}
+      >
+        Continue
+      </Button>
+    </form>
+  );
+};
+
+
+
+
+
+
+const AuthDashboard= {NewPasswordForm, LoginForm, LoginLayout,TwoFactorForm ,ForgotPasswordForm,OTPSetupForm}
+
+export {AuthDashboard};
+export default AuthDashboard;
 
 

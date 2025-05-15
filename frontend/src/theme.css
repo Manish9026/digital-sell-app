@@ -1,0 +1,80 @@
+@import "tailwindcss";
+/* shield: {
+					DEFAULT: "#2563eb",
+					primary: "#2563eb",
+					secondary: "#1d4ed8",
+					accent: "#3b82f6",
+					light: "#bfdbfe",
+				} */
+@theme{
+/* dashboard auth theme */
+  --color-shield-primary:blue;
+  --color-shield-secondary:#1d4ed8 ;
+  --color-shield-accent:#3b82f6 ;
+  --color-shield-light:#bfdbfe ;
+
+   --animate-fade-in: fadeIn 0.3s ease-out;
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-pulse-slow: pulse-slow 3s ease-in-out infinite;
+  --animate-shimmer: shimmer 2s infinite;
+
+
+}
+
+
+/* Keyframes */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
