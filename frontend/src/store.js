@@ -23,6 +23,6 @@ export const store=configureStore({
 
     },
     middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat([authApi.middleware,productApi.middleware,driveServiceApi.middleware,paymentApi.middleware,cartApi.middleware]),
+        getDefaultMiddleware().concat([authApi.middleware,productApi.middleware,driveServiceApi.middleware,paymentApi.middleware,cartApi.middleware,adminAuthApi.middleware]),
         devTools: import.meta.VITE_NODE_ENV !== 'production' || false,
     })

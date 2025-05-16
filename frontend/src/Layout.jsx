@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react'
+import React, { Suspense, useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import Navbar from './components/Store/Navbar'
-import DashboardLayout from './pages/dasboard/Layout.jsx';
+// import DashboardLayout from './pages/dasboard/Layout.jsx';
+const DashboardLayout = React.lazy(() => import('./pages/dasboard/Layout.jsx'));
 import { classSwitch } from './components/Shared/ThemeToggleButton.jsx';
 
 function Layout({role}) {
@@ -26,7 +27,10 @@ function Layout({role}) {
     </div>
     :
     <div className='light:bg-light flex  flex-col overflow-auto  min-h-screen min-w-screen max-w-screen dark:bg-primary dark:text-light  scroll-hide  light:text-black'>
+
+      <Suspense fallback={<div className='flex items-center justify-center min-h-screen'>Loading...</div>}>
     <DashboardLayout/>
+      </Suspense>
 
     </div>
     // <div className='bg-slate-100 flex flex-col scroll-auto min-h-screen min-w-screen'>

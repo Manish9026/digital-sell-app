@@ -10,6 +10,48 @@ import mongoose from "mongoose";
 
 export const createAccessToken = (data) => jwt.sign(data, process.env.ADMIN_ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
 export const createRefreshToken = (data) => jwt.sign(data, process.env.ADMIN_REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
+export const badResponse = ({
+  res,
+  statusCode = 400,
+  status = false,
+  message = "Something went wrong",
+  error = {},
+  isAuthenticated = false,
+} = {}) => {
+  if (!res) {
+    throw new Error("Response object (res) is required");
+  }
+
+  return res.status(statusCode).json({
+    status,
+    statusCode,
+    message,
+    error,
+    isAuthenticated :false,
+  });
+};
+
+export const goodResponse = ({
+  res,
+  statusCode = 200,
+  status = true,
+  message = "Successful",
+  data = {},
+  extra = {}
+} = {}) => {
+  if (!res) {
+    throw new Error("Response object (res) is required");
+  }
+
+  return res.status(statusCode).json({
+    status,
+    statusCode,
+    message,
+    ...data,
+    isAuthenticated: true,
+    ...extra // optional for future use like pagination, meta, etc.
+  });
+};
 
 
 // Login - Step 1 (Password Check)
@@ -24,12 +66,14 @@ export const createRefreshToken = (data) => jwt.sign(data, process.env.ADMIN_REF
         
         const admin = await AdminUser.findOne({ email });
         if (!admin || !(await bcrypt.compare(password, admin.password))) {
-            return res.status(401).json({ message: "Invalid credentials" });
+            return badResponse({ res, statusCode: 401, message: "Invalid credentials" });
+            
         }
         if (admin.twoFA.enabled) {
             const tempToken = jwt.sign({ id: admin._id }, process.env.ADMIN_TEMP_TOKEN_SECRET, { expiresIn: "15m" });
-            res.cookie("tempToken", tempToken, { httpOnly: true, secure: true, sameSite: "strict" });
-            return res.status(201).json({ need_2fa: true, tempToken });
+            res.cookie("tempToken", tempToken, { httpOnly: true, secure: true, maxAge: 1000 * 60 * 5, sameSite: "None" });
+
+            return goodResponse({ res, statusCode: 201, message: "2FA required", data:{need_2fa: true}  });
         }
         // No 2FA: login fully
         const newId = new mongoose.Types.ObjectId().toHexString();
@@ -52,9 +96,10 @@ export const createRefreshToken = (data) => jwt.sign(data, process.env.ADMIN_REF
     });
         // await admin.save(); 
         
-        res.cookie("accessToken", accessToken, { httpOnly: true, secure: true, sameSite: "strict" });
-        res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true, sameSite: "strict" });
-        res.status(201).json({ accessToken });
+        res.cookie("accessToken", accessToken, { httpOnly: true, secure: true, sameSite: "None", maxAge: 1000 * 60 * 15 });
+        res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true, sameSite: "None" , maxAge: 1000 * 60 * 60 * 24 * 7 });
+
+        goodResponse({ res, statusCode: 201, message: "Login successful", data:{isAuthenticated:true,admin} });
     }
     static verify2FA = async (req, res) => {
         const { token, tempToken } = req.body;
@@ -82,21 +127,17 @@ export const createRefreshToken = (data) => jwt.sign(data, process.env.ADMIN_REF
 console.log(decoded);
 
 
-            if(!admin) return res.status(401).json({message:"Unauthorized"});
+            if(!admin) return badResponse({res,statusCode:401,message:"Unauthorized",});
+              
 
-            if(twoFactorAuth) return res.status(403).json({message:"2FA required",need_2fa: true,});
-            res.json({message:"Token verified",user:admin,decoded});
-            // console.log(sessionId,admin);
-            
+            if(twoFactorAuth) return goodResponse({res,statusCode:201,message:"2FA required",data:{need_2fa:true,}});
 
-            // if (!sessionId) {
-            //     return res.status(401).json({ message: "Unauthorized" });
-            // }
-            // console.log(admin?.sessions.find((s)=>s?.id?.toString()===sessionId))
+            return goodResponse({res,statusCode:200,message:"Token verified",data:{admin}});
+
 
             
-        } catch (error) {
-            
+        } catch (error) {        
+          badResponse({res,statusCode:500,message:"internal server error",error});
         }
     }
 
@@ -169,8 +210,23 @@ console.log(decoded);
     console.error("Refresh error:", err);
     return res.status(403).json({ message: "Invalid or expired token" });
   }
-};
+};  
 
+    static logout = async (req, res) => {
+        const { refreshToken } = req.cookies;
+        if (!refreshToken) return res.status(401).json({ message: "No refresh token" });
+        const decoded = jwt.verify(refreshToken, process.env.ADMIN_REFRESH_TOKEN_SECRET);
+        const { id, sessionId } = decoded;
+        if (!id || !sessionId) return res.status(401).json({ message: "Invalid token owner" });
+        const admin = await AdminUser.findById(id);
+        if (!admin) return res.status(401).json({ message: "Invalid token owner" });
+        admin.sessions = admin.sessions.filter(s => s?.id?.toString() !== sessionId);
+        await admin.save();
+        res.clearCookie("refreshToken");
+        res.clearCookie("accessToken");
+        // res.json({ message: "Logged out successfully" });
+        return goodResponse({ res, statusCode: 200, message: "Logged out successfully" });
+    }
 
     // setup 2FA and generate QR code and confirm 2FA
     static setup2FA = async (req, res) => {

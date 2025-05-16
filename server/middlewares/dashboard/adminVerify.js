@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { AdminUser } from "../../models/dashboardModel.js";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
-import { createAccessToken, createRefreshToken } from "../../controllers/dashboard/authController.js";
+import { badResponse, createAccessToken, createRefreshToken } from "../../controllers/dashboard/authController.js";
 
 const updateRefreshToken = async (req, res, decoded, token) => {
   try {
@@ -58,16 +58,8 @@ const updateRefreshToken = async (req, res, decoded, token) => {
     await admin.save();
 
     // 7. Send tokens
-    res.cookie("refreshToken", newRefreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict"
-    });
-    res.cookie("accessToken", newAccessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict"
-    });
+      res.cookie("accessToken", newAccessToken, { httpOnly: true, secure: true, sameSite: "None", maxAge: 1000 * 60 * 15 });
+        res.cookie("refreshToken", newRefreshToken, { httpOnly: true, secure: true, sameSite: "None" , maxAge: 1000 * 60 * 60 * 24 * 7 });
 
     // res.status(201).json({ accessToken: newAccessToken ,message:"Token refreshed"});
 
@@ -88,9 +80,13 @@ const verifyAdminToken = async (req, res, next) => {
     // token = accessToken || refreshToken || tempToken;
     let decoded;
 
-    console.log(tempToken, refreshToken, accessToken);
+    console.log(tempToken,"tempToken");
+    console.log(refreshToken,"refreshToken");
+    console.log(accessToken,"accessToken");
 
-
+    if(!refreshToken && !accessToken && !tempToken) {
+      return badResponse({res, message:"No token provided",statusCode:401,});
+    }
 
     try {
       // Try verifying with Access Token secret

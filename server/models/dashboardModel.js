@@ -17,6 +17,8 @@ const sessionSchema = new mongoose.Schema({
 const adminUserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: String,
+  adminName: { type: String,  },
+  profilePic: String,
   twoFA: {
     enabled: { type: Boolean, default: false },
     secret: String // TOTP secret

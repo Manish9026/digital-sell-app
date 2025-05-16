@@ -14,8 +14,8 @@ import { store } from './store'
 import ScrollToTop from './components/Shared/ScrollTop';
 import AddProduct from './pages/dasboard/AddProduct';
 import AuthPage from './pages/dasboard/AuthPage';
-// import  { ForgotPasswordForm, TwoFactorForm ,LoginLayout} from './components/Dashboard/LoginLayout';
-import AuthDashboard from './components/Dashboard/LoginLayout';
+import { AuthDashboard } from './components/Dashboard/LazyComponent';
+
 
 // import ProfileTabs from './pages/store/ProfilePage';
 const ProfilePage=lazy(()=>import('./pages/store/ProfilePage'));

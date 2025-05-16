@@ -1,17 +1,35 @@
-// import { ReactNode } from "react";
-import { Shield } from "lucide-react";
-// import { ThemeToggle } from "@/components/ThemeToggle";
+
+import { Shield, Smartphone, Key, QrCode , Mail, Lock,Copy,Eye, EyeOff, CheckCircle,  ArrowRight,RefreshCcw, ArrowLeft} from "lucide-react";
+
+// react hooks
 import { useState, useEffect } from "react";
+import { useNavigate, useLocation, Link, Outlet } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import {motion }from 'framer-motion'
+//shadcn components 
+
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-// import { useToast } from "@/components/ui/use-toast";
 import { toast } from "../Shared/Toast";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import { Card, CardContent } from "@/components/ui/card";
 
-import { useNavigate, useLocation, Link, Outlet } from "react-router-dom";
-import { Smartphone, Key, QrCode } from "lucide-react";
-import { Mail, Lock } from "lucide-react";
-import {motion }from 'framer-motion'
+
+
+// services && api
+import { useLoginAdminMutation } from "../../services/dashboad/adminAuthServices";
+import {IsAuthenticated} from "./IsAuthenticated";
+import { loginFailure, logout } from "../../slices/dashboard/adminSlice";
+
+
 
 // This is the login layout component
 
@@ -20,6 +38,8 @@ const LoginLayout = ({ children, title, subtitle,activeChildren="2fa" }) => {
 
 
   return (
+
+    <IsAuthenticated navigatePath={"/dashboard"}>
     <motion.div 
       initial={{ opacity: 0, y: -30 }}
       animate={{ opacity: 1, y: 0 }}
@@ -61,6 +81,7 @@ const LoginLayout = ({ children, title, subtitle,activeChildren="2fa" }) => {
 
       
     </motion.div>
+    </IsAuthenticated>
   );
 };
 
@@ -73,6 +94,7 @@ const LoginForm = () => {
 //   const { toast } = useToast();
 const [loginAdmin,{isLoading}]=useLoginAdminMutation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -188,6 +210,7 @@ const [loginAdmin,{isLoading}]=useLoginAdminMutation();
           to="/dashboard/admin-auth/reset-password"
           state={{ email }}
           className="text-sm text-shield-primary hover:text-shield-secondary transition-colors"
+          onClick={()=>dispatch(logout())}
         >
           Forgot password?
         </Link>
@@ -291,16 +314,16 @@ const TwoFactorForm = () => {
     <LoginLayout title={"Two-Factor Authentication"} subtitle={"Verify your identity to continue"}
     >
       <form  onSubmit={handleSubmit} className="space-y-6">
-      <div className="flex items-center justify-center mb-4">
+      {/* <div className="flex items-center justify-center mb-4">
         <div className="p-3  rounded-full dark:bg-shield-primary/20 bg-shield-light/50  h-12 w-12">
           <Smartphone className="h-6 w-6 text-shield-primary" />
         </div>
-      </div>
+      </div> */}
       
-      <p className="text-center light:text-gray-600 dark:text-gray-400">
+      {/* <p className="text-center light:text-gray-600 dark:text-gray-400">
         We've sent a verification code to {email}. Please enter it below.
       </p>
-      
+       */}
       <div className="space-y-2">
         <Label htmlFor="code" className="flex items-center gap-2">
           <Key className="h-4 w-4 text-gray-500" />
@@ -377,10 +400,6 @@ const TwoFactorForm = () => {
 
 
 
-import {  RefreshCcw, ArrowLeft } from "lucide-react";
-
-import { Alert, AlertDescription } from "@/components/ui/alert";
-// import { toast } from "sonner";
 
 // This is the forgot password form component
 // This component is used to send a password reset link to the user's email
@@ -501,7 +520,7 @@ const ForgotPasswordForm = () => {
   );
 };
 
-import {  Eye, EyeOff, CheckCircle } from "lucide-react";
+
 const passwordStrengthLevels = [
   { level: "weak", color: "bg-red-500" },
   { level: "fair", color: "bg-orange-500" },
@@ -725,15 +744,7 @@ const NewPasswordForm = () => {
 
 
 
-import {  Copy,  ArrowRight } from "lucide-react";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
-import { useLoginAdminMutation } from "../../services/dashboad/adminAuthServices";
+
 
 const OTPSetupForm = () => {
   const [verificationCode, setVerificationCode] = useState("");
@@ -940,9 +951,9 @@ const OTPSetupForm = () => {
 
 
 
-const AuthDashboard= {NewPasswordForm, LoginForm, LoginLayout,TwoFactorForm ,ForgotPasswordForm,OTPSetupForm}
+export {NewPasswordForm, LoginForm, LoginLayout,TwoFactorForm ,ForgotPasswordForm,OTPSetupForm}
 
-export {AuthDashboard};
-export default AuthDashboard;
+
+// export default AuthDashboard;
 
 

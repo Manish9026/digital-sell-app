@@ -1,5 +1,5 @@
 import React from 'react'
-import AuthDashboard from '../../components/Dashboard/LoginLayout'
+
 import { Outlet } from 'react-router-dom'
 // components/AdminAuthHeader.tsx
 import { motion } from "framer-motion";
@@ -9,7 +9,7 @@ import ThemeToggleButton from '../../components/Shared/ThemeToggleButton';
  function AdminAuthHeader() {
   return (
     <motion.header
-      className="w-full flex-1 h-full  text-center p-6  flex flex-col items-center justify-center gap-2"
+      className="w-full   text-center p-6  flex flex-col items-center justify-center gap-2"
       initial={{ opacity: 0, y: -30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
@@ -35,7 +35,7 @@ import ThemeToggleButton from '../../components/Shared/ThemeToggleButton';
 
 const AuthPage = () => {
   return (
-    <div className='center w-full min-h-screen flex-col bg-gradient-to-br from-gray-50 light:from-light light:to-blue-200 dark:from-gray-900 dark:to-gray-950'>
+    <div className='items-center flex w-full min-h-screen flex-col bg-gradient-to-br from-gray-50 light:from-light light:to-blue-200 dark:from-gray-900 dark:to-gray-950'>
 <AdminAuthHeader/>
 
         <Outlet/>

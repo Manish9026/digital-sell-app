@@ -1,0 +1,125 @@
+import React, {  useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import  {useLocation, useNavigate} from 'react-router-dom'
+import { loginSuccess, setNeed2FA } from '../../slices/dashboard/adminSlice';
+import { useLazyVerifyAdminQuery } from '../../services/dashboad/adminAuthServices';
+
+import { motion } from 'framer-motion';
+import { ShieldCheck } from 'lucide-react';
+import { toast } from '../Shared/Toast';
+
+const CheckingAuth = () => {
+  return (
+    <div className="flex items-center justify-center  dark:text-white light:text-primary p-4">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="text-center space-y-4"
+      >
+        <motion.div
+          animate={{ rotate: [0, 10, -10, 0] }}
+          transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
+          className="inline-block will-change-transform p-4 rounded-full bg-slate-800/50 shadow-xl"
+        >
+          <ShieldCheck size={48} className="text-green-400" />
+        </motion.div>
+
+        <motion.h2
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="text-xl md:text-2xl font-semibold"
+        >
+          Checking authentication...
+        </motion.h2>
+
+        <p className="text-sm md:text-base text-slate-300 dark:text-slate-600">
+          Please wait while we verify your admin credentials.
+        </p>
+      </motion.div>
+    </div>
+  );
+};
+
+
+
+
+const IsAuthenticated = ({ navigatePath, children }) => {
+  const { isLoggedIn,need_2fa } = useSelector((state) => state.adminReducer);
+  const [trigger, { data, isLoading, isError }] = useLazyVerifyAdminQuery();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const location=useLocation();
+  useEffect(() => {
+    if (!(isLoggedIn || location.pathname.includes("dashboard/admin-auth/2fa-verify"))) {
+      trigger()
+        .unwrap()
+        .then((res) => {
+            console.log(res,"response");
+               if (res?.need_2fa) {
+                       
+                  navigate("/dashboard/admin-auth/2fa-verify");
+                  dispatch(setNeed2FA(true));
+                  return toast({
+                      title: "Verification required",
+                      description: "Please enter the code sent to your device",
+                      toastType:""
+                    });
+            }
+          // Assuming response is valid if token/session is valid
+          dispatch(loginSuccess(res));
+        })
+        .catch((err) => {
+            console.log(err,"error");
+            
+          console.error('Auth failed:', err);
+          navigate('/dashboard/admin-auth');
+        });
+    }
+    else{
+
+        if(navigatePath){
+            navigate(navigatePath)
+        }
+    }
+  }, [isLoggedIn, trigger, dispatch, navigate]);
+
+  if ( isLoading) {
+    return <CheckingAuth/>
+  }
+
+  return <>{children}</>;
+
+};
+
+const Authenticated=({children})=>{
+const { isLoggedIn,admin } = useSelector((state) => state.adminReducer);
+
+if (!isLoggedIn) return null;
+
+  // Render prop pattern: if `children` is a function, call it
+  console.log(typeof children);
+  
+  if (typeof children === 'function') {
+    return children({ admin });
+  }
+
+  return <>{children}</>;
+}
+
+const UnAuthenticated=({children})=>{
+const { isLoggedIn,admin } = useSelector((state) => state.adminReducer);
+
+
+    if(!isLoggedIn) {
+        // return <>{children}</>
+        return React.Children.map(children, child =>
+    React.cloneElement(child, { admin })
+  );
+    }
+    
+}
+
+export { IsAuthenticated, Authenticated, UnAuthenticated };
+// export default { IsAuthenticated, Authenticated, UnAuthenticated};

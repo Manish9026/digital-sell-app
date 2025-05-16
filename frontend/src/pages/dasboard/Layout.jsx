@@ -10,12 +10,14 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import data from "./data.json"
 import { Outlet } from 'react-router-dom'
 import ThemeToggleButton from '../../components/Shared/ThemeToggleButton'
+import { IsAuthenticated } from '../../components/Dashboard/IsAuthenticated'
 
 
 
 const DashboardLayout = () => {
   return (
-    <div className='min-w-screen min-h-screen '>
+    <IsAuthenticated>
+       <div className='min-w-screen min-h-screen '>
 <SidebarProvider >
       <AppSidebar variant="inset" />
       <SidebarInset>
@@ -27,6 +29,8 @@ const DashboardLayout = () => {
     </SidebarProvider>
 
     </div>
+    </IsAuthenticated>
+   
   )
 }
 
