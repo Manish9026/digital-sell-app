@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 // import { useToast } from "@/components/ui/use-toast";
-import { toast } from "sonner"
-
+import { toast } from "../Shared/Toast";
 
 import { useNavigate, useLocation, Link, Outlet } from "react-router-dom";
 import { Smartphone, Key, QrCode } from "lucide-react";
@@ -15,6 +14,7 @@ import { Mail, Lock } from "lucide-react";
 import {motion }from 'framer-motion'
 
 // This is the login layout component
+
 
 const LoginLayout = ({ children, title, subtitle,activeChildren="2fa" }) => {
 
@@ -69,45 +69,81 @@ const LoginLayout = ({ children, title, subtitle,activeChildren="2fa" }) => {
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
 //   const { toast } = useToast();
+const [loginAdmin,{isLoading}]=useLoginAdminMutation();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+ 
     if (!email || !password) {
       toast({
         title: "Error",
-        description: "Please enter both email and password",
+        description: "Please enter your email and password",
         variant: "destructive",
       });
       return;
     }
     
-    setIsLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    // setIsLoading(true);
+    await loginAdmin({email,password}).unwrap().then((res)=>{
+      console.log(res);
       
-      // Example validation - in a real app this would be authenticated via backend
-      if (email.includes("@") && password.length >= 6) {
-        toast({
+
+        if (res?.need_2fa) {
+           
+      navigate("/dashboard/admin-auth/2fa-verify");
+      return toast({
           title: "Verification required",
           description: "Please enter the code sent to your device",
+          toastType:""
         });
-        
-        // Since login was successful, navigate to 2FA page
-        navigate("/dashboard/admin-auth/2fa-verify", { state: { email } });
-      } else {
+}
         toast({
-          title: "Login failed",
-          description: "Invalid email or password",
-          variant: "destructive",
+          title: "Login successful",
+          description: "You have been successfully logged in",
         });
+        navigate("/dashboard");
+      
+      // console.log(status,data);
+      
+        // Navigate to dashboard or home page after successful login
+      
+    }).catch(({status,data})=>{
+      if(status===401 || status<=500){
+        
+        toast({
+          title: "Login failed",description:data?.message,toastType:"error"})
       }
-    }, 1500);
+
+      // console.log(err,"error");
+      
+    })
+
+    // Simulate API call
+    // setTimeout(() => {
+    //   setIsLoading(false);
+      
+    //   // Example validation - in a real app this would be authenticated via backend
+    //   if (email.includes("@") && password.length >= 6) {
+    //     toast({
+    //       title: "Verification required",
+    //       description: "Please enter the code sent to your device",
+    //     });
+      
+        
+    //     // Since login was successful, navigate to 2FA page
+    //     navigate("/dashboard/admin-auth/2fa-verify", { state: { email } });
+    //   } else {
+    //     toast({
+    //       title: "Login failed",
+    //       description: "Invalid email or password",
+    //       variant: "destructive",
+    //     });
+    //   }
+    // }, 1500);
   };
 
   return (
@@ -150,6 +186,7 @@ const LoginForm = () => {
       <div className="flex relative items-center justify-between pt-2 z-50">
         <Link 
           to="/dashboard/admin-auth/reset-password"
+          state={{ email }}
           className="text-sm text-shield-primary hover:text-shield-secondary transition-colors"
         >
           Forgot password?
@@ -696,6 +733,7 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
+import { useLoginAdminMutation } from "../../services/dashboad/adminAuthServices";
 
 const OTPSetupForm = () => {
   const [verificationCode, setVerificationCode] = useState("");

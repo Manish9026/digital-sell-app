@@ -1,5 +1,33 @@
+// import { required } from "joi";
 import { connectDashboardDB } from "../DBconfig/DB.config.js";
 import mongoose from "mongoose";
+// admin user schema 
+
+const sessionSchema = new mongoose.Schema({
+  id:{type: mongoose.Schema.Types.ObjectId, default: () => new mongoose.Types.ObjectId,required: true,unique:true
+
+  },
+  refreshTokenHash: String,
+  ip: String,
+  userAgent: String,
+  createdAt: { type: Date, default: Date.now },
+  lastUsed: Date
+},{_id: false});
+
+const adminUserSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  password: String,
+  twoFA: {
+    enabled: { type: Boolean, default: false },
+    secret: String // TOTP secret
+  },
+  sessions: [sessionSchema]
+});
+
+export  const  AdminUser = connectDashboardDB.model("AdminUser", adminUserSchema);
+
+
+
 
 // course schema
 

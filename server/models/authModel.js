@@ -47,25 +47,25 @@ const storeUserSchema = new mongoose.Schema({
     refreshToken: String,
   },{timestamps:true});
 
-const adminUserSchema=mongoose.Schema({
-    userEmail: {
-        type: String,
-        required: true,
-        unique:true,
-        index: true,
-    },
-    password: {
-        type: String
-    },
-    // loginType:{
+// const adminUserSchema=mongoose.Schema({
+//     userEmail: {
+//         type: String,
+//         required: true,
+//         unique:true,
+//         index: true,
+//     },
+//     password: {
+//         type: String
+//     },
+//     // loginType:{
 
-    // },
-    role:{
-        type:String,
-    },
-    refreshToken:String,
-    accessToken:String,
-})
+//     // },
+//     role:{
+//         type:String,
+//     },
+//     refreshToken:String,
+//     accessToken:String,
+// })
 
-export const adminUserModel=connectDashboardDB.model("admin-User",adminUserSchema)
+// export const adminUserModel=connectDashboardDB.model("admin-User",adminUserSchema)
 export const storeUserModel = connectStoreUserDB.model("storeUser", storeUserSchema);

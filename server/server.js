@@ -103,7 +103,7 @@ app.use("/api/dashboard", dashboardRoutes)
 Promise.all([
     connectStoreUserDB.once('open', () => console.log('✅ Connected to userDB')),
     connectDashboardDB.once('open', () => console.log('✅ Connected to DashboardDB')),
-  ])
+  ]) 
     .then(() => {
       app.listen(port, () => {
         console.log(`🚀 Server running on http://localhost:${port}`);

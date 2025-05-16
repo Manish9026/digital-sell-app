@@ -211,6 +211,11 @@ scrollbar-width: none;  /* Firefox */
   
  
 }
+
+.toast{
+  /* background: rgb(226, 64, 64); */
+  /* z-index: 200000; */
+}
 /* .conic-border::after{
 content: "";
 position: absolute;

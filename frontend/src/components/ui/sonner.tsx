@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils"
 import { useTheme } from "next-themes"
 import { Toaster as Sonner, ToasterProps } from "sonner"
 
@@ -7,7 +8,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
   return (
     <Sonner
       theme={theme as ToasterProps["theme"]}
-      className="toaster group"
+      className={"toaster group bg-slate-800"}
       style={
         {
           "--normal-bg": "var(--popover)",

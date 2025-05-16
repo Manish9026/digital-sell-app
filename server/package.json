@@ -32,8 +32,10 @@
     "nodemailer": "^6.10.0",
     "nodemon": "^3.1.4",
     "open": "^10.1.1",
+    "qrcode": "^1.5.4",
     "razorpay": "^2.9.6",
     "server": "file:",
+    "speakeasy": "^2.0.0",
     "xlsx": "^0.18.5"
   },
   "description": "",

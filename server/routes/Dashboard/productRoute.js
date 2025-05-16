@@ -1,6 +1,6 @@
 import express from 'express';
-import { ProductController } from '../../controllers/dashboard/productController.js';
 const productRoutes = express.Router();
+import { ProductController } from '../../controllers/dashboard/productController.js';
 
 productRoutes.get("",ProductController.getAllProducts)
 productRoutes.get("/:id",ProductController.getSingleProduct);

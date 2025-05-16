@@ -6,7 +6,8 @@ export default {
   content: [
     "./index.html",
     "./src/**/*.{html,js,jsx,css}",
-    "./node_modules/react-tailwindcss-datepicker/dist/index.esm.{js,ts}"
+    "./node_modules/react-tailwindcss-datepicker/dist/index.esm.{js,ts}",
+     "./node_modules/sonner/**/*.{js,ts,jsx,tsx,mjs}",
   ],
   theme: {
     extend: {
