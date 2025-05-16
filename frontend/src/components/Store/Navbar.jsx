@@ -11,7 +11,7 @@ import {  useLogoutMutation } from '../../services/store/authServices';
 const navigation = [
   { name: 'Home ', href: '/', current: false },
   { name: 'Cart', href: '/user/cart', current: false },
-  { name: 'My Course', href: '/Course', current: false },
+  { name: 'Dashboard', href: '/dashboard', current: false },
   { name: 'Cources', href: '/Cources', current: false },
   { name: 'Calendar', href: '/Calendar', current: false },
 ]
