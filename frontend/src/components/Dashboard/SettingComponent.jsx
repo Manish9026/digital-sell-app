@@ -16,6 +16,8 @@ import {
   Code,
   icons,
   KeyRound,
+  EyeOff,
+  Eye,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 // import { Authenticated } from "./IsAuthenticated";
@@ -197,6 +199,18 @@ const SettingCards = memo(({ title, subTitle, children, icons, isActive, delayti
 
 export const Authentication = () => {
 
+  const [password,setPassword]=useState({
+    new:{value:"",isShow:false},
+    old:{value:"",isShow:false}
+  })
+
+    const handleCopySecret = () => {
+      navigator.clipboard.writeText("secret key copied");
+      toast({
+        title: "Secret copied",
+        description: "Authentication secret has been copied to clipboard",
+      });
+    };
   return (
 
 
@@ -231,7 +245,7 @@ export const Authentication = () => {
           </button>
           </Link>
           
-          <button type="button" className={cn(styleButton)}>
+          <button type="button" onClick={handleCopySecret} className={cn(styleButton)}>
             <Code className="text-indigo-500" />
             HLPEMUHHDYN7937
           </button>
@@ -244,12 +258,32 @@ export const Authentication = () => {
       <SettingCards delaytime={2} isActive={true} title={"Change Password"} subTitle={"Change your password to enhance security."} icons={<KeyRound />}>
 
         <form className="">
-          <input type="password" placeholder="Old Password" className="border border-slate-300 dark:border-slate-700 p-3 rounded-lg shadow-md w-full mb-4" />
-          <input type="password" placeholder="New Password" className="border border-slate-300 dark:border-slate-700 p-3 rounded-lg shadow-md w-full mb-4" />
+
+          <label htmlFor="pass1" className="flex items-center border border-slate-300 dark:border-slate-700 p-3 rounded-lg shadow-md w-full mb-4 focus:bg-light">
+<input id="pass1" onChange={(e)=>setPassword(prev=>({...prev,old:{value:e.target.value,isShow:false}}))} type={password?.old?.isShow?"text":"password"} value={password?.old.value} placeholder="Old Password" className="flex-1 outline-none" />
+
+<button type="button" className="p-1 " onClick={()=>setPassword(prev=>({...prev,old:{isShow:!prev.old.isShow,value:prev.old.value}}))}>
+    {!password?.old?.isShow ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+</button>
+        
+          </label>
+          
+          <label htmlFor="pass2" className="flex items-center border border-slate-300 dark:border-slate-700 p-3 rounded-lg shadow-md w-full mb-4 focus:bg-light">
+<input id="pass" onChange={(e)=>setPassword(prev=>({...prev,new:{value:e.target.value,isShow:false}}))} type={password?.new?.isShow?"text":"password"} value={password?.new.value} placeholder="New Password" className="flex-1 outline-none" />
+
+<button type="button" className="p-1 " onClick={()=>setPassword(prev=>({...prev,new:{isShow:!prev.new.isShow,value:prev.new.value}}))}>
+    {!password?.new?.isShow ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+</button>
+        
+          </label>
 
           <span className="flex items-center gap-3">
-            <button type="button" className={cn(styleButton,)}>Change</button>
-            <button type="reset" className={cn(styleButton,)}>Reset</button>
+            <button type="button" onClick={()=>console.log(password)
+            } className={cn(styleButton,)}>Change</button>
+            <button type="reset" onClick={()=>setPassword({
+    new:{value:"",isShow:false},
+    old:{value:"",isShow:false}
+  })} className={cn(styleButton,)}>Reset</button>
           </span>
         </form>
 
@@ -267,6 +301,7 @@ export const Authentication = () => {
 
 // import { motion } from "framer-motion";
 import { LogOut, MonitorSmartphone, MapPin, Globe } from "lucide-react";
+import { toast } from "../Shared/Toast";
 
 const sessions = [
   {

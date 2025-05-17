@@ -750,6 +750,7 @@ const OTPSetupForm = () => {
   const [verificationCode, setVerificationCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState(1); // 1: Setup, 2: Verification, 3: Success
+  const [timeLeft,setTimeLeft]=useState(45);
   // const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -757,18 +758,37 @@ const OTPSetupForm = () => {
   const secretKey = "JBSWY3DPEHPK3PXP";
   const qrCodeUrl = `https://chart.googleapis.com/chart?chs=200x200&chld=M|0&cht=qr&chl=otpauth://totp/Lovable:user@example.com?secret=${secretKey}&issuer=Lovable`;
 
-  useEffect(()=>{
+  // useEffect(()=>{
+
+  //   if(step===3){
+
+  //     let timeout=setTimeout(()=>{
+  //       navigate('/dashboard/setting/authentication')
+  //     },5000)
+
+
+  //     return ()=> clearTimeout(timeout)
+  //   }
+  // },[step])
+
+  useEffect(() => {
 
     if(step===3){
-
-      let timeout=setTimeout(()=>{
-        navigate('/dashboard/setting/authentication')
-      },5000)
-
-
-      return ()=> clearTimeout(timeout)
+ let timer;
+    if (timeLeft > 0) {
+      timer = setInterval(() => {
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
+    } else if (timeLeft === 0) {
+     navigate('/dashboard/setting/authentication')
     }
-  },[step])
+
+    return () => clearInterval(timer);
+
+
+    }
+   
+  }, [timeLeft,step]);
 
   const handleCopySecret = () => {
     navigator.clipboard.writeText(secretKey);
@@ -884,23 +904,25 @@ className="space-y-6 max-w-[600px] primary-p"
       step===3?
         <div className="space-y-6 primary-p max-w-[600px] animate-fade-in">
         <div className="flex items-center justify-center mb-4">
-          <div className="h-16 w-16 rounded-full bg-shield-light flex items-center justify-center animate-bounce-in">
-            <Shield className="h-8 w-8 text-shield-primary" />
+          <div className="h-16 w-16 light:bg-blue-700 dark:text-shield-primary rounded-full dark:bg-shield-light light:text-white   flex items-center  justify-center animate-bounce-in">
+            <Shield className="h-8 w-8 " />
           </div>
         </div>
         
         <h3 className="text-xl font-semibold text-center">Two-Factor Authentication Enabled</h3>
-        <p className="text-center text-gray-600 dark:text-gray-400">
+        <p className="text-center light:text-gray-600 dark:text-gray-400">
           Your account is now more secure with two-factor authentication.
         </p>
         
         <Button 
           onClick={handleComplete}
-          className="w-full bg-shield-primary hover:bg-shield-secondary"
+          className="w-full text-white bg-shield-primary hover:bg-shield-secondary"
         >
           Continue to Dashboard
           <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
+
+        <p className="center">Back to Authentication ({timeLeft})</p>
       </div>
       :
    <form className="flex flex-col gap-4">
