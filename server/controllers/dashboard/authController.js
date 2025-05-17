@@ -96,7 +96,7 @@ export const goodResponse = ({
     });
         // await admin.save(); 
         
-        res.cookie("accessToken", accessToken, { httpOnly: true, secure: true, sameSite: "None", maxAge: 1000 * 60 * 15 });
+        res.cookie("accessToken", accessToken, { httpOnly: true, secure: true, sameSite: "None", maxAge: 1000 * 60 * 15, domain: '.vercel.app', });
         res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true, sameSite: "None" , maxAge: 1000 * 60 * 60 * 24 * 7 });
 
         goodResponse({ res, statusCode: 201, message: "Login successful", data:{isAuthenticated:true,admin} });
@@ -222,8 +222,8 @@ console.log(decoded);
         if (!admin) return res.status(401).json({ message: "Invalid token owner" });
         admin.sessions = admin.sessions.filter(s => s?.id?.toString() !== sessionId);
         await admin.save();
-        res.clearCookie("refreshToken");
-        res.clearCookie("accessToken");
+        res.clearCookie("refreshToken",{ httpOnly: true, secure: true, sameSite: "None" });
+        res.clearCookie("accessToken",{ httpOnly: true, secure: true, sameSite: "None" });
         // res.json({ message: "Logged out successfully" });
         return goodResponse({ res, statusCode: 200, message: "Logged out successfully" });
     }
