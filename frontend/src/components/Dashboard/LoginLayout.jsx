@@ -1,5 +1,5 @@
 
-import { Shield, Smartphone, Key, QrCode , Mail, Lock,Copy,Eye, EyeOff, CheckCircle,  ArrowRight,RefreshCcw, ArrowLeft} from "lucide-react";
+import { Shield, Smartphone, Key, QrCode , Mail, Lock,Copy,Eye, EyeOff, CheckCircle,  ArrowRight,RefreshCcw, ArrowLeft, Settings2} from "lucide-react";
 
 // react hooks
 import { useState, useEffect } from "react";
@@ -744,18 +744,31 @@ const NewPasswordForm = () => {
 
 
 
-
+import qr from './qr.png'
 
 const OTPSetupForm = () => {
   const [verificationCode, setVerificationCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState(1); // 1: Setup, 2: Verification, 3: Success
-  const { toast } = useToast();
+  // const { toast } = useToast();
   const navigate = useNavigate();
 
   // In a real app, these would come from your backend
   const secretKey = "JBSWY3DPEHPK3PXP";
   const qrCodeUrl = `https://chart.googleapis.com/chart?chs=200x200&chld=M|0&cht=qr&chl=otpauth://totp/Lovable:user@example.com?secret=${secretKey}&issuer=Lovable`;
+
+  useEffect(()=>{
+
+    if(step===3){
+
+      let timeout=setTimeout(()=>{
+        navigate('/dashboard/setting/authentication')
+      },5000)
+
+
+      return ()=> clearTimeout(timeout)
+    }
+  },[step])
 
   const handleCopySecret = () => {
     navigator.clipboard.writeText(secretKey);
@@ -793,34 +806,27 @@ const OTPSetupForm = () => {
     navigate("/dashboard");
   };
 
-  if (step === 3) {
-    return (
-      <div className="space-y-6 animate-fade-in">
-        <div className="flex items-center justify-center mb-4">
-          <div className="h-16 w-16 rounded-full bg-shield-light flex items-center justify-center animate-bounce-in">
-            <Shield className="h-8 w-8 text-shield-primary" />
-          </div>
-        </div>
-        
-        <h3 className="text-xl font-semibold text-center">Two-Factor Authentication Enabled</h3>
-        <p className="text-center text-gray-600 dark:text-gray-400">
-          Your account is now more secure with two-factor authentication.
-        </p>
-        
-        <Button 
-          onClick={handleComplete}
-          className="w-full bg-shield-primary hover:bg-shield-secondary"
-        >
-          Continue to Dashboard
-          <ArrowRight className="ml-2 h-4 w-4" />
-        </Button>
-      </div>
-    );
-  }
 
-  if (step === 2) {
-    return (
-      <div className="space-y-6 animate-fade-in">
+  return (
+
+<motion.section
+
+className="space-y-6 max-w-[600px] primary-p"
+>
+  <motion.h1
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="text-3xl font-bold mb-10 flex items-center gap-3"
+      >
+
+        <Settings2 className="w-7 h-7 text-indigo-500" />
+
+        Setup-2FA
+      </motion.h1>
+{
+  step===2?
+  <div className=" flex flex-col gap-4 animate-fade-in">
         <h3 className="text-lg font-medium">Verify Setup</h3>
         <p className="text-gray-600 dark:text-gray-400">
           Enter the verification code from your authenticator app to confirm setup
@@ -828,19 +834,22 @@ const OTPSetupForm = () => {
         
         <div className="space-y-2">
           <Label htmlFor="otp">Verification Code</Label>
-          <div className="flex justify-center">
+          <div className="flex justify-center mt-6">
+
+
             <InputOTP 
               maxLength={6}
               value={verificationCode}
               onChange={setVerificationCode}
-              render={({ slots }) => (
-                <InputOTPGroup>
-                  {slots.map((slot, i) => (
-                    <InputOTPSlot key={i} {...slot} />
-                  ))}
-                </InputOTPGroup>
-              )}
-            />
+
+            >
+              <InputOTPGroup className="sm:gap-4 gap-2 flex flex-wrap justify-center">
+                       {Array.from({ length: 6 }).map((_, index) => (
+    <InputOTPSlot key={index} index={index} className="size-[40px] text-xl sm:size-[50px] sm:text-3xl" />
+  ))}
+              </InputOTPGroup>
+      
+            </InputOTP>
           </div>
         </div>
         
@@ -870,12 +879,31 @@ const OTPSetupForm = () => {
             Back to Setup
           </Button>
         </div>
+      </div> 
+      :
+      step===3?
+        <div className="space-y-6 primary-p max-w-[600px] animate-fade-in">
+        <div className="flex items-center justify-center mb-4">
+          <div className="h-16 w-16 rounded-full bg-shield-light flex items-center justify-center animate-bounce-in">
+            <Shield className="h-8 w-8 text-shield-primary" />
+          </div>
+        </div>
+        
+        <h3 className="text-xl font-semibold text-center">Two-Factor Authentication Enabled</h3>
+        <p className="text-center text-gray-600 dark:text-gray-400">
+          Your account is now more secure with two-factor authentication.
+        </p>
+        
+        <Button 
+          onClick={handleComplete}
+          className="w-full bg-shield-primary hover:bg-shield-secondary"
+        >
+          Continue to Dashboard
+          <ArrowRight className="ml-2 h-4 w-4" />
+        </Button>
       </div>
-    );
-  }
-
-  return (
-    <form className="space-y-6">
+      :
+   <form className="flex flex-col gap-4">
       <div className="flex items-center justify-center mb-4">
         <div className="h-12 w-12 rounded-full bg-shield-light/50 flex items-center justify-center">
           <QrCode className="h-6 w-6 text-shield-primary" />
@@ -886,14 +914,14 @@ const OTPSetupForm = () => {
         Scan this QR code with your authenticator app or enter the setup key manually
       </p>
       
-      <Card className="overflow-hidden border-gray-200 dark:border-gray-700">
+      <Card className="overflow-hidden mx-auto w-full max-w-[300px]  border-gray-200 dark:border-gray-700">
         <CardContent className="p-4">
-          <div className="bg-white rounded-md p-4 flex items-center justify-center">
-            <AspectRatio ratio={1 / 1} className="w-48 mx-auto">
+          <div className="rounded-md p-4 flex items-center justify-center">
+            <AspectRatio ratio={1 / 1} className=" h-full ">
               <img 
-                src={qrCodeUrl}
+                src={ qr}
                 alt="QR Code for TOTP setup" 
-                className="rounded-md"
+                className="flex-1 rounded-md object-contain w-full h-full"
               />
             </AspectRatio>
           </div>
@@ -942,7 +970,9 @@ const OTPSetupForm = () => {
       >
         Continue
       </Button>
-    </form>
+    </form>}
+</motion.section>
+ 
   );
 };
 

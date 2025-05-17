@@ -1,26 +1,6 @@
 import React,{ lazy } from 'react';
 
-export  const AuthDashboard = {
 
-    LoginForm: lazy(() =>
-    import('./LoginLayout').then((m) => ({ default: m.LoginForm }))
-  ),
-  LoginLayout: lazy(() =>
-    import('./LoginLayout').then((m) => ({ default: m.LoginLayout }))
-  ),
-  ForgotPasswordForm: lazy(() =>
-    import('./LoginLayout').then((m) => ({ default: m.ForgotPasswordForm }))
-  ),
-  NewPasswordForm:lazy(() =>
-    import('./LoginLayout').then((m) => ({ default: m.NewPasswordForm }))
-  ),
-  TwoFactorForm: lazy(() =>
-    import('./LoginLayout').then((m) => ({ default: m.TwoFactorForm }))
-  ),
-  OTPSetupForm: lazy(() =>
-    import('./LoginLayout').then((m) => ({ default: m.OTPSetupForm }))
-  ),
-};
 
 // import React from "react";
 import { motion } from "framer-motion";
@@ -69,7 +49,45 @@ export const LazyLoadingDashboard = () => {
   );
 };
 
- 
+
+export  const AuthDashboard = {
+
+    LoginForm: lazy(() =>
+    import('./LoginLayout').then((m) => ({ default: m.LoginForm }))
+  ),
+  LoginLayout: lazy(() =>
+    import('./LoginLayout').then((m) => ({ default: m.LoginLayout }))
+  ),
+  ForgotPasswordForm: lazy(() =>
+    import('./LoginLayout').then((m) => ({ default: m.ForgotPasswordForm }))
+  ),
+  NewPasswordForm:lazy(() =>
+    import('./LoginLayout').then((m) => ({ default: m.NewPasswordForm }))
+  ),
+  TwoFactorForm: lazy(() =>
+    import('./LoginLayout').then((m) => ({ default: m.TwoFactorForm }))
+  ),
+  OTPSetupForm: lazy(() =>
+    import('./LoginLayout').then((m) => ({ default: m.OTPSetupForm }))
+  ),
+};
+
+export const DashboardSetting={
+
+  Setting: lazy(() =>
+    import('./SettingComponent').then((m) => ({ default: m.Setting }))
+  ),
+  Authentication: lazy(() =>
+    import('./SettingComponent').then((m) => ({ default: m.Authentication }))
+  ),
+  LoginActivity:lazy(()=>import('./SettingComponent').then((m) => ({ default: m.LoginActivity })))
+  // Notification: lazy(() =>
+  //   import('./SettingComponent').then((m) => ({ default: m.Notification }))
+  // ),
+  // Network: lazy(() =>
+  //   import('./SettingComponent').then((m) => ({ default: m.Network }))
+  // ),
+}
 
 
 
