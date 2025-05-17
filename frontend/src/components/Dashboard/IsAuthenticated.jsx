@@ -45,7 +45,7 @@ const CheckingAuth = () => {
 
 
 
-const IsAuthenticated = ({ navigatePath, children }) => {
+const IsAuthenticated = ({ navigatePath, children,isAuth=false }) => {
   const { isLoggedIn,need_2fa,firstRequest } = useSelector((state) => state.adminReducer);
   const [trigger, { data, isLoading, isError }] = useLazyVerifyAdminQuery();
   const navigate = useNavigate();
@@ -94,12 +94,15 @@ const IsAuthenticated = ({ navigatePath, children }) => {
     }
   }, [isLoggedIn, trigger, dispatch, navigate]);
 
-  if ( isLoading) {
+  if ( !isLoggedIn || isLoading) {
+    if(isAuth)
+    return <>{children}</>; 
     return <CheckingAuth/>
   }
     // return <CheckingAuth/>
-
-    
+ 
+ 
+    if(isLoggedIn)
     return <>{children}</>;
 };
 

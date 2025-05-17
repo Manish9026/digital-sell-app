@@ -14,6 +14,7 @@ import {
   ToggleRight,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+// import { Authenticated } from "./IsAuthenticated";
 
 
 export const Setting = () => {
@@ -36,7 +37,10 @@ export const Setting = () => {
           transition={{ duration: 0.6 }}
           className="text-3xl font-bold mb-10 flex items-center gap-3"
         >
-          <Settings2 className="w-7 h-7 text-indigo-500" /> Settings
+
+<Settings2 className="w-7 h-7 text-indigo-500" />
+
+           Settings
         </motion.h1>
 {/* <BreadcrumbCollapsed/> */}
 
