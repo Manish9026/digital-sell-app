@@ -137,7 +137,7 @@ console.log(decoded);
 
             
         } catch (error) {        
-          badResponse({res,statusCode:500,message:"internal server error",error});
+          return badResponse({res,statusCode:500,message:"internal server error",error});
         }
     }
 

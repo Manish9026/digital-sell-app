@@ -29,7 +29,7 @@ export const Setting = () => {
            "light:bg-light  light:text-primary dark:bg-primary dark:text-white "
       }`}
     >
-      <div className="max-w-3xl mx-auto py-12 primary-p">
+      <div className="max-w-3xl  py-12 primary-p">
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}

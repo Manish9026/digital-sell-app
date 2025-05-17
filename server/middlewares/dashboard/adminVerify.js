@@ -4,47 +4,102 @@ import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 import { badResponse, createAccessToken, createRefreshToken } from "../../controllers/dashboard/authController.js";
 
-const updateRefreshToken = async (req, res, decoded, token) => {
+// const updateRefreshToken = async (req, res, decoded, token) => {
+//   try {
+//     // const token = req.cookies?.refreshToken;
+//     console.log("updateRefreshToken", decoded);
+
+//     // if (!token) return res.status(401).json({ message: "No refresh token" });
+
+//     // // 1. Verify refresh token
+//     // const decoded = jwt.verify(token, process.env.ADMIN_REFRESH_TOKEN_SECRET);
+//     const { id, sessionId } = decoded;
+
+//     if (!id || !sessionId) return res.status(401).json({ message: "Invalid token owner" });
+//     console.log(sessionId, id);
+
+
+//     // 2. Find admin by ID
+//     const admin = await AdminUser.findById(id);
+//     if (!admin) return res.status(401).json({ message: "Invalid token owner" });
+
+//     // 3. Find the matching session
+//     const session = admin.sessions.find(s => s?.id?.toString() === sessionId);
+//     if (!session) return res.status(403).json({ message: "Session not found" });
+
+//     // console.log("ip",req.ip,session.ip);
+//     // console.log("agent",req.headers['user-agent'],session?.userAgent)
+//     // viladate device session using ip
+//     if (session?.ip !== req.ip) return res.status(403).json({ message: "IP mismatch" });
+//     if (session?.userAgent !== req.headers['user-agent']) return res.status(403).json({ message: "User agent mismatch" });
+
+//     // 4. Compare hashed token
+//     const isValid = await bcrypt.compare(token, session.refreshTokenHash);
+//     if (!isValid) return res.status(403).json({ message: "Invalid token" });
+
+//     // 5. Rotate refresh token
+//     const newSessionId = new mongoose.Types.ObjectId().toHexString();
+//     const newRefreshToken = createRefreshToken({ id: admin._id, sessionId: newSessionId });
+//     const newRefreshTokenHash = await bcrypt.hash(newRefreshToken, 10);
+//     const newAccessToken = createAccessToken({ id: admin._id, sessionId: newSessionId });
+
+//     // 6. Update session: remove old, insert new
+//     console.log(admin.sessions.filter(s => s?.id?.toString() !== sessionId), "admin.sessions");
+
+//     admin.sessions = admin.sessions.filter(s => s?.id?.toString() !== sessionId);
+//     admin.sessions.push({
+//       id: newSessionId,
+//       refreshTokenHash: newRefreshTokenHash,
+//       ip: req.ip,
+//       userAgent: req.headers['user-agent'],
+//       lastUsed: new Date()
+//     });
+
+//     await admin.save();
+
+//     // 7. Send tokens
+
+//     req.newAccessToken = newAccessToken;
+//     req.newRefreshToken = newRefreshToken;
+//       // res.cookie("accessToken", newAccessToken, { httpOnly: true, secure: true, sameSite: "None", maxAge: 1000 * 60 * 15 });
+//       // res.cookie("refreshToken", newRefreshToken, { httpOnly: true, secure: true, sameSite: "None" , maxAge: 1000 * 60 * 60 * 24 * 7 });
+
+//     // res.status(201).json({ accessToken: newAccessToken ,message:"Token refreshed"});
+
+//     return { admin, decoded: { id: admin._id, sessionId: newSessionId } };
+
+//   } catch (err) {
+//     console.error("Refresh error:", err);
+//     return res.status(403).json({ message: "Invalid or expired token" });
+//   }
+// };
+
+// refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MjcxYzFiZjZhYjgwM2NjNTYzOTZjMSIsInNlc3Npb25JZCI6IjY4MjcyYWIyZmEyYjg4ZTJkZmM0MGNmZCIsImlhdCI6MTc0NzM5NzI5OCwiZXhwIjoxNzQ4MDAyMDk4fQ.LM41DhhqSUc5jsPumFuHmSATn09lxSVeOP_VdH2Zp98; Path=;
+
+
+const updateRefreshToken = async (req, decoded, token) => {
   try {
-    // const token = req.cookies?.refreshToken;
-    console.log("updateRefreshToken", decoded);
-
-    // if (!token) return res.status(401).json({ message: "No refresh token" });
-
-    // // 1. Verify refresh token
-    // const decoded = jwt.verify(token, process.env.ADMIN_REFRESH_TOKEN_SECRET);
     const { id, sessionId } = decoded;
 
-    if (!id || !sessionId) return res.status(401).json({ message: "Invalid token owner" });
-    console.log(sessionId, id);
+    if (!id || !sessionId) throw new Error("Invalid token owner");
 
-
-    // 2. Find admin by ID
     const admin = await AdminUser.findById(id);
-    if (!admin) return res.status(401).json({ message: "Invalid token owner" });
+    if (!admin) throw new Error("Invalid token owner");
 
-    // 3. Find the matching session
     const session = admin.sessions.find(s => s?.id?.toString() === sessionId);
-    if (!session) return res.status(403).json({ message: "Session not found" });
+    if (!session) throw new Error("Session not found");
 
-    // console.log("ip",req.ip,session.ip);
-    // console.log("agent",req.headers['user-agent'],session?.userAgent)
-    // viladate device session using ip
-    if (session?.ip !== req.ip) return res.status(403).json({ message: "IP mismatch" });
-    if (session?.userAgent !== req.headers['user-agent']) return res.status(403).json({ message: "User agent mismatch" });
+    if (session?.ip !== req.ip || session?.userAgent !== req.headers['user-agent']) {
+      throw new Error("Device mismatch");
+    }
 
-    // 4. Compare hashed token
     const isValid = await bcrypt.compare(token, session.refreshTokenHash);
-    if (!isValid) return res.status(403).json({ message: "Invalid token" });
+    if (!isValid) throw new Error("Invalid refresh token");
 
-    // 5. Rotate refresh token
     const newSessionId = new mongoose.Types.ObjectId().toHexString();
     const newRefreshToken = createRefreshToken({ id: admin._id, sessionId: newSessionId });
     const newRefreshTokenHash = await bcrypt.hash(newRefreshToken, 10);
     const newAccessToken = createAccessToken({ id: admin._id, sessionId: newSessionId });
-
-    // 6. Update session: remove old, insert new
-    console.log(admin.sessions.filter(s => s?.id?.toString() !== sessionId), "admin.sessions");
 
     admin.sessions = admin.sessions.filter(s => s?.id?.toString() !== sessionId);
     admin.sessions.push({
@@ -57,21 +112,16 @@ const updateRefreshToken = async (req, res, decoded, token) => {
 
     await admin.save();
 
-    // 7. Send tokens
-      res.cookie("accessToken", newAccessToken, { httpOnly: true, secure: true, sameSite: "None", maxAge: 1000 * 60 * 15 });
-        res.cookie("refreshToken", newRefreshToken, { httpOnly: true, secure: true, sameSite: "None" , maxAge: 1000 * 60 * 60 * 24 * 7 });
+    // 🧠 Store new tokens in req to set cookies later
+    req.newAccessToken = newAccessToken;
+    req.newRefreshToken = newRefreshToken;
 
-    // res.status(201).json({ accessToken: newAccessToken ,message:"Token refreshed"});
-
-    return { accessToken: newAccessToken, refreshToken: newRefreshToken };
+    return { admin, decoded: { id: admin._id, sessionId: newSessionId } };
 
   } catch (err) {
-    console.error("Refresh error:", err);
-    return res.status(403).json({ message: "Invalid or expired token" });
+    throw err;
   }
 };
-
-// refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MjcxYzFiZjZhYjgwM2NjNTYzOTZjMSIsInNlc3Npb25JZCI6IjY4MjcyYWIyZmEyYjg4ZTJkZmM0MGNmZCIsImlhdCI6MTc0NzM5NzI5OCwiZXhwIjoxNzQ4MDAyMDk4fQ.LM41DhhqSUc5jsPumFuHmSATn09lxSVeOP_VdH2Zp98; Path=;
 
 const verifyAdminToken = async (req, res, next) => {
   try {
@@ -79,6 +129,7 @@ const verifyAdminToken = async (req, res, next) => {
 
     // token = accessToken || refreshToken || tempToken;
     let decoded;
+    let admin;
 
     console.log(tempToken,"tempToken");
     console.log(refreshToken,"refreshToken");
@@ -96,10 +147,12 @@ const verifyAdminToken = async (req, res, next) => {
       // If failed, check if it's a tempToken
       // console.log(err,"tempToken");
       try {
-        decoded = jwt.verify(refreshToken, process.env.ADMIN_REFRESH_TOKEN_SECRET);
-        if (decoded) {
-          await updateRefreshToken(req, res, decoded, refreshToken);
-        }
+       decoded = jwt.verify(refreshToken, process.env.ADMIN_REFRESH_TOKEN_SECRET);
+        const result = await updateRefreshToken(req, decoded, refreshToken);
+
+        // Assign fresh admin + decoded
+        admin = result.admin;
+        decoded = result.decoded;
       } catch (error) {
         try {
           decoded = jwt.verify(tempToken, process.env.ADMIN_TEMP_TOKEN_SECRET); // TEMP_SECRET
@@ -115,13 +168,22 @@ const verifyAdminToken = async (req, res, next) => {
     }
 
     // Fetch admin from DB
-    const admin = await AdminUser.findById(decoded.id);
-    if (!admin) {
-      return res.status(401).json({ error: "Unauthorized: Admin not found" });
+   if (!admin) {
+      admin = await AdminUser.findById(decoded.id);
+      if (!admin) {
+        return res.status(401).json({ error: "Unauthorized: Admin not found" });
+      }
     }
 
     req.admin = admin;
     req.decoded = decoded;
+
+    // 🌱 Set new tokens if generated
+    if (req.newAccessToken && req.newRefreshToken) {
+      res.cookie("accessToken", req.newAccessToken, { httpOnly: true, secure: true, sameSite: "None", maxAge: 1000 * 60 * 15 });
+      res.cookie("refreshToken", req.newRefreshToken, { httpOnly: true, secure: true, sameSite: "None", maxAge: 1000 * 60 * 60 * 24 * 7 });
+    }
+
     next();
 
   } catch (err) {

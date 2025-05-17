@@ -80,6 +80,7 @@ const IsAuthenticated = ({ navigatePath, children }) => {
         })
         .catch((err) => {
             console.log(err,"error");
+            dispatch(setFirstRequest(true))
             
           console.error('Auth failed:', err);
           navigate('/dashboard/admin-auth');
