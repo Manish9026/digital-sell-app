@@ -318,7 +318,7 @@ const CourseUploadForm = () => {
 
 
 
-const AddProduct = () => {
+export const AddProduct = () => {
   return (
         
     <section className="p-2">
@@ -327,4 +327,3 @@ const AddProduct = () => {
   )
 }
 
-export default AddProduct

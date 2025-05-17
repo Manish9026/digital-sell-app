@@ -61,7 +61,7 @@ const LoginLayout = ({ children, title, subtitle,activeChildren="2fa" }) => {
         </div>}
         
         <div className="relative overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-md animate-fade-in">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 dark:via-white/5 to-transparent -translate-x-full animate-shimmer z-10" />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent light:via-white/30 dark:via-white/5 to-transparent -translate-x-full animate-shimmer z-10" />
           <div className="p-6 light:bg-light dark:bg-primary dark:text-light light:text-black">
         
             {/* <LoginForm/> */}

@@ -67,7 +67,7 @@ export  function PaymentWaiting() {
   );
 }
 
-export default function PaymentSuccessPage() {
+export  function PaymentSuccessPage() {
   const [params] = useSearchParams();
   const location=useLocation();
 console.log(location);

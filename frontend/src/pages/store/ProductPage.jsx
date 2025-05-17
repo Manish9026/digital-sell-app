@@ -43,7 +43,7 @@ const Button = ({
   );
 };
 
-const ProductPage = () => {
+export const ProductPage = () => {
     const [rating, setRating] = useState(4.5);
     const [userRating, setUserRating] = useState(0);
     const [reviewText, setReviewText] = useState("");
@@ -284,4 +284,4 @@ const ProductPage = () => {
     );
   };
 
-export default ProductPage;
+// export default ProductPage;

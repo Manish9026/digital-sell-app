@@ -1,7 +1,7 @@
 import React, {  useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import  {useLocation, useNavigate} from 'react-router-dom'
-import { loginSuccess, setNeed2FA } from '../../slices/dashboard/adminSlice';
+import { loginSuccess, setFirstRequest, setNeed2FA } from '../../slices/dashboard/adminSlice';
 import { useLazyVerifyAdminQuery } from '../../services/dashboad/adminAuthServices';
 
 import { motion } from 'framer-motion';
@@ -10,7 +10,7 @@ import { toast } from '../Shared/Toast';
 
 const CheckingAuth = () => {
   return (
-    <div className="flex items-center justify-center  dark:text-white light:text-primary p-4">
+    <div className="fixed w-full h-full bg-slate-900 flex items-center justify-center z-50 dark:text-white light:text-primary p-4">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -46,17 +46,25 @@ const CheckingAuth = () => {
 
 
 const IsAuthenticated = ({ navigatePath, children }) => {
-  const { isLoggedIn,need_2fa } = useSelector((state) => state.adminReducer);
+  const { isLoggedIn,need_2fa,firstRequest } = useSelector((state) => state.adminReducer);
   const [trigger, { data, isLoading, isError }] = useLazyVerifyAdminQuery();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location=useLocation();
+  const allowedPaths = [
+"2fa-verify",
+"reset-password",
+    "new-password",]
+
+  // console.log(location.pathname.split('/')?.some(path=>allowedPaths.includes(path)),"location.pathname");
+  // location.pathname.includes("dashboard/admin-auth/2fa-verify")
   useEffect(() => {
-    if (!(isLoggedIn || location.pathname.includes("dashboard/admin-auth/2fa-verify"))) {
+    if (!(isLoggedIn || (location.pathname.split('/')?.some(path=>allowedPaths.includes(path)) && firstRequest))) {
       trigger()
         .unwrap()
         .then((res) => {
             console.log(res,"response");
+            dispatch(setFirstRequest(true))
                if (res?.need_2fa) {
                        
                   navigate("/dashboard/admin-auth/2fa-verify");
@@ -79,7 +87,7 @@ const IsAuthenticated = ({ navigatePath, children }) => {
     }
     else{
 
-        if(navigatePath){
+        if(isLoggedIn && navigatePath){
             navigate(navigatePath)
         }
     }
@@ -88,9 +96,10 @@ const IsAuthenticated = ({ navigatePath, children }) => {
   if ( isLoading) {
     return <CheckingAuth/>
   }
+    // return <CheckingAuth/>
 
-  return <>{children}</>;
-
+    
+    return <>{children}</>;
 };
 
 const Authenticated=({children})=>{

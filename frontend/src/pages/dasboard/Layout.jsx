@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 
 import { AppSidebar } from "@/components/MainSidebar"
 import { ChartAreaInteractive } from "@/components/chart-area-interactive"
@@ -11,13 +11,15 @@ import data from "./data.json"
 import { Outlet } from 'react-router-dom'
 import ThemeToggleButton from '../../components/Shared/ThemeToggleButton'
 import { IsAuthenticated } from '../../components/Dashboard/IsAuthenticated'
+import { LazyLoadingDashboard } from '../../components/Dashboard/LazyComponent'
 
 
 
 const DashboardLayout = () => {
   return (
-    <IsAuthenticated>
-       <div className='min-w-screen min-h-screen '>
+    // <Suspense fallback={<LazyLoadingDashboard/>}>
+        <IsAuthenticated>
+       <div className='light:bg-light flex  flex-col overflow-auto  min-h-screen min-w-screen max-w-screen dark:bg-primary dark:text-light  scroll-hide  light:text-black '>
 <SidebarProvider >
       <AppSidebar variant="inset" />
       <SidebarInset>
@@ -30,6 +32,8 @@ const DashboardLayout = () => {
 
     </div>
     </IsAuthenticated>
+    // </Suspense>
+  
    
   )
 }

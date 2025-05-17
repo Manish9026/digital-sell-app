@@ -11,6 +11,7 @@ const initialState = {
     isLoading: false,
     isError: false,
     isSuccess: false,
+    firstRequest:false,
     need_2fa: false,
 }
 
@@ -42,8 +43,11 @@ const adminSlice = createSlice({
         setNeed2FA: (state, action) => {
             state.need_2fa = action.payload;
         },
+        setFirstRequest: (state, action) => {
+            state.firstRequest = action.payload;
+        },
     },
 });
 
-export const {loginSuccess,loginFailure,logout,setNeed2FA}= adminSlice.actions;
+export const {loginSuccess,loginFailure,setFirstRequest,logout,setNeed2FA}= adminSlice.actions;
 export const adminReducer = adminSlice.reducer;

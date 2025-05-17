@@ -2,37 +2,54 @@
 
 import React, { lazy, Suspense } from 'react'
 import { createBrowserRouter, RouterProvider, useLocation } from 'react-router-dom'
-import App from './App'
 import 'keen-slider/keen-slider.min.css';
-import PaymentSuccessPage, { PaymentWaiting } from './components/PaymentSuccess'
+
 import  Layout  from './Layout'
 import ProtectedRoute from './ProtectedRoute'
-import LoadingScreen from './components/Shared/LoadingComponent'
-import ProductPage from './pages/store/ProductPage'
-import { productApi, useGetSingleProductQuery } from './services/store/productServices'
-import { store } from './store'
-import ScrollToTop from './components/Shared/ScrollTop';
-import AddProduct from './pages/dasboard/AddProduct';
-import AuthPage from './pages/dasboard/AuthPage';
-import { AuthDashboard } from './components/Dashboard/LazyComponent';
 
 
-// import ProfileTabs from './pages/store/ProfilePage';
-const ProfilePage=lazy(()=>import('./pages/store/ProfilePage'));
-// import CartPage from './pages/store/CartPage';
-const CartPage=lazy(()=>import('./pages/store/CartPage'));
-// import { LoginForm, RegistrationForm } from './component/Store/AuthForm'
+
+
+// import { store } from './store'
+/* ------------------------------Shared compmonent import statement------------------- */
+
+const ScrollToTop=lazy(()=>import('./components/Shared/ScrollTop').then(module=>({default:module.ScrollToTop})));
+const LoadingScreen=lazy(()=>import('./components/Shared/LoadingComponent').then(module=>({default:module.LoadingScreen})));
+
+/* ------------------------------Dashboard compmonent import statement------------------- */
+
+const AddProductPage=lazy(()=>import('./pages/dasboard/AddProduct').then(module=>({default:module.AddProduct})));
+const AuthPage=lazy(()=>import('./pages/dasboard/AuthPage').then(module=>({default:module.AuthPage})));
+import { AuthDashboard, LazyLoadingDashboard } from './components/Dashboard/LazyComponent';
+import { LazySetting } from './pages/dasboard/SettingPage';
+const DashboardLayout=lazy(()=>import('./pages/dasboard/Layout'));
 const DashboardHome=lazy(()=>import('./pages/dasboard/Home'));
+const DashboardSetting=lazy(()=>import('./pages/dasboard/SettingPage').then(module=>({default:module.SettingLayout})));
+
+/* ------------------------------Store compmonent import statement------------------- */
+const StoreHome=lazy(()=>import('./pages/store/Home'));
+const ProfilePage=lazy(()=>import('./pages/store/ProfilePage'));
+const CartPage=lazy(()=>import('./pages/store/CartPage'));
+const ProductPage=lazy(()=>import('./pages/store/ProductPage').then(module=>({default:module.ProductPage})));
 const LoginForm =lazy(()=>import('./components/Store/AuthForm').then(module=>({default:module.LoginForm})));
 const RegistrationForm =lazy(()=>import('./components/Store/AuthForm').then(module=>({default:module.RegistrationForm})));
-const StoreHome=lazy(()=>import('./pages/store/Home'));
+// payment pages
+const PaymentSuccessPage=lazy(()=>import('./components/PaymentSuccess').then(module=>({default:module.PaymentSuccessPage})));
+const PaymentWaiting=lazy(()=>import('./components/PaymentSuccess').then(module=>({default:module.PaymentWaiting})));
+
 // NotFoundPage
 const NotFoundPage=lazy(()=>import('./components/Shared/NotFoundPage'));
+
+/* <-------------------------------------layouts-----------------------------------> */
 const DashboardProtectedLayout = () => {
   return (
-    <ProtectedRoute allowedRoles={["dashboard"]}>
-      <Layout role="dashboard" />
-    </ProtectedRoute>
+    <Suspense fallback={<LazyLoadingDashboard/>}>
+      <ScrollToTop/>
+
+      <DashboardLayout />
+     
+      </Suspense>
+
   );
 };
 const StoreProtectedLayout = () => {
@@ -44,21 +61,8 @@ const StoreProtectedLayout = () => {
   );
 };
 
-// export async function userLoader({ params }) {
-//   const promise = store.dispatch(
-//     productApi.endpoints.getSingleProduct.initiate(params.prdId)
-//   );
 
-//   try {
-//     const result = await promise.unwrap();
-//     console.log(result, "result");
-    
-//     return result;
-//   } finally {
-//     store.dispatch(productApi.util.resetApiState()); // optional: clean up
-//   }
-// }
-
+/* <-------------------------------------Routes-----------------------------------> */
 export function RoutesProvider() {
 
   // const loaction=useLocation();
@@ -131,8 +135,31 @@ export function RoutesProvider() {
             },
             {
               path:"product",
-              element:<AddProduct/>
+              element:<AddProductPage/>
             },
+            {
+              path:"setting",
+              element:<DashboardSetting/>,
+              children:[{
+                path:"",
+                element:<LazySetting.Setting/>
+              },
+                
+                {
+                path:"authentication",
+                element:<div className='center flex-1'>Authentication</div>,
+              },
+              {
+                path:"notification",
+                element:<div className='center flex-1'>Notification</div>,
+              },
+              {
+                path:"network",
+                element:<div className='center flex-1'>Network</div>,
+              },
+            
+            ]
+            }
             
 ,
             

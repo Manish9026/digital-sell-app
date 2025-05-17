@@ -4,7 +4,8 @@ import Navbar from './components/Store/Navbar'
 // import DashboardLayout from './pages/dasboard/Layout.jsx';
 const DashboardLayout = React.lazy(() => import('./pages/dasboard/Layout.jsx'));
 import { classSwitch } from './components/Shared/ThemeToggleButton.jsx';
-
+// import { LazyLoadingDashboard } from './components/Dashboard/LazyComponent.jsx';
+const LazyLoadingDashboard = React.lazy(() => import('./components/Dashboard/LazyComponent.jsx').then(module => ({ default: module.LazyLoadingDashboard })));
 function Layout({role}) {
 
    useEffect(() => {
@@ -28,7 +29,7 @@ function Layout({role}) {
     :
     <div className='light:bg-light flex  flex-col overflow-auto  min-h-screen min-w-screen max-w-screen dark:bg-primary dark:text-light  scroll-hide  light:text-black'>
 
-      <Suspense fallback={<div className='flex items-center justify-center min-h-screen'>Loading...</div>}>
+      <Suspense fallback={<LazyLoadingDashboard/>}>
     <DashboardLayout/>
       </Suspense>
 

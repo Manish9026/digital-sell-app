@@ -10,6 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { Link, NavLink } from "react-router-dom"
 
 export function NavSecondary({
   items,
@@ -21,12 +22,19 @@ export function NavSecondary({
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild>
-                <a href={item.url}>
-                  <item.icon />
-                  <span>{item.title}</span>
-                </a>
+              <NavLink end  to={item?.url} 
+              
+                className={({ isActive, isPending }) =>
+   (isActive ? "bg-slate-600/40" : "") + " w-full  relative flex rounded-md"
+  }
+
+            > 
+              <SidebarMenuButton className="bg-transparent" tooltip={item.title}>
+                {item.icon && <item.icon />}
+                <span>{item.title}</span>
               </SidebarMenuButton>
+              </NavLink>
+             
             </SidebarMenuItem>
           ))}
         </SidebarMenu>

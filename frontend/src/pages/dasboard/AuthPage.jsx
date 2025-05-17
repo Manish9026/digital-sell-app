@@ -33,9 +33,9 @@ import ThemeToggleButton from '../../components/Shared/ThemeToggleButton';
 
 // We'll send you instructions to reset your password
 
-const AuthPage = () => {
+export const AuthPage = () => {
   return (
-    <div className='items-center flex w-full min-h-screen flex-col bg-gradient-to-br from-gray-50 light:from-light light:to-blue-200 dark:from-gray-900 dark:to-gray-950'>
+    <div className='items-center flex w-full min-h-screen flex-col bg-gradient-to-br dark:from-gray-900 dark:to-gray-950 light:from-light light:to-blue-200 '>
 <AdminAuthHeader/>
 
         <Outlet/>
@@ -43,4 +43,3 @@ const AuthPage = () => {
   )
 }
 
-export default AuthPage
