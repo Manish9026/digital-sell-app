@@ -70,7 +70,7 @@ export const goodResponse = ({
             
         }
         if (admin.twoFA.enabled) {
-            const tempToken = jwt.sign({ id: admin._id }, process.env.ADMIN_TEMP_TOKEN_SECRET, { expiresIn: "15m" });
+            const tempToken = jwt.sign({ id: admin._id }, process.env.ADMIN_TEMP_TOKEN_SECRET, { expiresIn: "5m" });
             res.cookie("tempToken", tempToken, { httpOnly: true, secure: true, maxAge: 1000 * 60 * 5, sameSite: "None" });
 
             return goodResponse({ res, statusCode: 201, message: "2FA required", data:{need_2fa: true}  });
