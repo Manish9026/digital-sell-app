@@ -32,12 +32,13 @@ const updateRefreshToken = async (req, decoded, token) => {
 
     const unUsedSession = 15 * 24 * 60 * 60 * 1000;
     const now = Date.now();
-
+        const adminInfo=await getDeviceInfo(req);
+   
 
     const session = admin.sessions.find(s => s?.id?.toString() === sessionId);
     if (!session) throw new Error("Session not found");
 
-    if (session?.ip !== req.ip || session?.userAgent !== req.headers['user-agent']) {
+    if (session?.ip !== adminInfo.ip || session?.userAgent !== adminInfo?.userAgent) {
       throw {message:"Unauthorized:Device mismatched!"};
     }
 
@@ -54,7 +55,7 @@ const updateRefreshToken = async (req, decoded, token) => {
     admin.sessions = admin.sessions.filter(
       s => now - new Date(s.lastUsed).getTime() < unUsedSession && s?.id?.toString() !== sessionId
     );
-    const adminInfo=await getDeviceInfo(req);
+
     admin.sessions.push({
       id: newSessionId,
       refreshTokenHash: newRefreshTokenHash,

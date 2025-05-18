@@ -83,6 +83,7 @@ export const getDeviceInfo = async (req) => {
 }
 
 
+
 // Login - Step 1 (Password Check)
 
 
@@ -391,6 +392,73 @@ static getSessions = async (req, res) => {
   }
 };
 
+static deleteSession = async (req, res) => {
+  try {
+    const { admin } = req;
+    const { sessionId } = req.params;
+    const { refreshToken } = req.cookies;
+
+    if (!admin) {
+      return badResponse({ res, statusCode: 401, message: "Unauthorized" });
+    }
+
+    const decoded = jwt.verify(refreshToken, process.env.ADMIN_REFRESH_TOKEN_SECRET);
+    if (!decoded?.sessionId) {
+      return badResponse({ res, statusCode: 401, message: "Invalid token" });
+    }
+
+    const currentSessionId = decoded.sessionId;
+
+    if (sessionId === "all-others") {
+      // 🔐 Delete all sessions except current
+      admin.sessions = admin.sessions.filter(
+        (session) => session.id.toString() === currentSessionId
+      );
+      await admin.save();
+      return goodResponse({
+        res,
+        message: "Logged out from all other devices",
+      });
+    }
+
+    // 🧹 Delete a specific session
+    const targetSession = admin.sessions.find(
+      (session) => session.id.toString() === sessionId
+    );
+
+    if (!targetSession) {
+      return badResponse({ res, statusCode: 404, message: "Session not found" });
+    }
+
+    // Prevent deletion of current session (optional — for safety)
+    if (sessionId === currentSessionId) {
+      return badResponse({
+        res,
+        statusCode: 400,
+        message: "Cannot delete current session via this route",
+      });
+    }
+
+    admin.sessions = admin.sessions.filter(
+      (session) => session.id.toString() !== sessionId
+    );
+    await admin.save();
+
+    return goodResponse({
+      res,
+      message: "Session deleted successfully",
+    });
+
+  } catch (error) {
+    console.error("Delete session error:", error);
+    return badResponse({
+      res,
+      statusCode: 500,
+      message: "Internal server error",
+      error,
+    });
+  }
+};
 
 }
 

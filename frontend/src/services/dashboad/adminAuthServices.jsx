@@ -78,6 +78,13 @@ const adminAuthApi = createApi({
       }),
     }),
 
+    deleteSession: builder.mutation({
+      query: (id) => ({
+        url: "/session",
+        method: "DELETE",
+        params:id
+      }),
+    }),
 
     logoutAdmin: builder.query({
       query: () => ({
@@ -88,5 +95,5 @@ const adminAuthApi = createApi({
   }),
 });
 
-export const { useLoginAdminMutation, useLogoutAdminMutation,useLazyVerifyAdminQuery,useLazyLogoutAdminQuery,useSetup_2FAMutation,useConfirm_2FAMutation,useLazyDisabled_2FAQuery ,useVerify_2FAMutation,useSessionsQuery} = adminAuthApi;
+export const { useLoginAdminMutation, useLogoutAdminMutation,useLazyVerifyAdminQuery,useLazyLogoutAdminQuery,useSetup_2FAMutation,useConfirm_2FAMutation,useLazyDisabled_2FAQuery ,useVerify_2FAMutation,useSessionsQuery,useDeleteSessionMutation} = adminAuthApi;
 export { adminAuthApi };

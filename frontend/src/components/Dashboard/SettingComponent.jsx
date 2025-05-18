@@ -27,7 +27,7 @@ import { Link, useLocation } from "react-router-dom";
 import { LogOut, MonitorSmartphone, MapPin, Globe } from "lucide-react";
 import { toast } from "../Shared/Toast";
 import { useDispatch, useSelector } from "react-redux";
-import { useLazyDisabled_2FAQuery, useSessionsQuery } from "../../services/dashboad/adminAuthServices";
+import { useDeleteSessionMutation, useLazyDisabled_2FAQuery, useSessionsQuery } from "../../services/dashboad/adminAuthServices";
 import { setAdmin } from "../../slices/dashboard/adminSlice";
 // import { Authenticated } from "./IsAuthenticated";
 const Alert=lazy(()=>import('../Shared/Alert').then(m=>({ default: m.Alert })))
@@ -390,9 +390,30 @@ const DeviceCard = ({ data = {}, onLogout = () => {} }) => {
     location = "Unknown",
     lastUsed = "Unknown",
     current = false,
+    id
   } = data;
 
+    const [deleteSession,{isLoading}]=useDeleteSessionMutation();
+ 
+    const deleteHandle=async(id)=>{
 
+      await deleteSession(id).unwrap().then(res=>{
+
+        toast({
+          title:"Logout Success.",
+          description:"You have been successfully logged out from the selected session.",
+          toastType:"success"
+        })
+      }).catch(err=>{
+
+        toast({
+          title:"Logout Failed.",
+          description:"You have been successfully logged out from the selected session.",
+          toastType:"success"
+        })
+      })
+
+    }
 
   return (
     <motion.div
@@ -437,7 +458,7 @@ const DeviceCard = ({ data = {}, onLogout = () => {} }) => {
             </span>
           </div>
 
-          <button onClick={onLogout} className="text-red-500 hover:text-red-400 transition">
+          <button onClick={()=>deleteHandle(id)} className="text-red-500 hover:text-red-400 transition">
             <Power size={18} />
           </button>
 {
@@ -459,6 +480,7 @@ export function LoginActivity() {
     refetchOnReconnect:true,
     refetchOnMountOrArgChange:true
   })
+  const [deleteSession,{isLoading:dLoading}]=useDeleteSessionMutation();
   console.log(data);
   
   return (
@@ -513,7 +535,7 @@ export function LoginActivity() {
           //   )}
           // </motion.div>
 
-          <DeviceCard data={session}/>
+          <DeviceCard data={session} />
         ))}
       </div>
       <div className="text-right mt-6">
