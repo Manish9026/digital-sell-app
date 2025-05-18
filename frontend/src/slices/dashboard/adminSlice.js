@@ -46,8 +46,11 @@ const adminSlice = createSlice({
         setFirstRequest: (state, action) => {
             state.firstRequest = action.payload;
         },
+        setAdmin:(state,{payload})=>{
+            state.admin=payload;
+        }
     },
 });
 
-export const {loginSuccess,loginFailure,setFirstRequest,logout,setNeed2FA}= adminSlice.actions;
+export const {loginSuccess,loginFailure,setFirstRequest,logout,setNeed2FA,setAdmin}= adminSlice.actions;
 export const adminReducer = adminSlice.reducer;

@@ -4,7 +4,7 @@ import { Shield, Smartphone, Key, QrCode , Mail, Lock,Copy,Eye, EyeOff, CheckCir
 // react hooks
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link, Outlet } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {motion }from 'framer-motion'
 //shadcn components 
 
@@ -25,9 +25,9 @@ import { Card, CardContent } from "@/components/ui/card";
 
 
 // services && api
-import { useLoginAdminMutation } from "../../services/dashboad/adminAuthServices";
+import { useConfirm_2FAMutation, useLoginAdminMutation, useSetup_2FAMutation, useVerify_2FAMutation } from "../../services/dashboad/adminAuthServices";
 import {IsAuthenticated} from "./IsAuthenticated";
-import { loginFailure, logout } from "../../slices/dashboard/adminSlice";
+import { loginFailure, loginSuccess, logout, setAdmin } from "../../slices/dashboard/adminSlice";
 
 
 
@@ -241,12 +241,14 @@ const [loginAdmin,{isLoading}]=useLoginAdminMutation();
 // This component is used to verify the 2FA code sent to the user's device
 const TwoFactorForm = () => {
   const [code, setCode] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
   const [countdown, setCountdown] = useState(60);
   const [canResend, setCanResend] = useState(false);
+  const [verify_2FA,{isLoading}]=useVerify_2FAMutation();
 //   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch=useDispatch();
   const email = location.state?.email || "your account";
 
   useEffect(() => {
@@ -270,33 +272,54 @@ const TwoFactorForm = () => {
         title: "Error",
         description: "Please enter the verification code",
         variant: "destructive",
+        toastType:"error"
       });
       return;
     }
     
-    setIsLoading(true);
+    await verify_2FA({token:code}).unwrap().then((res)=>{
+
+      if(res?.status){
+      dispatch(loginSuccess(res));
+      navigate('/dashboard');
+      return toast({
+        title:"Login Success.",
+        description:res?.message,
+        toastType:"success"
+      });
+    }
+
+    }).catch(err=>{
+
+      return toast({
+        title:"Login Failed.",
+        description:err.data?.message,
+        toastType:"error"
+      })
+    })
+    // setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    // // Simulate API call
+    // setTimeout(() => {
+    //   setIsLoading(false);
       
-      // Example validation - in a real app this would verify via backend
-      if (code === "123456" || code === "000000") {
-        toast({
-          title: "Success",
-          description: "You have been successfully authenticated",
-        });
+    //   // Example validation - in a real app this would verify via backend
+    //   if (code === "123456" || code === "000000") {
+    //     toast({
+    //       title: "Success",
+    //       description: "You have been successfully authenticated",
+    //     });
         
-        // Navigate to dashboard or home page after successful 2FA
-        navigate("/dashboard");
-      } else {
-        toast({
-          title: "Verification failed",
-          description: "Invalid code. Please try again",
-          variant: "destructive",
-        });
-      }
-    }, 1500);
+    //     // Navigate to dashboard or home page after successful 2FA
+    //     navigate("/dashboard");
+    //   } else {
+    //     toast({
+    //       title: "Verification failed",
+    //       description: "Invalid code. Please try again",
+    //       variant: "destructive",
+    //     });
+    //   }
+    // }, 1500);
   };
 
   const handleResendCode = () => {
@@ -368,15 +391,18 @@ const TwoFactorForm = () => {
         </Button>
         
         <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-          <Button
+          <a href="https://support.microsoft.com/en-us/account-billing/how-to-add-your-accounts-to-microsoft-authenticator-92544b53-7706-4581-a142-30344a2a2a57#id0ebh=signinorgid" target="_blank">
+           <Button
             type="button"
             variant="outline"
             className="w-full flex items-center gap-2"
-            onClick={() => navigate("/otp-setup")}
+            
           >
             <QrCode className="h-4 w-4" />
             Set up authenticator app
           </Button>
+          </a>
+         
           <p className="mt-2 text-xs text-center light:text-gray-500 dark:text-gray-400">
             Don't want to receive SMS codes? Set up an authenticator app instead.
           </p>
@@ -748,31 +774,21 @@ import qr from './qr.png'
 
 const OTPSetupForm = () => {
   const [verificationCode, setVerificationCode] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const {admin}=useSelector(state=>state.adminReducer);
   const [step, setStep] = useState(1); // 1: Setup, 2: Verification, 3: Success
+
+  const [setup_2FA,{isLoading:qrLoading,isSuccess}]=useSetup_2FAMutation();
+  const [confirm_2FA,{isLoading:cLoading}]=useConfirm_2FAMutation();
   const [timeLeft,setTimeLeft]=useState(45);
-  // const { toast } = useToast();
   const navigate = useNavigate();
+  const dispatch=useDispatch();
+  const [secretKey,setSecretKey]=useState('');
+  const [qrCodeUrl,setQrCodeUrl]=useState()
 
-  // In a real app, these would come from your backend
-  const secretKey = "JBSWY3DPEHPK3PXP";
-  const qrCodeUrl = `https://chart.googleapis.com/chart?chs=200x200&chld=M|0&cht=qr&chl=otpauth://totp/Lovable:user@example.com?secret=${secretKey}&issuer=Lovable`;
-
-  // useEffect(()=>{
-
-  //   if(step===3){
-
-  //     let timeout=setTimeout(()=>{
-  //       navigate('/dashboard/setting/authentication')
-  //     },5000)
-
-
-  //     return ()=> clearTimeout(timeout)
-  //   }
-  // },[step])
 
   useEffect(() => {
 
+    if(!(admin && admin?.twoFA.enabled)){
     if(step===3){
  let timer;
     if (timeLeft > 0) {
@@ -787,6 +803,28 @@ const OTPSetupForm = () => {
 
 
     }
+    if(step==1 && !secretKey){
+
+       setup_2FA().unwrap().then((res)=>{
+      setQrCodeUrl(res.qr);
+      setSecretKey(res.secret)
+      
+    }).catch((error)=>{
+
+      console.log("error",error)
+    })
+    }}
+
+    else{
+      navigate("/dashboard/setting/authentication")
+      toast({
+        toastType:"info",
+        title:"Already Enabled 2FA",
+        description:"If you want to change 2FA code,disabled firstly"
+
+      })
+      return 
+    }
    
   }, [timeLeft,step]);
 
@@ -798,33 +836,65 @@ const OTPSetupForm = () => {
     });
   };
 
-  const handleVerify = () => {
-    setIsLoading(true);
-    
+  const handleVerify =async () => {
     // In a real app, you would validate this with your backend
-    setTimeout(() => {
-      setIsLoading(false);
-      
-      // Demo validation - pretend "123456" is a valid code
-      if (verificationCode === "123456") {
-        setStep(3);
-        toast({
+      await confirm_2FA({token:verificationCode,secret:secretKey}).unwrap().then((res)=>{
+
+
+        // console.log(res,'response');
+        if(res?.status){
+          setStep(3)
+          dispatch(setAdmin(res?.admin));
+          return toast({
           title: "Success",
           description: "Two-factor authentication has been enabled",
+          toastType:"success"
         });
-      } else {
-        toast({
+        }
+        return toast({
+          title: "Success",
+          description: res?.message,
+          toastType:"success"
+        });
+        
+    }).catch(({data})=>{
+
+      // console.log("error",error)
+       toast({
           title: "Verification failed",
-          description: "Invalid code. Please try again",
+          description: data?.message,
           variant: "destructive",
+          toastType:"error"
         });
-      }
-    }, 1500);
+    })
+    // setTimeout(() => {
+    //   setIsLoading(false);
+      
+    //   // Demo validation - pretend "123456" is a valid code
+    //   if (verificationCode === "123456") {
+    //     setStep(3);
+    //     toast({
+    //       title: "Success",
+    //       description: "Two-factor authentication has been enabled",
+    //     });
+    //   } else {
+    //     toast({
+    //       title: "Verification failed",
+    //       description: "Invalid code. Please try again",
+    //       variant: "destructive",
+    //     });
+    //   }
+    // }, 1500);
   };
 
   const handleComplete = () => {
     navigate("/dashboard");
   };
+  const handleContinue=async()=>{
+
+    
+    setStep(2)
+  }
 
 
   return (
@@ -876,11 +946,11 @@ className="space-y-6 max-w-[600px] primary-p"
         <div className="space-y-4">
           <Button
             type="button"
-            disabled={isLoading || verificationCode.length < 6}
+            disabled={cLoading || verificationCode.length < 6}
             className="w-full bg-shield-primary hover:bg-shield-secondary"
             onClick={handleVerify}
           >
-            {isLoading ? (
+            {cLoading ? (
               <>
                 <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
                 Verifying...
@@ -940,11 +1010,13 @@ className="space-y-6 max-w-[600px] primary-p"
         <CardContent className="p-4">
           <div className="rounded-md p-4 flex items-center justify-center">
             <AspectRatio ratio={1 / 1} className=" h-full ">
-              <img 
-                src={ qr}
+             {!qrLoading? <img 
+                src={qrCodeUrl || qr}
                 alt="QR Code for TOTP setup" 
                 className="flex-1 rounded-md object-contain w-full h-full"
-              />
+              />:
+              <span>loding....</span>
+              }
             </AspectRatio>
           </div>
         </CardContent>
@@ -988,7 +1060,7 @@ className="space-y-6 max-w-[600px] primary-p"
       <Button
         type="button"
         className="w-full bg-shield-primary hover:bg-shield-secondary"
-        onClick={() => setStep(2)}
+        onClick={() => handleContinue()}
       >
         Continue
       </Button>

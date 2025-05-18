@@ -43,6 +43,34 @@ const adminAuthApi = createApi({
                             }
                           },
     }),
+    verify_2FA:builder.mutation({
+      query:(data)=>({
+        url:'/verify-2fa',
+        method:"POST",
+        body:data
+      })
+    }),
+    
+    setup_2FA:builder.mutation({
+      query:()=>({
+        url:'/enable-2fa',
+        method:"POST"
+      })
+    }),
+    confirm_2FA:builder.mutation({
+      query:(data)=>({
+        url:'/confirm-2fa',
+        method:"POST",
+        body:data
+      })
+    }),
+    disabled_2FA: builder.query({
+      query: () => ({
+        url: "/disabled-2fa",
+        method: "GET",
+      }),
+    }),
+
     logoutAdmin: builder.query({
       query: () => ({
         url: "/logout",
@@ -52,5 +80,5 @@ const adminAuthApi = createApi({
   }),
 });
 
-export const { useLoginAdminMutation, useLogoutAdminMutation,useLazyVerifyAdminQuery,useLazyLogoutAdminQuery } = adminAuthApi;
+export const { useLoginAdminMutation, useLogoutAdminMutation,useLazyVerifyAdminQuery,useLazyLogoutAdminQuery,useSetup_2FAMutation,useConfirm_2FAMutation,useLazyDisabled_2FAQuery ,useVerify_2FAMutation} = adminAuthApi;
 export { adminAuthApi };

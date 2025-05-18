@@ -99,26 +99,55 @@ export const goodResponse = ({
         res.cookie("accessToken", accessToken, { httpOnly: true, secure: true, sameSite: "None", maxAge: 1000 * 60 * 15, domain: '.vercel.app', });
         res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true, sameSite: "None" , maxAge: 1000 * 60 * 60 * 24 * 7 });
 
-        goodResponse({ res, statusCode: 201, message: "Login successful", data:{isAuthenticated:true,admin} });
+        return goodResponse({ res, statusCode: 201, message: "Login successful", data:{isAuthenticated:true,admin} });
     }
     static verify2FA = async (req, res) => {
-        const { token, tempToken } = req.body;
-        const decoded = jwt.verify(tempToken, "TEMP_SECRET");
-        const admin = await AdminUser.findById(decoded.id);
+        const { token } = req.body;
+        const {admin:user}=req;
+
+        console.log(token);
+        
+
+
+        // const decoded = jwt.verify(tempToken, "TEMP_SECRET");
+        const admin = await AdminUser.findById(user._id);
+        console.log(admin.twoFA.secret);
+        
         const isVerified = speakeasy.totp.verify({
             secret: admin.twoFA.secret,
             encoding: "base32",
             token
         });
+        console.log(isVerified);
+        
         if (!isVerified) return res.status(401).json({ message: "Invalid TOTP" });
 
-        const accessToken = createAccessToken(admin._id);
-        const refreshToken = createRefreshToken(admin._id);
-        const hash = await bcrypt.hash(refreshToken, 10);
-        admin.sessions.push({ refreshTokenHash: hash, ip: req.ip, userAgent: req.headers['user-agent'] });
-        await admin.save();
-        res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true, sameSite: "strict" });
-        res.json({ accessToken });
+         // No 2FA: login fully
+        const newId = new mongoose.Types.ObjectId().toHexString();
+        // console.log(newId.toHexString());
+        
+        const accessToken = createAccessToken({id: admin._id,sessionId: newId});
+            const refreshToken = createRefreshToken({ id: admin._id, sessionId: newId });
+            const hash = await bcrypt.hash(refreshToken, 10);
+        // admin.sessions.push({id:newId, refreshTokenHash: hash, ip: req.ip, userAgent: req.headers['user-agent'] });
+         await AdminUser.findOneAndUpdate({_id:admin._id}, {
+      $push: {
+        sessions: {
+          id: newId,
+        refreshTokenHash:hash,
+          ip: req.ip,
+          userAgent: req.headers['user-agent'],
+          lastUsed: new Date()
+        }
+      }
+    });
+       
+        res.cookie("accessToken", accessToken, { httpOnly: true, secure: true, sameSite: "None", maxAge: 1000 * 60 * 15, domain: '.vercel.app', });
+        res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true, sameSite: "None" , maxAge: 1000 * 60 * 60 * 24 * 7 });
+
+        return  goodResponse({ res, statusCode: 201, message: "You have been successfully authenticated.", data:{isAuthenticated:true,admin} });
+        
+       
     }
     static verifyToken = async (req, res) => {
         try {
@@ -230,8 +259,10 @@ console.log(decoded);
 
     // setup 2FA and generate QR code and confirm 2FA
     static setup2FA = async (req, res) => {
-        const { email } = req.body;
-        const admin = await AdminUser.findOne({ email });
+
+      const {admin}=req;
+        // const { email } = req.body;
+        // const admin = await AdminUser.findOne({ email });
         const secret = speakeasy.generateSecret({ name: "Admin Dashboard" });
         qrcode.toDataURL(secret.otpauth_url, async (err, image_data) => {
             if (err) return res.status(500).json({ message: "QR generation failed" });
@@ -241,18 +272,44 @@ console.log(decoded);
         });
     };
     static confirm2FA = async (req, res) => {
-        const { email, token, secret } = req.body;
+        const {token, secret } = req.body;
+        const {admin}=req;
+
+        if(admin && admin?.twoFA.enabled)
+          return badResponse({res,message:"Already enabled 2FA. "})
         const isVerified = speakeasy.totp.verify({
             secret,
             encoding: "base32",
             token
         });
-        if (!isVerified) return res.status(400).json({ message: "Invalid TOTP code" });
-        const admin = await AdminUser.findOne({ email });
-        admin.twoFA.enabled = true;
-        admin.twoFA.secret = secret;
-        await admin.save();
-        res.json({ message: "2FA enabled" });
+        if (!isVerified) return badResponse({res,statusCode:400,message:"Invalid TOTP code"})
+        const updateAdmin = await AdminUser.findOne({ _id:admin });
+        updateAdmin.twoFA.enabled = true;
+        updateAdmin.twoFA.secret = secret;
+        await updateAdmin.save();
+
+        return goodResponse({res,message:"2FA enabled" ,data:{admin:updateAdmin}})
+        // res.json({ message: "2FA enabled",admin });
+    }
+
+    static disabled2FA=async(req,res)=>{
+      try {
+        
+        const {admin}=req;
+        if(!admin) return badResponse({res,message:"try after some time",statusCode:400})
+        
+          const updatedAdmin=await AdminUser.findById(admin?._id);
+          updatedAdmin.twoFA.enabled=false;
+          updatedAdmin.twoFA.secret="";
+          await updatedAdmin.save()
+
+          return goodResponse({res,message:"Disabled 2FA.",data:{admin:updatedAdmin}})
+          
+      } catch (error) {  
+        console.log(error);
+          
+       return badResponse({res,message:"server error",statusCode:500})
+      }
     }
 
 }
