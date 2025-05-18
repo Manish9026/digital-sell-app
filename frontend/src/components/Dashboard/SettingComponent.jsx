@@ -19,12 +19,15 @@ import {
   EyeOff,
   Eye,
   Loader2,
+  Phone,
+  Smartphone,
+  Tablet,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { LogOut, MonitorSmartphone, MapPin, Globe } from "lucide-react";
 import { toast } from "../Shared/Toast";
 import { useDispatch, useSelector } from "react-redux";
-import { useLazyDisabled_2FAQuery } from "../../services/dashboad/adminAuthServices";
+import { useLazyDisabled_2FAQuery, useSessionsQuery } from "../../services/dashboad/adminAuthServices";
 import { setAdmin } from "../../slices/dashboard/adminSlice";
 // import { Authenticated } from "./IsAuthenticated";
 const Alert=lazy(()=>import('../Shared/Alert').then(m=>({ default: m.Alert })))
@@ -365,7 +368,99 @@ const sessions = [
   },
 ];
 
+// components/DeviceCard.tsx
+import { Card, CardContent } from "@/components/ui/card";
+// import { motion } from "framer-motion";
+import { Monitor , Power, Clock } from "lucide-react";
+import { formatRelativeTime } from "../../lib/time";
+
+
+const deviceIcons={
+  tablet:<Tablet className="text-blue-400" size={20} />,
+  desktop:<Monitor className="text-blue-400" size={20} />,
+  phone:<Smartphone className="text-blue-400" size={20} />,
+  default:""
+}
+const DeviceCard = ({ data = {}, onLogout = () => {} }) => {
+  const {
+    browser = "Unknown",
+    os = "Unknown",
+    device = "Unknown",
+    ip = "Unknown",
+    location = "Unknown",
+    lastUsed = "Unknown",
+    current = false,
+  } = data;
+
+
+
+  return (
+    <motion.div
+      // initial={{ opacity: 0, y: 20 }}
+      // animate={{ opacity: 1, y: 0 }}
+      // transition={{ duration: 0.5 }}
+       whileHover={{ scale: 1.02 }}
+      className="w-full sm:min-w-[350px] max-w-[450px] flex-1 min-w-[250px]"
+    >
+      <Card 
+            className={`flex flex-1 flex-wrap items-center justify-between p-4 rounded-lg border  ${current
+                ? "border-indigo-300 bg-indigo-50 dark:bg-slate-700/30"
+                : "border-slate-200 dark:border-slate-600"
+              }`}>
+        <CardContent className="p-0 flex relative flex-1 flex-wrap w-full justify-between items-center gap-4">
+          <div className="flex items-center gap-3">
+            {
+               deviceIcons[device.toLowerCase()] || deviceIcons.default
+
+            }
+           
+            <div className="leading-tight">
+              <p className="text-sm font-semibold">{device}</p>
+              <p className="text-xs text-slate-400">{browser}</p>
+            </div>
+          </div>
+
+          <div className="text-xs text-slate-400 flex flex-col items-start justify-center">
+            <span className="flex items-center gap-1">
+              <MapPin size={12} /> {location}
+            </span>
+            <span className="flex items-center gap-1">
+              <Globe size={12} /> {ip}
+            </span>
+          </div>
+
+          <div className="text-xs text-slate-400 flex flex-col items-end justify-center">
+            <span>{os}</span>
+            <span className="flex items-center gap-1">
+              <Clock size={12} />
+              {formatRelativeTime(lastUsed)}
+            </span>
+          </div>
+
+          <button onClick={onLogout} className="text-red-500 hover:text-red-400 transition">
+            <Power size={18} />
+          </button>
+{
+     current && <span class="absolute -right-5 -top-5 center flex size-3">  <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>  <span class="relative inline-flex size-3 rounded-full bg-green-500"></span></span>}
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+};
+
+export default DeviceCard;
+
+
 export function LoginActivity() {
+
+  const {admin}=useSelector(state=>state.adminReducer);
+
+  const {data,isLoading}=useSessionsQuery(undefined,{
+    refetchOnReconnect:true,
+    refetchOnMountOrArgChange:true
+  })
+  console.log(data);
+  
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -387,36 +482,38 @@ export function LoginActivity() {
         Login Activity
       </motion.h1>
 
-      <div className="flex gap-4 items-center flex-wrap ">
-        {sessions.map((session, index) => (
-          <motion.div
-            key={index}
-            whileHover={{ scale: 1.02 }}
-            className={`flex flex-1 items-center justify-between p-4 rounded-lg border max-w-xl ${session.current
-                ? "border-indigo-300 bg-indigo-50 dark:bg-slate-700/30"
-                : "border-slate-200 dark:border-slate-600"
-              }`}
-          >
-            <div className="flex flex-1 items-start gap-4">
-              <MonitorSmartphone className="w-6 h-6 mt-1 text-indigo-500" />
-              <div>
-                <p className="font-medium flex items-center text-slate-800 dark:text-white">
-                  {session.device}{session.current && (
-                    <span className="text-[10px] ml-2  text-green-500 font-medium">( Current Device )</span>
-                  )}
-                </p>
-                <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                  <MapPin className="w-4 h-4" /> {session.location} · <Globe className="w-4 h-4" /> {session.ip}
-                </p>
+      <div className="flex flex-1 gap-4 items-center flex-wrap ">
+        {data && data?.sessions.map((session, index) => (
+          // <motion.div
+          //   key={index}
+          //   whileHover={{ scale: 1.02 }}
+          //   className={`flex flex-1 items-center justify-between p-4 rounded-lg border max-w-xl ${session.current
+          //       ? "border-indigo-300 bg-indigo-50 dark:bg-slate-700/30"
+          //       : "border-slate-200 dark:border-slate-600"
+          //     }`}
+          // >
+          //   <div className="flex flex-1 items-start gap-4">
+          //     <MonitorSmartphone className="w-6 h-6 mt-1 text-indigo-500" />
+          //     <div>
+          //       <p className="font-medium flex items-center text-slate-800 dark:text-white">
+          //         {session.device}{session.current && (
+          //           <span className="text-[10px] ml-2  text-green-500 font-medium">( Current Device )</span>
+          //         )}
+          //       </p>
+          //       <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
+          //         <MapPin className="w-4 h-4" /> {session.location} · <Globe className="w-4 h-4" /> {session.ip}
+          //       </p>
 
-              </div>
-            </div>
-            {!session.current && (
-              <button className="text-red-500 hover:underline text-sm flex items-center gap-1">
-                <LogOut className="w-4 h-4" /> Logout
-              </button>
-            )}
-          </motion.div>
+          //     </div>
+          //   </div>
+          //   {!session.current && (
+          //     <button className="text-red-500 hover:underline text-sm flex items-center gap-1">
+          //       <LogOut className="w-4 h-4" /> Logout
+          //     </button>
+          //   )}
+          // </motion.div>
+
+          <DeviceCard data={session}/>
         ))}
       </div>
       <div className="text-right mt-6">

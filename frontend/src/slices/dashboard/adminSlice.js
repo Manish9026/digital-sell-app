@@ -39,6 +39,7 @@ const adminSlice = createSlice({
         logout: (state) => {
             state.admin = {};
             state.isLoggedIn = false;
+            state.firstRequest=false;
         }, 
         setNeed2FA: (state, action) => {
             state.need_2fa = action.payload;

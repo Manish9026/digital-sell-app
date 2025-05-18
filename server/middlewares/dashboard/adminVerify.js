@@ -2,7 +2,8 @@ import jwt from "jsonwebtoken";
 import { AdminUser } from "../../models/dashboardModel.js";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
-import { badResponse, createAccessToken, createRefreshToken } from "../../controllers/dashboard/authController.js";
+import { badResponse, createAccessToken, createRefreshToken, getDeviceInfo } from "../../controllers/dashboard/authController.js";
+import { UAParser } from "ua-parser-js"
 
 // const  logout = async (req,decoded, token) => {
 //         const { refreshToken } = req.cookies;
@@ -29,12 +30,17 @@ const updateRefreshToken = async (req, decoded, token) => {
     const admin = await AdminUser.findById(id);
     if (!admin) throw new Error("Invalid token owner");
 
+    const unUsedSession = 15 * 24 * 60 * 60 * 1000;
+    const now = Date.now();
+
+
     const session = admin.sessions.find(s => s?.id?.toString() === sessionId);
     if (!session) throw new Error("Session not found");
 
     if (session?.ip !== req.ip || session?.userAgent !== req.headers['user-agent']) {
-      throw new Error("Device mismatch");
+      throw {message:"Unauthorized:Device mismatched!"};
     }
+
 
     const isValid = await bcrypt.compare(token, session.refreshTokenHash);
     if (!isValid) throw new Error("Invalid refresh token");
@@ -44,12 +50,15 @@ const updateRefreshToken = async (req, decoded, token) => {
     const newRefreshTokenHash = await bcrypt.hash(newRefreshToken, 10);
     const newAccessToken = createAccessToken({ id: admin._id, sessionId: newSessionId });
 
-    admin.sessions = admin.sessions.filter(s => s?.id?.toString() !== sessionId);
+    // admin.sessions = admin.sessions.filter(s => s?.id?.toString() !== sessionId);
+    admin.sessions = admin.sessions.filter(
+      s => now - new Date(s.lastUsed).getTime() < unUsedSession && s?.id?.toString() !== sessionId
+    );
+    const adminInfo=await getDeviceInfo(req);
     admin.sessions.push({
       id: newSessionId,
       refreshTokenHash: newRefreshTokenHash,
-      ip: req.ip,
-      userAgent: req.headers['user-agent'],
+     ...adminInfo,
       lastUsed: new Date()
     });
 
@@ -66,6 +75,7 @@ const updateRefreshToken = async (req, decoded, token) => {
   }
 };
 
+
 const verifyAdminToken = async (req, res, next) => {
   try {
     const { refreshToken, accessToken, tempToken } = req.cookies;
@@ -74,12 +84,12 @@ const verifyAdminToken = async (req, res, next) => {
     let decoded;
     let admin;
 
-    console.log(tempToken,"tempToken");
-    console.log(refreshToken,"refreshToken");
-    console.log(accessToken,"accessToken");
 
-    if(!refreshToken && !accessToken && !tempToken) {
-      return badResponse({res, message:"No token provided",statusCode:401,});
+    console.log(tempToken, "tempToken");
+    console.log(refreshToken, "refreshToken");
+    console.log(accessToken, "accessToken");
+    if (!refreshToken && !accessToken && !tempToken) {
+      return badResponse({ res, message: "No token provided", statusCode: 401, });
     }
 
     try {
@@ -90,7 +100,7 @@ const verifyAdminToken = async (req, res, next) => {
       // If failed, check if it's a tempToken
       // console.log(err,"tempToken");
       try {
-       decoded = jwt.verify(refreshToken, process.env.ADMIN_REFRESH_TOKEN_SECRET);
+        decoded = jwt.verify(refreshToken, process.env.ADMIN_REFRESH_TOKEN_SECRET);
         const result = await updateRefreshToken(req, decoded, refreshToken);
 
         // Assign fresh admin + decoded
@@ -101,9 +111,9 @@ const verifyAdminToken = async (req, res, next) => {
           decoded = jwt.verify(tempToken, process.env.ADMIN_TEMP_TOKEN_SECRET); // TEMP_SECRET
           req.twoFactorAuth = true; // Optional flag to detect it's a tempToken
         } catch (tempErr) {
-          console.log(tempErr, "tempErr");
+          console.log(error?.message,error, "tempErr");
 
-          return res.status(401).json({ error: "Unauthorized: Invalid or expired token" });
+          return badResponse({ res, message: error?.message || "Unauthorized: Invalid or expired token", statusCode: 401 });
         }
       }
 
@@ -111,7 +121,7 @@ const verifyAdminToken = async (req, res, next) => {
     }
 
     // Fetch admin from DB
-   if (!admin) {
+    if (!admin) {
       admin = await AdminUser.findById(decoded.id);
       if (!admin) {
         return res.status(401).json({ error: "Unauthorized: Admin not found" });

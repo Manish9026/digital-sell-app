@@ -6,7 +6,7 @@ import qrcode from "qrcode";
 import { AdminUser } from "../../models/dashboardModel.js";
 // AdminUser.createIndexes({ email: 1 }, { unique: true });
 import mongoose from "mongoose";
-
+import {UAParser} from 'ua-parser-js'
 
 export const createAccessToken = (data) => jwt.sign(data, process.env.ADMIN_ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
 export const createRefreshToken = (data) => jwt.sign(data, process.env.ADMIN_REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
@@ -53,6 +53,35 @@ export const goodResponse = ({
   });
 };
 
+export const getDeviceInfo = async (req) => {
+  const parser = new UAParser();
+  const userAgent = req.headers['user-agent'];
+  const uaResult = parser.setUA(userAgent).getResult();
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+
+
+  console.log({
+    ip,
+    userAgent,
+    browser: uaResult.browser.name,
+    os: uaResult.os.name,
+    device: uaResult.device.type || 'Desktop',
+    // location
+  });
+
+  return ({
+    ip,
+    userAgent,
+    browser: uaResult.browser.name,
+    os: uaResult.os.name,
+    device: uaResult.device.type || 'Desktop',
+    // location
+  })
+  // console.log(userAgent);
+
+
+}
+
 
 // Login - Step 1 (Password Check)
 
@@ -63,6 +92,7 @@ export const goodResponse = ({
     static adminLogin = async (req, res) => {
         const { email, password } = req.body;
         console.log(email, password); 
+
         
         const admin = await AdminUser.findOne({ email });
         if (!admin || !(await bcrypt.compare(password, admin.password))) {
@@ -83,13 +113,13 @@ export const goodResponse = ({
             const refreshToken = createRefreshToken({ id: admin._id, sessionId: newId });
             const hash = await bcrypt.hash(refreshToken, 10);
         // admin.sessions.push({id:newId, refreshTokenHash: hash, ip: req.ip, userAgent: req.headers['user-agent'] });
+        const adminInfo=await getDeviceInfo(req);
          await AdminUser.findOneAndUpdate({_id:admin._id}, {
       $push: {
         sessions: {
           id: newId,
         refreshTokenHash:hash,
-          ip: req.ip,
-          userAgent: req.headers['user-agent'],
+          ...adminInfo,
           lastUsed: new Date()
         }
       }
@@ -105,8 +135,6 @@ export const goodResponse = ({
         const { token } = req.body;
         const {admin:user}=req;
 
-        console.log(token);
-        
 
 
         // const decoded = jwt.verify(tempToken, "TEMP_SECRET");
@@ -130,13 +158,14 @@ export const goodResponse = ({
             const refreshToken = createRefreshToken({ id: admin._id, sessionId: newId });
             const hash = await bcrypt.hash(refreshToken, 10);
         // admin.sessions.push({id:newId, refreshTokenHash: hash, ip: req.ip, userAgent: req.headers['user-agent'] });
+
+        const adminInfo=await getDeviceInfo(req);
          await AdminUser.findOneAndUpdate({_id:admin._id}, {
       $push: {
         sessions: {
           id: newId,
         refreshTokenHash:hash,
-          ip: req.ip,
-          userAgent: req.headers['user-agent'],
+          ...adminInfo,
           lastUsed: new Date()
         }
       }
@@ -153,7 +182,8 @@ export const goodResponse = ({
         try {
             const {decoded,admin,twoFactorAuth} = req;
             // const {user}=req;
-console.log(decoded);
+            
+
 
 
             if(!admin) return badResponse({res,statusCode:401,message:"Unauthorized",});
@@ -165,10 +195,13 @@ console.log(decoded);
 
 
             
-        } catch (error) {        
+        } catch (error) { 
+          console.log(error);
+                 
           return badResponse({res,statusCode:500,message:"internal server error",error});
         }
     }
+
 
     static refreshToken= async (req, res) => {
   try {
@@ -291,7 +324,6 @@ console.log(decoded);
         return goodResponse({res,message:"2FA enabled" ,data:{admin:updateAdmin}})
         // res.json({ message: "2FA enabled",admin });
     }
-
     static disabled2FA=async(req,res)=>{
       try {
         
@@ -311,6 +343,54 @@ console.log(decoded);
        return badResponse({res,message:"server error",statusCode:500})
       }
     }
+
+static getSessions = async (req, res) => {
+  try {
+    const { admin } = req;
+    const { refreshToken } = req.cookies;
+    if (!admin) return res.status(401).json({ message: "Unauthorized" });
+
+    const decoded = jwt.verify(refreshToken, process.env.ADMIN_REFRESH_TOKEN_SECRET);
+    if (!decoded) return badResponse({ req, message: "Unauthorized access." });
+
+    const adminInfo = await getDeviceInfo(req);
+
+    const sessions = admin.sessions.map(session => {
+      const sessionObj = session.toObject();
+      const isCurrent =
+        session.ip === adminInfo.ip &&
+        session.userAgent === adminInfo.userAgent &&
+        session.id.toString() === decoded.sessionId;
+
+      const { refreshTokenHash, ...safeSession } = sessionObj;
+      return { ...safeSession, current: isCurrent };
+    });
+
+    const sortedSessions = sessions.sort((a, b) => {
+      if (a.current && !b.current) return -1;
+      if (!a.current && b.current) return 1;
+
+      const timeA = new Date(a.lastUsed || a.createdAt).getTime();
+      const timeB = new Date(b.lastUsed || b.createdAt).getTime();
+      return timeB - timeA;
+    });
+
+    return goodResponse({
+      res,
+      message: "Session found.",
+      data: { sessions: sortedSessions },
+      statusCode: 200,
+    });
+  } catch (error) {
+    console.error("GetSessions Error:", error);
+    return badResponse({
+      req,
+      message: "Internal Server Error.",
+      statusCode: 500,
+    });
+  }
+};
+
 
 }
 

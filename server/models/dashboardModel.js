@@ -10,12 +10,22 @@ const sessionSchema = new mongoose.Schema({
   refreshTokenHash: String,
   ip: String,
   userAgent: String,
+  browser:String,
+  device:String,
+  os:String,
   createdAt: { type: Date, default: Date.now },
   lastUsed: Date
 },{_id: false});
 
 const adminUserSchema = new mongoose.Schema({
-  email: { type: String, required: true, unique: true },
+ email: { 
+    type: String, 
+    required: true, 
+    unique: true,
+    lowercase: true,
+    trim: true,
+    match: [/^\S+@\S+\.\S+$/, 'Please use a valid email address']
+  },
   password: String,
   adminName: { type: String,  },
   profilePic: String,

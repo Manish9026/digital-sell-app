@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^1.7.7",
+    "axios": "^1.9.0",
     "bcrypt": "^5.1.1",
     "cloudinary": "^2.5.0",
     "cookie-parser": "^1.4.6",
@@ -36,6 +36,7 @@
     "razorpay": "^2.9.6",
     "server": "file:",
     "speakeasy": "^2.0.0",
+    "ua-parser-js": "^2.0.3",
     "xlsx": "^0.18.5"
   },
   "description": "",

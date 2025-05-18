@@ -71,6 +71,14 @@ const adminAuthApi = createApi({
       }),
     }),
 
+    sessions: builder.query({
+      query: () => ({
+        url: "/sessions",
+        method: "GET",
+      }),
+    }),
+
+
     logoutAdmin: builder.query({
       query: () => ({
         url: "/logout",
@@ -80,5 +88,5 @@ const adminAuthApi = createApi({
   }),
 });
 
-export const { useLoginAdminMutation, useLogoutAdminMutation,useLazyVerifyAdminQuery,useLazyLogoutAdminQuery,useSetup_2FAMutation,useConfirm_2FAMutation,useLazyDisabled_2FAQuery ,useVerify_2FAMutation} = adminAuthApi;
+export const { useLoginAdminMutation, useLogoutAdminMutation,useLazyVerifyAdminQuery,useLazyLogoutAdminQuery,useSetup_2FAMutation,useConfirm_2FAMutation,useLazyDisabled_2FAQuery ,useVerify_2FAMutation,useSessionsQuery} = adminAuthApi;
 export { adminAuthApi };

@@ -7,6 +7,7 @@ import { useLazyVerifyAdminQuery } from '../../services/dashboad/adminAuthServic
 import { motion } from 'framer-motion';
 import { ShieldCheck } from 'lucide-react';
 import { toast } from '../Shared/Toast';
+import { useRef } from 'react';
 
 const CheckingAuth = () => {
   return (
@@ -54,16 +55,23 @@ const IsAuthenticated = ({ navigatePath, children,isAuth=false }) => {
   const allowedPaths = [
 "2fa-verify",
 "reset-password",
-    "new-password",]
+    "new-password"]
 
   // console.log(location.pathname.split('/')?.some(path=>allowedPaths.includes(path)),"location.pathname");
   // location.pathname.includes("dashboard/admin-auth/2fa-verify")
+  const pathArray=location.pathname.split('/');
   useEffect(() => {
-    if (!(isLoggedIn || (location.pathname.split('/')?.some(path=>allowedPaths.includes(path)) && firstRequest))) {
+
+
+    
+    let timer=setTimeout(()=>{
+     
+if (!(isLoggedIn || (pathArray?.some(path=>allowedPaths.includes(path)) && firstRequest))) {
+  // hasRun.current=false
       trigger()
         .unwrap()
         .then((res) => {
-            console.log(res,"response");
+            // console.log(res,"response");
             dispatch(setFirstRequest(true))
                if (res?.need_2fa) {
                        
@@ -79,11 +87,20 @@ const IsAuthenticated = ({ navigatePath, children,isAuth=false }) => {
           dispatch(loginSuccess(res));
         })
         .catch((err) => {
-            console.log(err,"error");
+
+
+
+            // console.log(err,"error");
             dispatch(setFirstRequest(true))
             
-          console.error('Auth failed:', err);
+          // console.error('Auth failed:', err);
+          if(!pathArray?.includes("admin-auth")){
           navigate('/dashboard/admin-auth');
+                    return toast({
+                      title: "Validations Error!",
+                      description: err?.data?.message,
+                      toastType:"error"
+                    });}
         });
     }
     else{
@@ -92,6 +109,10 @@ const IsAuthenticated = ({ navigatePath, children,isAuth=false }) => {
             navigate(navigatePath)
         }
     }
+
+    },1000)
+    
+    return ()=>clearTimeout(timer);
   }, [isLoggedIn, trigger, dispatch, navigate]);
 
   if ( !isLoggedIn || isLoading) {

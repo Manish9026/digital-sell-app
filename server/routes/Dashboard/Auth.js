@@ -14,6 +14,7 @@ AuthRoutes.get("/logout",AuthController.logout);
 AuthRoutes.post("/enable-2fa", verifyAdminToken, AuthController.setup2FA);
 AuthRoutes.post("/confirm-2fa",verifyAdminToken,AuthController.confirm2FA)
 AuthRoutes.get("/disabled-2fa", verifyAdminToken, AuthController.disabled2FA);
+AuthRoutes.get("/sessions",verifyAdminToken,AuthController.getSessions)
 // AuthRoutes.post("/disable-2fa", verifyAdminToken, AuthController.disable2FA);
 
 export default AuthRoutes;
