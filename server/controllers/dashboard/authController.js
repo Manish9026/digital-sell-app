@@ -57,8 +57,14 @@ export const getDeviceInfo = async (req) => {
   const parser = new UAParser();
   const userAgent = req.headers['user-agent'];
   const uaResult = parser.setUA(userAgent).getResult();
-  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+const forwarded = req.headers['x-forwarded-for'];
+ const  ip = forwarded
+    ? forwarded.split(',')[0].trim()
+    : req.socket.remoteAddress;
+  // const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
+  console.log(req.headers['x-forwarded-for'],req.socket.remoteAddress);
+  
 
   console.log({
     ip,
