@@ -36,6 +36,8 @@ const updateRefreshToken = async (req, decoded, token) => {
    
 
     const session = admin.sessions.find(s => s?.id?.toString() === sessionId);
+    console.log("\------------------------------------------------\n",session);
+    
     if (!session) throw new Error("Session not found");
 
     if (session?.ip !== adminInfo.ip || session?.userAgent !== adminInfo?.userAgent) {

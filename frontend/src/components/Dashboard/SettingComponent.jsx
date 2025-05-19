@@ -378,10 +378,10 @@ import { formatRelativeTime } from "../../lib/time";
 const deviceIcons={
   tablet:<Tablet className="text-blue-400" size={20} />,
   desktop:<Monitor className="text-blue-400" size={20} />,
-  phone:<Smartphone className="text-blue-400" size={20} />,
+  mobile:<Smartphone className="text-blue-400" size={20} />,
   default:""
 }
-const DeviceCard = ({ data = {}, onLogout = () => {} }) => {
+const DeviceCard = ({ data = {},dLoading, onLogout = () => {} }) => {
   const {
     browser = "Unknown",
     os = "Unknown",
@@ -395,21 +395,21 @@ const DeviceCard = ({ data = {}, onLogout = () => {} }) => {
 
     const [deleteSession,{isLoading}]=useDeleteSessionMutation();
  
-    const deleteHandle=async(id)=>{
+    const deleteHandle=async()=>{
 
       await deleteSession(id).unwrap().then(res=>{
 
         toast({
           title:"Logout Success.",
-          description:"You have been successfully logged out from the selected session.",
+          description:"You have been successfully logged out.",
           toastType:"success"
         })
       }).catch(err=>{
 
         toast({
           title:"Logout Failed.",
-          description:"You have been successfully logged out from the selected session.",
-          toastType:"success"
+          description:err?.data?.message || "You have been successfully logged out from the selected session.",
+          toastType:"error"
         })
       })
 
@@ -424,11 +424,17 @@ const DeviceCard = ({ data = {}, onLogout = () => {} }) => {
       className="w-full sm:min-w-[350px] max-w-[450px] flex-1 min-w-[250px]"
     >
       <Card 
-            className={`flex flex-1 flex-wrap items-center justify-between p-4 rounded-lg border  ${current
+            className={`flex p-0 relative flex-1 flex-wrap items-center justify-between rounded-lg border  ${current
                 ? "border-indigo-300 bg-indigo-50 dark:bg-slate-700/30"
                 : "border-slate-200 dark:border-slate-600"
               }`}>
-        <CardContent className="p-0 flex relative flex-1 flex-wrap w-full justify-between items-center gap-4">
+                {
+     current && <span className="absolute z-50 -right-1 -top-1 center flex size-3">  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>  <span className="relative inline-flex size-3  rounded-full bg-green-500"></span></span>}
+
+    {(isLoading || dLoading )&&  <span className="absolute rounded-lg top-0 gap-4 left-0 center flex-1 w-full h-full bg-gray-600/95"><Loader2 className="animate-spin "/>Processing....</span>}
+        <CardContent className="p-4 overflow-hidden flex relative flex-1 flex-wrap w-full justify-between items-center gap-4">
+
+          
           <div className="flex items-center gap-3">
             {
                deviceIcons[device.toLowerCase()] || deviceIcons.default
@@ -458,11 +464,10 @@ const DeviceCard = ({ data = {}, onLogout = () => {} }) => {
             </span>
           </div>
 
-          <button onClick={()=>deleteHandle(id)} className="text-red-500 hover:text-red-400 transition">
+          <button onClick={()=>deleteHandle()} className="text-red-500 hover:text-red-400 transition">
             <Power size={18} />
           </button>
-{
-     current && <span class="absolute -right-5 -top-5 center flex size-3">  <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>  <span class="relative inline-flex size-3 rounded-full bg-green-500"></span></span>}
+
         </CardContent>
       </Card>
     </motion.div>
@@ -481,7 +486,7 @@ export function LoginActivity() {
     refetchOnMountOrArgChange:true
   })
   const [deleteSession,{isLoading:dLoading}]=useDeleteSessionMutation();
-  console.log(data);
+
   
   return (
     <motion.div
@@ -535,11 +540,28 @@ export function LoginActivity() {
           //   )}
           // </motion.div>
 
-          <DeviceCard data={session} />
+          <DeviceCard key={index} data={session} dLoading={session?.current?null:dLoading} />
         ))}
       </div>
       <div className="text-right mt-6">
-        <button className="text-red-600 text-sm font-medium hover:underline flex items-center gap-1">
+        <button onClick={()=>{
+
+      deleteSession('all-others').unwrap().then(res=>{
+
+        toast({
+          title:"Logout Success.",
+          description:"You have been successfully logged out from all devices.",
+          toastType:"success"
+        })
+      }).catch(err=>{
+
+        toast({
+          title:"Logout Failed.",
+          description:err?.data?.message || "You have been successfully logged out from the selected session.",
+          toastType:"error"
+        })
+      })
+        }} className="text-red-600 text-sm font-medium hover:underline flex items-center gap-1">
           <LogOut className="w-4 h-4" /> Logout from all devices
         </button>
       </div>

@@ -9,6 +9,7 @@ const baseQuery = fetchBaseQuery({
 const adminAuthApi = createApi({
   reducerPath: "adminAuthApi",
   baseQuery,
+   tagTypes: ['Session'],
   endpoints: (builder) => ({
     loginAdmin: builder.mutation({
       query: (data) => ({
@@ -76,14 +77,16 @@ const adminAuthApi = createApi({
         url: "/sessions",
         method: "GET",
       }),
+       providesTags: ['Session']
     }),
 
     deleteSession: builder.mutation({
       query: (id) => ({
-        url: "/session",
+       url: `/session/${id}`,
         method: "DELETE",
-        params:id
+        // params:id
       }),
+       invalidatesTags: ['Session']
     }),
 
     logoutAdmin: builder.query({

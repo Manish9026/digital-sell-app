@@ -414,6 +414,8 @@ static deleteSession = async (req, res) => {
       admin.sessions = admin.sessions.filter(
         (session) => session.id.toString() === currentSessionId
       );
+      console.log("heklii\n",admin.sessions);
+      
       await admin.save();
       return goodResponse({
         res,
