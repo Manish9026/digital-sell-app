@@ -7,7 +7,7 @@ import { AdminUser } from "../../models/dashboardModel.js";
 // AdminUser.createIndexes({ email: 1 }, { unique: true });
 import mongoose from "mongoose";
 import {UAParser} from 'ua-parser-js'
-
+import axios from 'axios'
 export const createAccessToken = (data) => jwt.sign(data, process.env.ADMIN_ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
 export const createRefreshToken = (data) => jwt.sign(data, process.env.ADMIN_REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
 export const badResponse = ({
@@ -53,6 +53,29 @@ export const goodResponse = ({
   });
 };
 
+const getLocation = async (quardinate) => {
+  const { latitude, longitude}=quardinate
+  const apiKey = "164407c11c2b43538012e5cbc3929918"; // get free key from OpenCage
+  const url = `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${apiKey}`;
+
+  try {
+    const response = await axios.get(url);
+    const results = response.data.results;
+    if (results.length > 0) {
+      const components = results[0].components;
+      console.log("City:", components.city || components.town || components.village);
+      console.log("State:", components.state);
+      console.log("Country:", components.country);
+      return components;
+    } else {
+      console.log("No results found");
+      return null;
+    }
+  } catch (error) {
+    console.error("Reverse geocoding error:", error);
+  }
+};
+// 164407c11c2b43538012e5cbc3929918
 export const getDeviceInfo = async (req) => {
   const parser = new UAParser();
   const userAgent = req.headers['user-agent'];
@@ -64,6 +87,8 @@ const forwarded = req.headers['x-forwarded-for'];
   // const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
   console.log(req.headers['x-forwarded-for'],req.socket.remoteAddress);
+  // const location=await getLocation("47.31.255.141");
+  // console.log(location);
   
 
   console.log({
@@ -97,9 +122,13 @@ const forwarded = req.headers['x-forwarded-for'];
  class Auth {
 
     static adminLogin = async (req, res) => {
-        const { email, password } = req.body;
+
+      try {
+         const { email, password ,quardinate} = req.body;
         console.log(email, password); 
 
+        const location =await getLocation(quardinate);
+        console.log(location,'location');
         
         const admin = await AdminUser.findOne({ email });
         if (!admin || !(await bcrypt.compare(password, admin.password))) {
@@ -127,22 +156,28 @@ const forwarded = req.headers['x-forwarded-for'];
           id: newId,
         refreshTokenHash:hash,
           ...adminInfo,
+          location,
           lastUsed: new Date()
         }
       }
     });
         // await admin.save(); 
+        console.log(accessToken,"accesstoken");
         
-        res.cookie("accessToken", accessToken, { httpOnly: true, secure: true, sameSite: "None", maxAge: 1000 * 60 * 15, domain: '.vercel.app', });
+        res.cookie("accessToken", accessToken, { httpOnly: true, secure: true, sameSite: "None", maxAge: 1000 * 60 * 15,});
         res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true, sameSite: "None" , maxAge: 1000 * 60 * 60 * 24 * 7 });
 
         return goodResponse({ res, statusCode: 201, message: "Login successful", data:{isAuthenticated:true,admin} });
+      } catch (error) {
+        console.log(error);
+        
+      }
+
+       
     }
     static verify2FA = async (req, res) => {
-        const { token } = req.body;
+        const { token ,quardinate} = req.body;
         const {admin:user}=req;
-
-
 
         // const decoded = jwt.verify(tempToken, "TEMP_SECRET");
         const admin = await AdminUser.findById(user._id);
@@ -167,18 +202,22 @@ const forwarded = req.headers['x-forwarded-for'];
         // admin.sessions.push({id:newId, refreshTokenHash: hash, ip: req.ip, userAgent: req.headers['user-agent'] });
 
         const adminInfo=await getDeviceInfo(req);
+        const location=await getLocation(quardinate);
          await AdminUser.findOneAndUpdate({_id:admin._id}, {
       $push: {
         sessions: {
           id: newId,
         refreshTokenHash:hash,
           ...adminInfo,
+          location,
           lastUsed: new Date()
         }
       }
     });
        
-        res.cookie("accessToken", accessToken, { httpOnly: true, secure: true, sameSite: "None", maxAge: 1000 * 60 * 15, domain: '.vercel.app', });
+    console.log(("accesstoken",accessToken));
+    
+        res.cookie("accessToken", accessToken, { httpOnly: true, secure: true, sameSite: "None", maxAge: 1000 * 60 * 15,  });
         res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true, sameSite: "None" , maxAge: 1000 * 60 * 60 * 24 * 7 });
 
         return  goodResponse({ res, statusCode: 201, message: "You have been successfully authenticated.", data:{isAuthenticated:true,admin} });

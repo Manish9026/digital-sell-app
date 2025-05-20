@@ -13,6 +13,7 @@ const sessionSchema = new mongoose.Schema({
   browser:String,
   device:String,
   os:String,
+  location:Object,
   createdAt: { type: Date, default: Date.now },
   lastUsed: Date
 },{_id: false});
