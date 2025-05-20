@@ -4,9 +4,11 @@ import React, { useEffect, useState } from 'react';
 // import { UploadCloud, X } from 'lucide-react';
 // import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ImageIcon, FileVideo2, FileAudio, FileText, Upload } from 'lucide-react';
+import { X, ImageIcon, FileVideo2, FileAudio, FileText, Upload, Wand2, FileBox } from 'lucide-react';
 import axios from 'axios';
 import { url } from '../../utils/service';
+import { Input } from "@/components/ui/input";
+
 const FileTypeIcon = ({ type }) => {
   if (type.startsWith("image/")) return <ImageIcon className="text-blue-400" />;
   if (type.startsWith("video/")) return <FileVideo2 className="text-pink-400" />;
@@ -14,7 +16,7 @@ const FileTypeIcon = ({ type }) => {
   return <FileText className="text-yellow-400" />;
 };
 
-const FilePreview = ({ file, onRemove }) => (
+export const FilePreview = ({ file, onRemove }) => (
   <motion.div
     layout
     initial={{ opacity: 0, scale: 0.95 }}
@@ -25,6 +27,7 @@ const FilePreview = ({ file, onRemove }) => (
     <div className="flex justify-between items-center mb-2">
       <FileTypeIcon type={file.type} />
       <button
+      type="reset"
         onClick={onRemove}
         className="text-gray-400 hover:text-red-500 transition-colors"
       >
@@ -46,10 +49,10 @@ const FilePreview = ({ file, onRemove }) => (
   </motion.div>
 );
 
-const FileUploader = ({ label, files, onChange, onRemove, accept, multiple }) => (
+export const FileUploader = ({ label, files, onChange, onRemove, accept, multiple }) => (
   <div className="space-y-2">
-    <label className="block font-medium text-gray-700 dark:text-gray-300">{label}</label>
-    <div className="w-full border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 bg-white dark:bg-gray-900 text-center transition hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-gray-800">
+    <label className="block font-medium light:text-gray-700 dark:text-gray-300">{label}</label>
+    <div className="w-full border-2 border-dashed light:border-gray-300 dark:border-gray-600 rounded-lg p-6 bg-white dark:bg-gray-900 text-center transition hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-gray-800">
       <input
         type="file"
         accept={accept}
@@ -89,10 +92,12 @@ import {
 import { LoadingScreen } from '../../components/Shared/LoadingComponent';
 import { toast } from 'react-toastify';
 import { useUploadPoductOnDriveMutation } from '../../services/dashboad/driveServices';
+import AIProductGenerator from './AiGen';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 const AnimatedInput = ({ label, icon: Icon,inputClass,lableClass,containerClass ,...props }) => (
   <div className="space-y-1 w-full">
-    <label className={`${lableClass} text-sm font-medium text-gray-700 dark:text-gray-300`}>{label}</label>
+    <label className={`${lableClass} text-sm font-medium light:text-gray-700 dark:text-gray-300`}>{label}</label>
     <div className={` flex mt-1 p-2 items-center bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 ${containerClass}`}>
       {Icon && <Icon className="w-5 h-5 text-gray-400 mr-2" />}
       <input
@@ -211,12 +216,20 @@ const CourseUploadForm = () => {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="max-w-6xl flex flex-col w-full p-4 sm:p-6 lg:p-10 bg-white dark:bg-gray-900 shadow-xl rounded-xl space-y-6 relative overflow-hidden"
+    <motion.form
+    initial={{y:-10,opacity:0}}
+    animate={{y:0,opacity:1}}
+    exit={{y:-10,opacity:0}}
+    transition={{duration:.6,}}
+
+    onSubmit={handleSubmit}
+      className="max-w-6xl flex flex-col w-full p-4 sm:p-6 lg:p-10  shadow-xl rounded-xl  relative overflow-hidden border light:border-primary light:text-primary"
     >
    { isLoading && <LoadingScreen title={"Uploading on you drive, waiting...."}/>}
-      <h2 className="text-2xl mb-10 font-bold text-center text-gray-800 dark:text-white">Create Course</h2>
+    <h2 className="min-w-full text-2xl font-semibold mb-4 flex items-center gap-2">
+             <FileBox className='text-purple-500 texl-2xl' /> Create Course
+           </h2>
+
 <div className="lg:grid lg:grid-cols-2 flex-1 gap-6">
 <div className="grid grid-cols2 gap-2 lg:max-h-[600px]   min-h-[500px]">
       <div className="grid sm:grid-cols-2 gap-6">
@@ -234,7 +247,7 @@ const CourseUploadForm = () => {
 
       {/* Coupon Section */}
       <div>
-        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Add Coupons</label>
+        <label className="text-sm font-medium light:text-gray-700 dark:text-gray-300">Add Coupons</label>
         <div className="flex gap-3 items-center mt-1">
           <AnimatedInput
             type="text"
@@ -273,7 +286,7 @@ const CourseUploadForm = () => {
     
 
       <div>
-        <label className="block font-medium text-gray-700 dark:text-gray-300">Description</label>
+        <label className="block font-medium light:text-gray-700 dark:text-gray-300">Description</label>
         <textarea
           name="description"
           value={form.description}
@@ -312,7 +325,7 @@ const CourseUploadForm = () => {
       >
         Submit Course
       </button>
-    </form>
+    </motion.form>
   );
 };
 
@@ -321,8 +334,28 @@ const CourseUploadForm = () => {
 export const AddProduct = () => {
   return (
         
-    <section className="p-2">
-        <CourseUploadForm/>
+    <section className="primary-p ">
+
+      <Tabs defaultValue="manual" className=" center  flex-1 w-full ">
+          <TabsList className="grid  w-full grid-cols-2 mb-0 border max-w-4xl">
+            <TabsTrigger value="manual" className="flex items-center gap-1 dark:data-[state=active]:bg-slate-600 light:data-[state=active]:bg-purple-600 text-white">
+              <Upload className="w-4 h-4" /> Manual Upload
+            </TabsTrigger>
+            <TabsTrigger value="ai" className="flex items-center gap-1 dark:data-[state=active]:bg-slate-600">
+              <Wand2 className="w-4 h-4" /> Generate with AI
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="manual" className="mt-2 md:mt-4 flex-1 w-full">
+            <CourseUploadForm/>
+          </TabsContent>
+
+          <TabsContent value="ai" className="mt-2 md:mt-4 flex flex-wrap flex-1 w-full">
+<AIProductGenerator/>
+          </TabsContent>
+        </Tabs>
+       
+        {/* <AIProductGenerator> </AIProductGenerator> */}
     </section>
   )
 }
