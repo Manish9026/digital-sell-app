@@ -11,7 +11,7 @@ import { useRef } from 'react';
 
 const CheckingAuth = () => {
   return (
-    <div className="fixed w-full h-full bg-slate-900 flex items-center justify-center z-50 dark:text-white light:text-primary p-4">
+    <div className="fixed dark:bg-primary light:bg-light  w-full h-full  flex items-center justify-center z-50 dark:text-white light:text-primary p-4">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -21,7 +21,7 @@ const CheckingAuth = () => {
         <motion.div
           animate={{ rotate: [0, 10, -10, 0] }}
           transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
-          className="inline-block will-change-transform p-4 rounded-full bg-slate-800/50 shadow-xl"
+          className="inline-block will-change-transform p-4 rounded-full dark:bg-slate-800/50 light:bg-blue-500  shadow-xl"
         >
           <ShieldCheck size={48} className="text-green-400" />
         </motion.div>
@@ -35,7 +35,7 @@ const CheckingAuth = () => {
           Checking authentication...
         </motion.h2>
 
-        <p className="text-sm md:text-base text-slate-300 dark:text-slate-600">
+        <p className="text-sm md:text-base light:text-slate-500 dark:text-slate-600">
           Please wait while we verify your admin credentials.
         </p>
       </motion.div>
