@@ -56,6 +56,8 @@ export const goodResponse = ({
 const getLocation = async (quardinate) => {
   const { latitude, longitude}=quardinate
   const apiKey = "164407c11c2b43538012e5cbc3929918"; // get free key from OpenCage
+
+  if(!(latitude || longitude)) return {}
   const url = `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${apiKey}`;
 
   try {
@@ -72,7 +74,8 @@ const getLocation = async (quardinate) => {
       return null;
     }
   } catch (error) {
-    console.error("Reverse geocoding error:", error);
+    console.error("Reverse geocoding error:");
+    return {}
   }
 };
 // 164407c11c2b43538012e5cbc3929918
@@ -86,19 +89,11 @@ const forwarded = req.headers['x-forwarded-for'];
     : req.socket.remoteAddress;
   // const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
-  console.log(req.headers['x-forwarded-for'],req.socket.remoteAddress);
+  // console.log(req.headers['x-forwarded-for'],req.socket.remoteAddress);\
   // const location=await getLocation("47.31.255.141");
   // console.log(location);
   
 
-  console.log({
-    ip,
-    userAgent,
-    browser: uaResult.browser.name,
-    os: uaResult.os.name,
-    device: uaResult.device.type || 'Desktop',
-    // location
-  });
 
   return ({
     ip,
@@ -108,9 +103,6 @@ const forwarded = req.headers['x-forwarded-for'];
     device: uaResult.device.type || 'Desktop',
     // location
   })
-  // console.log(userAgent);
-
-
 }
 
 
@@ -125,7 +117,7 @@ const forwarded = req.headers['x-forwarded-for'];
 
       try {
          const { email, password ,quardinate} = req.body;
-        console.log(email, password); 
+        // console.log(email, password); 
 
         const location =await getLocation(quardinate);
         console.log(location,'location');
@@ -162,7 +154,7 @@ const forwarded = req.headers['x-forwarded-for'];
       }
     });
         // await admin.save(); 
-        console.log(accessToken,"accesstoken");
+        // console.log(accessToken,"accesstoken");
         
         res.cookie("accessToken", accessToken, { httpOnly: true, secure: true, sameSite: "None", maxAge: 1000 * 60 * 15,});
         res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true, sameSite: "None" , maxAge: 1000 * 60 * 60 * 24 * 7 });
