@@ -1,14 +1,15 @@
 
 import nodemailer from 'nodemailer';
 import { google } from 'googleapis';
-import { auth } from '../../server.js'; // Adjust the path as necessary
+import { driveAccess } from '../shared.js';
+// import { auth } from '../../server.js'; // Adjust the path as necessary
 export class DriveController{
      SCOPE = "https://www.googleapis.com/auth/drive";
 
     
 static async  shareFileWithUser(fileId, email) {
  
-
+    const auth=await driveAccess()   
     const drive = google.drive({ version: 'v3', auth });
     // Give read access to the user
     await drive.permissions.create({

@@ -111,7 +111,7 @@ const LocationPopup =({
   if (!isVisible) return null;
 
   return (
-    <div className={`fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-200  transition-opacity duration-300 ${showPopup ? 'opacity-100' : 'opacity-0'}`}>
+    <div className={`fixed top-0 left-0 w-full h-full inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-200  transition-opacity duration-300 ${showPopup ? 'opacity-100' : 'opacity-0'}`}>
       <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-md w-full mx-4 overflow-hidden transition-transform duration-300 ${showPopup ? 'scale-100' : 'scale-95'}`}>
         <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">

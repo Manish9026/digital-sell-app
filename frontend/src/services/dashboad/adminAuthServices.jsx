@@ -98,5 +98,39 @@ const adminAuthApi = createApi({
   }),
 });
 
+const driveSetupApi=createApi({
+  baseQuery:fetchBaseQuery({
+    baseUrl:`${dashboardBaseUrl}/drive`,
+    credentials:"include"
+  }),
+  tagTypes:["drives"],
+  endpoints:(builder)=>({
+    addDrive:builder.mutation({
+      query:()=>({
+        url:"/auth/google",
+        method:"POST"
+      }),
+      invalidatesTags:["drive"]
+    }),
+
+    getDriveDate:builder.query({
+
+      query:()=>(
+        {
+          url:"/get-drives",
+          method:"GET",       
+        }
+      ),
+      
+      providesTags: ['drives']
+    }),
+    
+  })
+
+
+
+})
+export const {useAddDriveMutation,useGetDriveDateQuery}=driveSetupApi
+
 export const { useLoginAdminMutation, useLogoutAdminMutation,useLazyVerifyAdminQuery,useLazyLogoutAdminQuery,useSetup_2FAMutation,useConfirm_2FAMutation,useLazyDisabled_2FAQuery ,useVerify_2FAMutation,useSessionsQuery,useDeleteSessionMutation} = adminAuthApi;
-export { adminAuthApi };
+export { adminAuthApi ,driveSetupApi};

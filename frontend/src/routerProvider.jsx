@@ -163,7 +163,12 @@ export function RoutesProvider() {
               element:<DashboardSetting.LoginActivity/>
 
             },
+
             {
+              path: "drive-setup",
+              element: <DashboardSetting.DriveSetting/>,
+            },
+             {
               path: "notification",
               element: <div className='center flex-1'>Notification</div>,
             },

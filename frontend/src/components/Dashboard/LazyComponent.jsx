@@ -80,7 +80,8 @@ export const DashboardSetting={
   Authentication: lazy(() =>
     import('./SettingComponent').then((m) => ({ default: m.Authentication }))
   ),
-  LoginActivity:lazy(()=>import('./SettingComponent').then((m) => ({ default: m.LoginActivity })))
+  LoginActivity:lazy(()=>import('./SettingComponent').then((m) => ({ default: m.LoginActivity }))),
+  DriveSetting:lazy(()=>import('./SettingComponent').then((m) => ({ default: m.DriveSetting })))
   // Notification: lazy(() =>
   //   import('./SettingComponent').then((m) => ({ default: m.Notification }))
   // ),

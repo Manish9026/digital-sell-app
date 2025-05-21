@@ -102,7 +102,7 @@ const verifyAdminToken = async (req, res, next) => {
 
     } catch (err) {
       // If failed, check if it's a tempToken
-      console.log(err,"tempToken"); 
+      // console.log(err,"tempToken"); 
       try {
         decoded = jwt.verify(refreshToken, process.env.ADMIN_REFRESH_TOKEN_SECRET);
         const result = await updateRefreshToken(req, decoded, refreshToken);

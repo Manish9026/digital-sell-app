@@ -31,19 +31,19 @@ app.use(cors({
 app.use(express.urlencoded({ extended: true }))
 
 
-const clientId = process.env.CLIENT_ID;
-const clientSecret = process.env.CLIENT_SECRET_KEY;
-const redirectUri = process.env.REDIRECT_URL;
-const SCOPE = "https://www.googleapis.com/auth/drive";
-const refresh_token = process.env.REFRESH_TOKEN
-const accessToken = process.env.ACCESSTOKEN;
-export const auth = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
-auth.setCredentials({ refresh_token: refresh_token });
+// const clientId = process.env.CLIENT_ID;
+// const clientSecret = process.env.CLIENT_SECRET_KEY;
+// const redirectUri = process.env.REDIRECT_URL;
+// const SCOPE = "https://www.googleapis.com/auth/drive";
+// const refresh_token = process.env.REFRESH_TOKEN
+// const accessToken = process.env.ACCESSTOKEN;
+// export const auth = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
+// auth.setCredentials({ refresh_token: refresh_token });
 // "https://www.googleapis.com/auth/drive.readonly",
 // "https://www.googleapis.com/auth/userinfo.profile",
 // "https://www.googleapis.com/auth/drive",
 
-console.log(auth, "auth");
+// console.log(auth, "auth");
 
 
  
@@ -77,6 +77,8 @@ app.post("/api/download", async (req, res) => {
 
     }
 })
+
+
 
 app.get("/oauth2callback", async (req, res) => {
     const { code } = req.query;

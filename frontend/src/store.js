@@ -8,7 +8,7 @@ import { driveServiceApi } from './services/dashboad/driveServices'
 import { paymentApi } from './services/store/paymentServices'
 import { cartApi } from './services/store/cartServices'
 import { adminReducer } from './slices/dashboard/adminSlice'
-import { adminAuthApi } from './services/dashboad/adminAuthServices'
+import { adminAuthApi,driveSetupApi } from './services/dashboad/adminAuthServices'
 export const store=configureStore({
     reducer:{
         authReducer,
@@ -20,9 +20,10 @@ export const store=configureStore({
 //  dashboard reducer
     adminReducer,
     [adminAuthApi.reducerPath]: adminAuthApi.reducer,
-
+    [driveSetupApi.reducerPath]:driveSetupApi.reducer,
+        
     },
     middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat([authApi.middleware,productApi.middleware,driveServiceApi.middleware,paymentApi.middleware,cartApi.middleware,adminAuthApi.middleware]),
+        getDefaultMiddleware().concat([authApi.middleware,productApi.middleware,driveServiceApi.middleware,paymentApi.middleware,cartApi.middleware,adminAuthApi.middleware,driveSetupApi.middleware]),
         devTools: import.meta.VITE_NODE_ENV !== 'production' || false,
     })

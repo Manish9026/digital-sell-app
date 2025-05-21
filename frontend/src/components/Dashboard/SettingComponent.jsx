@@ -27,8 +27,9 @@ import { Link, useLocation } from "react-router-dom";
 import { LogOut, MonitorSmartphone, MapPin, Globe } from "lucide-react";
 import { toast } from "../Shared/Toast";
 import { useDispatch, useSelector } from "react-redux";
-import { useDeleteSessionMutation, useLazyDisabled_2FAQuery, useSessionsQuery } from "../../services/dashboad/adminAuthServices";
+import { useAddDriveMutation, useDeleteSessionMutation, useGetDriveDateQuery, useLazyDisabled_2FAQuery, useSessionsQuery } from "../../services/dashboad/adminAuthServices";
 import { setAdmin } from "../../slices/dashboard/adminSlice";
+import { FaGoogleDrive } from "react-icons/fa";
 // import { Authenticated } from "./IsAuthenticated";
 const Alert=lazy(()=>import('../Shared/Alert').then(m=>({ default: m.Alert })))
 const styleButton = "fadein center gap-3 border border-slate-300 dark:border-slate-700 px-3 py-2 min-w-[120px] rounded-lg shadow-md hover:bg-slate-100 dark:hover:bg-slate-700 light:hover:text-light"
@@ -107,6 +108,25 @@ export const Setting = () => {
               </p>
             </Link>
           </motion.div>
+
+          {/* Drive setUp  */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+            className="light:bg-light/70 shadow-md dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-6 rounded-xl shadow"
+          >
+
+            <Link to={"./drive-setup"}>
+              <div className="flex items-center gap-3 mb-4">
+                <FaGoogleDrive className="text-indigo-500" />
+                <h2 className="text-xl font-semibold">Google Drive Setup</h2>
+              </div>
+              <p className="text-sm light:text-slate-700 dark:text-slate-400">
+                Manage your connected Google Drive accounts, add or remove multiple accounts, and monitor access token expiration times for each account.
+              </p>
+            </Link>
+          </motion.div>
           {/*  */}{/* Notifications */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -152,6 +172,178 @@ export const Setting = () => {
   );
 };
 
+
+import { Cloud, Plus, Trash2, AlertCircle, CheckCircle2, RefreshCw } from 'lucide-react';
+
+
+const  DriveSetup=memo(()=> {
+  const [accounts, setAccounts] = useState([
+    {
+      id: '1',
+      email: 'example@gmail.com',
+      tokenExpiry: new Date('2024-04-01'),
+      storageUsed: '15.5',
+      totalStorage: '100'
+    }
+  ]);
+
+  const {data ,isLoading}=useGetDriveDateQuery(undefined,{
+    refetchOnMountOrArgChange:true,
+    // refetchOnReconnect:true,
+  }
+    
+  )
+  const [setDrive,{}]=useAddDriveMutation();
+
+  console.log(data?.drives);
+  
+  const addAccount = () => {
+    // In a real app, this would trigger Google OAuth
+    setDrive().unwrap().then(res=>{
+
+      console.log(res);
+      window.location.href = res.url;
+      
+    }).catch(err=>{
+      console.log(err);
+      
+    })
+    const newAccount = {
+      id: Math.random().toString(),
+      email: `user${accounts.length + 1}@gmail.com`,
+      tokenExpiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+      storageUsed: '0',
+      totalStorage: '100'
+    };
+    setAccounts([...accounts, newAccount]);
+  };
+
+  const removeAccount = (id) => {
+    setAccounts(accounts.filter(account => account.id !== id));
+  };
+
+  const getDaysUntilExpiry = (expiryDate) => {
+    const exDate=new Date(expiryDate)
+    const today = new Date();
+    const diffTime = exDate.getTime() - today.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
+
+  return (
+    <div className="min-h-screen primary-p light:text-primary dark:text-light">
+      <div className="max-w-4xl mx-auto  ">
+        <div className="flex items-center flex-wrap gap-4 justify-between mb-8">
+          <h1 className="text-2xl font-bold  flex items-center">
+            <Cloud className="mr-2 text-purple-600 text-4xl" />
+            Google Drive Accounts
+          </h1>
+          <button
+            onClick={addAccount}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center transition-all duration-300 transform hover:scale-105"
+          >
+            <Plus className="mr-2" size={20} />
+            Add Account
+          </button>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          <AnimatePresence>
+  {data &&   data?.drives.map((account,index) => (
+            <motion.div
+
+        initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+              transition={{duration:.3}}
+              key={account.id}
+              className="border rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-102 hover:shadow-xl animate-fadeIn"
+            >
+              <div className="p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold light:text-gray-800 dark:text-light mb-1">{account?.email}</h3>
+                    <div className="flex items-center">
+                      {getDaysUntilExpiry(account?.expiryDate) > 7 ? (
+                        <CheckCircle2 className="text-green-500 mr-2" size={16} />
+                      ) : (
+                        <AlertCircle className="text-orange-500 mr-2" size={16} />
+                      )}
+                      <span className="text-sm text-gray-600">
+                        Token expires in {getDaysUntilExpiry(account?.expiryDate)} days
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => removeAccount()}
+                    className="text-gray-400 hover:text-red-500 transition-colors duration-200"
+                  >
+                    <Trash2 size={20} />
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="relative pt-1">
+                    <div className="flex mb-2 items-center justify-between">
+                      <div>
+                        <span className="text-xs font-semibold inline-block text-blue-600">
+                          Storage Usage
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xs font-semibold inline-block text-blue-600">
+                          {/* {account?.storageUsed}/{account?.totalStorage} GB */}
+                          50/200 GB
+                        </span>
+                      </div>
+                    </div>
+                    <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-blue-100">
+                      <div
+                        // style={{ width: `${(Number(account.storageUsed) / Number(account.totalStorage)) * 100}%` }}
+                        style={{
+                          width:`${(50/200)*100}%`
+                        }}
+                        className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500 transition-all duration-500"
+                      />
+                    </div>
+                  </div>
+
+                  <button className="w-full bg-gray-50 hover:bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-lg flex items-center justify-center transition-colors duration-200">
+                    <RefreshCw className="mr-2" size={16} />
+                    Refresh Token
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+          </AnimatePresence>
+        
+        </div>
+
+        {accounts.length === 0 && (
+          <div className="text-center py-12 bg-white rounded-xl shadow-md">
+            <Cloud className="mx-auto text-gray-400 mb-4" size={48} />
+            <h3 className="text-xl font-medium text-gray-700 mb-2">No Accounts Connected</h3>
+            <p className="text-gray-500 mb-4">Add your Google Drive account to get started</p>
+            <button
+              onClick={addAccount}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg flex items-center mx-auto transition-all duration-300 transform hover:scale-105"
+            >
+              <Plus className="mr-2" size={20} />
+              Add Account
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+})
+
+export const DriveSetting=()=>{
+
+  return (
+    <DriveSetup/>
+  )
+}
 
 const SettingCards = memo(({ title, subTitle, children, icons, isActive, delaytime }) => {
   const [isToggled, setIsToggled] = useState(isActive || false);

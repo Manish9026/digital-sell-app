@@ -1,22 +1,38 @@
 // import auth 
 
-import {auth} from '../../server.js'
+// import {auth} from '../../server.js'
 
 
 import path from 'path';
 import fs from 'fs';
 import { GoogleApis ,google} from 'googleapis';
 import mime from 'mime-types';
-import { productModel } from '../../models/dashboardModel.js';
+import { AdminUser, driveModel, productModel } from '../../models/dashboardModel.js';
 import { badResponse, goodResponse } from '../../utils/response.js';
+import { driveAccess } from '../shared.js';
 
-export const getDriveService =async () => {
-const SCOPE = "https://www.googleapis.com/auth/drive";
-//  const auth = new google.auth.OAuth2(process.env.CLIENT_ID, process.env.CLIENT_SECRET_KEY, process.env.REDIRECT_URL);
-// auth.setCredentials({ refresh_token: process.env.REFRESH_TOKEN,scope: SCOPE });
 
-return   google.drive({ version: 'v3', auth });
-}
+
+let driveInstance = null;
+let authClient = null;
+
+export const getDriveService = async () => {
+  if (driveInstance && authClient) {
+    return driveInstance;
+  }
+
+  if (!authClient) {
+    authClient = await driveAccess(); // returns OAuth2 client with refresh token
+  }
+("\n\n<--------------------count--------------------\n\n");
+  driveInstance = google.drive({ version: "v3", auth: authClient });
+  return driveInstance;
+};
+
+
+// const SCOPE = "https://www.googleapis.com/auth/drive";
+
+
 
 
 //  const drive = google.drive({ version: 'v3', auth });
@@ -24,9 +40,63 @@ return   google.drive({ version: 'v3', auth });
 
 
 export class DriveController  {
+
+
   constructor(driveService) {
     this.drive = driveService;
   }
+
+ 
+
+static saveToken = async (email, tokens,adminId) => {
+  try {
+  
+    if(!adminId) throw {message:"Unauthorized access !!"}
+  // const adminId="68271c1bf6ab803cc56396c1"
+ const storedData = await driveModel.findOneAndUpdate(
+    { email, adminId }, // Lookup condition
+    {
+      $set: {
+        accessToken: tokens.access_token,
+        refreshToken: tokens.refresh_token,
+        expiryDate: tokens.expiry_date,
+      },
+      $setOnInsert: {
+        email,
+        adminId,
+      }
+    },
+    {
+      upsert: true,
+      new: true,
+    }
+  );
+  const newUser=await AdminUser.findByIdAndUpdate(adminId,{
+    $push:{
+      adminDrives:storedData?._id,
+    }
+  },{upsert:true,new:true})
+
+
+  return {admin:newUser}
+  
+  } catch (error) {
+    console.log(error);
+    
+  }
+};
+
+static getToken = async (email,id) => {
+  const drive= await AdminUser.findOne({ "adminDrives.drive.isPrimary":true,_id:id }).populate("adminDrives.drive");
+
+  console.log(drive,"edirve");
+  
+  return 
+};
+
+static deleteToken = async (email,id) => {
+  await Token.deleteOne({ email ,adminId:id});
+};
 
 
   static createProductFolder = async (prdName) => {
@@ -157,12 +227,20 @@ console.log(title, description, category, price);
       return badResponse({res,statusCode:500,message:"sever error"})
     }
   }
-  async getDriveData(req, res) {
+  static getDriveData= async(req, res) =>{
     try {
-      const driveData = await this.driveService.getDriveData();
-      res.status(200).json(driveData);
+      const {admin}=req;
+
+      await  this.getToken("",admin?._id)
+      if(!admin) return  badResponse({res,message:'Failed to fetch drive data',statusCode:403})
+       const drives=await AdminUser.findById(admin?._id,{password:0,twoFA:0,sessions:0}).populate({
+  path: "adminDrives",
+});
+
+      //  console.log(drives);
+       return goodResponse({res,message:"record found!!",extra:{drives:drives?.adminDrives	|| []}})
     } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch drive data' });
+      badResponse({res,message:'Failed to fetch drive data',statusCode:500})
     }
   }
 }

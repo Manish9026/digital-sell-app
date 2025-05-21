@@ -34,9 +34,32 @@ const adminUserSchema = new mongoose.Schema({
     enabled: { type: Boolean, default: false },
     secret: String // TOTP secret
   },
-  sessions: [sessionSchema]
-});
+  sessions: [sessionSchema],
+  adminDrives: 
+  { 
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "adminDrives",
+      required: true
+  }
 
+},);
+
+
+const driveSchema=new mongoose.Schema({
+  adminId:mongoose.Types.ObjectId,
+  email: { type: String, required: true, unique: true },
+  details:Object,
+  accessToken:String,
+  refreshToken:String,
+  expiryDate:Date,
+  isAccess:{
+    type:Boolean,
+    default:true
+  },
+
+})
+
+export const driveModel=connectDashboardDB.model("adminDrives",driveSchema);
 export  const  AdminUser = connectDashboardDB.model("AdminUser", adminUserSchema);
 
 
