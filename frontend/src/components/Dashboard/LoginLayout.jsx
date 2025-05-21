@@ -2,7 +2,7 @@
 import { Shield, Smartphone, Key, QrCode , Mail, Lock,Copy,Eye, EyeOff, CheckCircle,  ArrowRight,RefreshCcw, ArrowLeft, Settings2} from "lucide-react";
 
 // react hooks
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { useNavigate, useLocation, Link, Outlet } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {motion }from 'framer-motion'
@@ -27,14 +27,26 @@ import { Card, CardContent } from "@/components/ui/card";
 // services && api
 import { useConfirm_2FAMutation, useLoginAdminMutation, useSetup_2FAMutation, useVerify_2FAMutation } from "../../services/dashboad/adminAuthServices";
 import {IsAuthenticated} from "./IsAuthenticated";
-import { loginFailure, loginSuccess, logout, setAdmin } from "../../slices/dashboard/adminSlice";
+import { loginFailure, loginSuccess, logout, setAdmin, setLocationShow, setLocationValue } from "../../slices/dashboard/adminSlice";
 
+
+ 
 
 
 // This is the login layout component
 
 
 const LoginLayout = ({ children, title, subtitle,activeChildren="2fa" }) => {
+
+  const {location}=useSelector(state=>state.adminReducer);
+  const dispatch =useDispatch();
+
+  // const [coords,setCoords]=useState();
+  // const {coords}=useLocationGeo();
+  useEffect(()=>{
+    if(!location?.value)
+    dispatch(setLocationShow(true));    
+  },[location?.value])
 
 
   return (
@@ -46,7 +58,11 @@ const LoginLayout = ({ children, title, subtitle,activeChildren="2fa" }) => {
       transition={{ duration: 0.6, ease: "easeOut" }}
      className="flex  w-full items-center justify-center  p-4">
       {/* <div className="absolute top-0 left-0 w-full h-64 bg-shield-primary/20 dark:bg-shield-primary/10 -z-10" /> */}
-      
+         <LocationPopup showPopup={location.isvisible }
+         onClose={()=>dispatch(setLocationShow(false))}
+         onLocationReceived={(value)=>{console.log(value);dispatch(setLocationValue(value))}
+         }
+         />
       <div className="absolute top-4 right-4">
         {/* <ThemeToggle /> */}
       </div>
@@ -90,15 +106,29 @@ const LoginLayout = ({ children, title, subtitle,activeChildren="2fa" }) => {
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   // const [isLoading, setIsLoading] = useState(false);
 //   const { toast } = useToast();
 const [loginAdmin,{isLoading}]=useLoginAdminMutation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+ const {location}=useSelector(state=>state.adminReducer) 
+  // const [location,setLocation]=useState();
 
+
+
+
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    // dispatch(setLocationShow(true))
+
+    setTimeout(()=>{
+
+      console.log(location?.value,"location");
+    },2000)
+  
+  // const location=await getLocation ();
  
     if (!email || !password) {
       toast({
@@ -110,7 +140,7 @@ const [loginAdmin,{isLoading}]=useLoginAdminMutation();
     }
     
     // setIsLoading(true);
-    await loginAdmin({email,password}).unwrap().then((res)=>{
+    await loginAdmin({email,password,quardinate:location?.value}).unwrap().then((res)=>{
       console.log(res);
       
 
@@ -172,6 +202,7 @@ const [loginAdmin,{isLoading}]=useLoginAdminMutation();
 
     <LoginLayout  title="Welcome Back" subtitle="Sign in to access your account">
 
+
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="email" className="flex items-center gap-2 light:text-gray-700 dark:text-gray-300">
@@ -231,6 +262,7 @@ const [loginAdmin,{isLoading}]=useLoginAdminMutation();
         </Button>
       </div>
     </form>
+ 
     </LoginLayout>
   );
 };
@@ -241,15 +273,12 @@ const [loginAdmin,{isLoading}]=useLoginAdminMutation();
 // This component is used to verify the 2FA code sent to the user's device
 const TwoFactorForm = () => {
   const [code, setCode] = useState("");
-  // const [isLoading, setIsLoading] = useState(false);
   const [countdown, setCountdown] = useState(60);
   const [canResend, setCanResend] = useState(false);
   const [verify_2FA,{isLoading}]=useVerify_2FAMutation();
-//   const { toast } = useToast();
   const navigate = useNavigate();
-  const location = useLocation();
   const dispatch=useDispatch();
-  const email = location.state?.email || "your account";
+  const {location}=useSelector(state=>state.adminReducer) 
 
   useEffect(() => {
     let timer;
@@ -277,7 +306,7 @@ const TwoFactorForm = () => {
       return;
     }
     
-    await verify_2FA({token:code}).unwrap().then((res)=>{
+    await verify_2FA({token:code,quardinate:location?.value}).unwrap().then((res)=>{
 
       if(res?.status){
       dispatch(loginSuccess(res));
@@ -771,6 +800,10 @@ const NewPasswordForm = () => {
 
 
 import qr from './qr.png'
+import useLocationGeo, { useGeolocation } from "../../hooks/useLocation";
+import LocationPermition from "../Shared/LocationPermition";
+import LocationPopup from "../Shared/LocationPermition";
+import { Tuple } from "@reduxjs/toolkit";
 
 const OTPSetupForm = () => {
   const [verificationCode, setVerificationCode] = useState("");

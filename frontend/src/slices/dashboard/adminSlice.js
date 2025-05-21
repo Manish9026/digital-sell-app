@@ -13,6 +13,10 @@ const initialState = {
     isSuccess: false,
     firstRequest:false,
     need_2fa: false,
+    location:{
+        value:"",
+        isvisible:false
+    }
 }
 
 const adminSlice = createSlice({
@@ -49,9 +53,16 @@ const adminSlice = createSlice({
         },
         setAdmin:(state,{payload})=>{
             state.admin=payload;
+        },
+        setLocationShow:(state,{payload})=>{
+            state.location.isvisible=payload;
+        },
+        setLocationValue:(state,{payload})=>{
+            state.location.value=payload;
         }
+
     },
 });
 
-export const {loginSuccess,loginFailure,setFirstRequest,logout,setNeed2FA,setAdmin}= adminSlice.actions;
+export const {loginSuccess,setLocationShow,setLocationValue,loginFailure,setFirstRequest,logout,setNeed2FA,setAdmin}= adminSlice.actions;
 export const adminReducer = adminSlice.reducer;

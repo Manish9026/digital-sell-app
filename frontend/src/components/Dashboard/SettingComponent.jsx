@@ -449,7 +449,7 @@ const DeviceCard = ({ data = {},dLoading, onLogout = () => {} }) => {
 
           <div className="text-xs text-slate-400 flex flex-col items-start justify-center">
             <span className="flex items-center gap-1">
-              <MapPin size={12} /> {location}
+              <MapPin size={12} /> {location?.state}
             </span>
             <span className="flex items-center gap-1">
               <Globe size={12} /> {ip}
