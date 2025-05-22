@@ -41,4 +41,14 @@ const connectDashboardDB = mongoose.createConnection(process.env.DB_CONNECTION_S
   useUnifiedTopology: true,
 });
 
+
+// export const connectStoreUserDB = async () => {
+//   await mongoose.createConnection(process.env.STORE_USER_DB_URI);
+// };
+
+// export const connectDashboardDB = async () => {
+//   await mongoose.createConnection(process.env.DASHBOARD_DB_URI);
+// };
+
+
 export  { connectStoreUserDB, connectDashboardDB };

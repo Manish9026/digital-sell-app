@@ -52,50 +52,6 @@ app.get("/", (req, res) => {
         message: "this is server page"
     })
 })
-  
-
-app.post("/api/download", async (req, res) => {
-
-    try {
-        const { fileId, email, productName } = req.body;
-        console.log(fileId, email, productName);
-
-         const authUrl = auth.generateAuthUrl({
-          access_type: "offline",
-          prompt: "consent",
-          scope: SCOPE,
-        });
-        console.log("🔗 Open this URL to authorize:\n", authUrl);
-          open(authUrl);
-
-
-        // const link = await DriveController.shareFileWithUser(fileId, email);
-        // await DriveController.sendDownloadEmail(email, productName, link);
-        // res.status(200).json({ message: "Email sent successfully", link });
-    } catch (error) {
-        console.log(error);
-
-    }
-})
-
-
-
-app.get("/oauth2callback", async (req, res) => {
-    const { code } = req.query;
-    try {
-        const { tokens } = await auth.getToken(code);
-        console.log(tokens);
-        
-        res.send("✅ Authorization successful! Check your terminal.");
-        console.log("\n🔑 ACCESS TOKEN:\n", tokens.access_token);
-        console.log("\n🔁 REFRESH TOKEN (save this in .env):\n", tokens.refresh_token);
-        process.exit();
-    } catch (err) {
-        console.error("Error getting tokens:", err.message);
-        res.status(500).send("Auth failed.");
-    }
-})
-
 app.use("/api/payment", paymentRouter)
 // store-user-auth-apis
 app.use("/api/user", userAuthRoutes)
@@ -115,7 +71,5 @@ Promise.all([
       console.error('❌ Error connecting to databases:', err);
       process.exit(1); // Stop the app if DB connections fail
     });
-// app.listen(port, () => {
-//     DB_connection()
-//     console.log("server runing on port 2000");
-// })
+
+
