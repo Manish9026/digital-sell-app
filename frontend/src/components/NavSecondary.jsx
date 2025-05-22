@@ -22,13 +22,14 @@ export function NavSecondary({
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
-              <NavLink end  to={item?.url} 
+              <NavLink  to={item?.url} 
               
                 className={({ isActive, isPending }) =>
    (isActive ? "bg-slate-600/40" : "") + " w-full  relative flex rounded-md"
   }
 
             > 
+            {/* {(!item?.isChild || true) && "sdajf"} {item?.isChild} */}
               <SidebarMenuButton className="bg-transparent" tooltip={item.title}>
                 {item.icon && <item.icon />}
                 <span>{item.title}</span>

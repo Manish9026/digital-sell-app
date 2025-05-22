@@ -31,6 +31,8 @@ const StoreHome = lazy(() => import('./pages/store/Home'));
 const ProfilePage = lazy(() => import('./pages/store/ProfilePage'));
 const CartPage = lazy(() => import('./pages/store/CartPage'));
 const ProductPage = lazy(() => import('./pages/store/ProductPage').then(module => ({ default: module.ProductPage })));
+
+const ProductCategory=lazy(()=>import("./pages/store/Category").then(m=>({default:m.CategoryPage})))
 const LoginForm = lazy(() => import('./components/Store/AuthForm').then(module => ({ default: module.LoginForm })));
 const RegistrationForm = lazy(() => import('./components/Store/AuthForm').then(module => ({ default: module.RegistrationForm })));
 // payment pages
@@ -98,6 +100,10 @@ export function RoutesProvider() {
           path: "/product/:prdId",
           element: <ProductPage />,
           // loader:()=>userLoader
+        },
+        {
+          path: "/product/category",
+          element: <ProductCategory />,
         },
         {
           path: "/user/payment-success",

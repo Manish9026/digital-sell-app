@@ -117,6 +117,7 @@ const data = {
       title: "Settings",
       url: "/dashboard/setting",
       icon: IconSettings,
+      isChild:true
     },
     {
       title: "Get Help",
@@ -153,10 +154,10 @@ export function AppSidebar({ ...props }) {
     <Sidebar collapsible="offcanvas" className="dark:bg-primary dark:text-light light:bg-light light:text-primary"  {...props}>
       <SidebarHeader className="">
         <SidebarMenu>
-          <SidebarMenuItem>
+          <SidebarMenuItem className="hover:bg-transparent ">
             <SidebarMenuButton
               asChild
-              className=" overflow-visible data-[slot=sidebar-menu-button]:!p-1.5"
+              className="overflow-visible data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <a href="#" className="mt-2">
                 {/* <IconInnerShadowTop className="!size-5" /> */}

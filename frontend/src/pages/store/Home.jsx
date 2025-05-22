@@ -260,20 +260,7 @@ const ProductSection=()=>{
     </section>
   )
 }
-// function Home() {
-// // const {data}=useGetSingleProductQuery("67fc44645889c2c5950b7fd1", {
-// //   refetchOnFocus: true,
-// //   refetchOnMountOrArgChange: false,
-// // })
-//   return (
-//     <div className='flex-1  flex min-h-full flex-col pb-10 light:text-slate-800 light:bg-light dark:bg-primary dark:text-slate-200 '>
 
-
-// <HomePage/>
-
-//     </div>
-//   )
-// }
 
 import "keen-slider/keen-slider.min.css";
 import { useKeenSlider } from "keen-slider/react";
@@ -369,9 +356,12 @@ function Home() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.4 }}
         >
-          <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl text-lg shadow-md">
+          <Link to="/product/category">
+            <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl text-lg shadow-md">
             Browse Products
           </button>
+          </Link>
+        
         </motion.div>
         </span>
         

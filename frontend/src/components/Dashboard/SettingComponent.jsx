@@ -230,8 +230,8 @@ const  DriveSetup=memo(()=> {
   };
 
   return (
-    <div className="min-h-screen primary-p light:text-primary dark:text-light">
-      <div className="max-w-4xl mx-auto  ">
+    <div className=" primary-p light:text-primary dark:text-light">
+      <div className="max-w-4xl lg:max-w-6xl ">
         <div className="flex items-center flex-wrap gap-4 justify-between mb-8">
           <h1 className="text-2xl font-bold  flex items-center">
             <Cloud className="mr-2 text-purple-600 text-4xl" />
@@ -246,7 +246,7 @@ const  DriveSetup=memo(()=> {
           </button>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2 ">
           <AnimatePresence>
   {data &&   data?.drives.map((account,index) => (
             <motion.div
@@ -256,19 +256,19 @@ const  DriveSetup=memo(()=> {
       exit={{ opacity: 0, y: -20 }}
               transition={{duration:.3}}
               key={account.id}
-              className="border rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-102 hover:shadow-xl animate-fadeIn"
+              className="w-full sm:min-w-[350px] min-w-[200px] border rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-102 hover:shadow-xl animate-fadeIn"
             >
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold light:text-gray-800 dark:text-light mb-1">{account?.email}</h3>
-                    <div className="flex items-center">
+                  <div className="flex-1 truncate">
+                    <h3 className="text-lg truncate font-semibold light:text-gray-800 dark:text-light mb-1">{account?.email}</h3>
+                    <div className="flex items-center truncate">
                       {getDaysUntilExpiry(account?.expiryDate) > 7 ? (
                         <CheckCircle2 className="text-green-500 mr-2" size={16} />
                       ) : (
                         <AlertCircle className="text-orange-500 mr-2" size={16} />
                       )}
-                      <span className="text-sm text-gray-600">
+                      <span className="text-sm truncate text-gray-600">
                         Token expires in {getDaysUntilExpiry(account?.expiryDate)} days
                       </span>
                     </div>

@@ -53,13 +53,17 @@ static saveToken = async (email, tokens,adminId) => {
   
     if(!adminId) throw {message:"Unauthorized access !!"}
   // const adminId="68271c1bf6ab803cc56396c1"
+  if(!tokens) throw {message:"token not valied access !!"}
+  const expiryDate= new Date(Date.now() + (Number(tokens?.refresh_token_expires_in)*1000))
+  console.log("\n expireDate \n",expiryDate.toLocaleDateString());
+  
  const storedData = await driveModel.findOneAndUpdate(
     { email, adminId }, // Lookup condition
     {
       $set: {
         accessToken: tokens.access_token,
         refreshToken: tokens.refresh_token,
-        expiryDate: tokens.expiry_date,
+        expiryDate,
       },
       $setOnInsert: {
         email,
@@ -72,12 +76,12 @@ static saveToken = async (email, tokens,adminId) => {
     }
   );
   const newUser=await AdminUser.findByIdAndUpdate(adminId,{
-    $push:{
-      adminDrives:storedData?._id,
-    }
+   
+    $addToSet: {
+      adminDrives: storedData?._id,
+    },
+  
   },{upsert:true,new:true})
-
-
   return {admin:newUser}
   
   } catch (error) {
