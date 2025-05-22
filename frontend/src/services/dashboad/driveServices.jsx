@@ -28,6 +28,13 @@ const driveServiceApi=createApi({
                         notify({message:error?.data?.message, type:"error",status:error?.data?.status})
                       }
                     },
+        }),
+        getCategory:builder.query({
+          query:(s)=>({
+            url:`/category?search=${s}`,
+            method:"GET",
+            
+          })
         })
     })
 
@@ -36,5 +43,5 @@ const driveServiceApi=createApi({
 
 
 
-export const {useUploadPoductOnDriveMutation}=driveServiceApi;
+export const {useUploadPoductOnDriveMutation,useGetCategoryQuery}=driveServiceApi;
 export {driveServiceApi}

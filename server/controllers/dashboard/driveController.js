@@ -5,9 +5,9 @@
 
 import path from 'path';
 import fs from 'fs';
-import { GoogleApis ,google} from 'googleapis';
+import { GoogleApis, google } from 'googleapis';
 import mime from 'mime-types';
-import { AdminUser, driveModel, productModel } from '../../models/dashboardModel.js';
+import { AdminUser, categoryModel, driveModel, productModel } from '../../models/dashboardModel.js';
 import { badResponse, goodResponse } from '../../utils/response.js';
 import { driveAccess } from '../shared.js';
 
@@ -24,7 +24,7 @@ export const getDriveService = async () => {
   if (!authClient) {
     authClient = await driveAccess(); // returns OAuth2 client with refresh token
   }
-("\n\n<--------------------count--------------------\n\n");
+  ("\n\n<--------------------count--------------------\n\n");
   driveInstance = google.drive({ version: "v3", auth: authClient });
   return driveInstance;
 };
@@ -39,68 +39,68 @@ export const getDriveService = async () => {
 
 
 
-export class DriveController  {
+export class DriveController {
 
 
   constructor(driveService) {
     this.drive = driveService;
   }
 
- 
 
-static saveToken = async (email, tokens,adminId) => {
-  try {
-  
-    if(!adminId) throw {message:"Unauthorized access !!"}
-  // const adminId="68271c1bf6ab803cc56396c1"
-  if(!tokens) throw {message:"token not valied access !!"}
-  const expiryDate= new Date(Date.now() + (Number(tokens?.refresh_token_expires_in)*1000))
-  console.log("\n expireDate \n",expiryDate.toLocaleDateString());
-  
- const storedData = await driveModel.findOneAndUpdate(
-    { email, adminId }, // Lookup condition
-    {
-      $set: {
-        accessToken: tokens.access_token,
-        refreshToken: tokens.refresh_token,
-        expiryDate,
-      },
-      $setOnInsert: {
-        email,
-        adminId,
-      }
-    },
-    {
-      upsert: true,
-      new: true,
+
+  static saveToken = async (email, tokens, adminId) => {
+    try {
+
+      if (!adminId) throw { message: "Unauthorized access !!" }
+      // const adminId="68271c1bf6ab803cc56396c1"
+      if (!tokens) throw { message: "token not valied access !!" }
+      const expiryDate = new Date(Date.now() + (Number(tokens?.refresh_token_expires_in) * 1000))
+      console.log("\n expireDate \n", expiryDate.toLocaleDateString());
+
+      const storedData = await driveModel.findOneAndUpdate(
+        { email, adminId }, // Lookup condition
+        {
+          $set: {
+            accessToken: tokens.access_token,
+            refreshToken: tokens.refresh_token,
+            expiryDate,
+          },
+          $setOnInsert: {
+            email,
+            adminId,
+          }
+        },
+        {
+          upsert: true,
+          new: true,
+        }
+      );
+      const newUser = await AdminUser.findByIdAndUpdate(adminId, {
+
+        $addToSet: {
+          adminDrives: storedData?._id,
+        },
+
+      }, { upsert: true, new: true })
+      return { admin: newUser }
+
+    } catch (error) {
+      console.log(error);
+
     }
-  );
-  const newUser=await AdminUser.findByIdAndUpdate(adminId,{
-   
-    $addToSet: {
-      adminDrives: storedData?._id,
-    },
-  
-  },{upsert:true,new:true})
-  return {admin:newUser}
-  
-  } catch (error) {
-    console.log(error);
-    
-  }
-};
+  };
 
-static getToken = async (email,id) => {
-  const drive= await AdminUser.findOne({ "adminDrives.drive.isPrimary":true,_id:id }).populate("adminDrives.drive");
+  static getToken = async (email, id) => {
+    const drive = await AdminUser.findOne({ "adminDrives.drive.isPrimary": true, _id: id }).populate("adminDrives.drive");
 
-  console.log(drive,"edirve");
-  
-  return 
-};
+    console.log(drive, "edirve");
 
-static deleteToken = async (email,id) => {
-  await Token.deleteOne({ email ,adminId:id});
-};
+    return
+  };
+
+  static deleteToken = async (email, id) => {
+    await Token.deleteOne({ email, adminId: id });
+  };
 
 
   static createProductFolder = async (prdName) => {
@@ -109,36 +109,34 @@ static deleteToken = async (email,id) => {
       name: prdName,
       mimeType: 'application/vnd.google-apps.folder',
     };
-  
+
     const folder = await drive.files.create({
       resource: folderMetadata,
       fields: 'id',
     });
-  
+
     return folder.data.id;
   };
-
- 
   static uploadSingleFile = async (filePath, fileName, folderId, isPublic = false) => {
     const drive = await getDriveService();
     const fileMetadata = {
       name: fileName,
       parents: [folderId],
     };
-  
+
     const media = {
       mimeType: mime.lookup(filePath), // auto-detect type
       body: fs.createReadStream(filePath),
     };
-  
+
     const uploadedFile = await drive.files.create({
       resource: fileMetadata,
       media,
       fields: 'id',
     });
-  
+
     const fileId = uploadedFile.data.id;
-  
+
     if (isPublic) {
       await drive.permissions.create({
         fileId,
@@ -148,30 +146,30 @@ static deleteToken = async (email,id) => {
         },
       });
     }
-  
+
     const result = await drive.files.get({
       fileId,
       fields: 'id, name, mimeType, webViewLink, webContentLink,thumbnailLink',
     });
-  
+
     return {
       id: result.data.id,
       name: result.data.name,
       mimeType: result.data.mimeType,
       viewLink: result.data.webViewLink,
-   thumbnailLink:isPublic && result.data.thumbnailLink,
+      thumbnailLink: isPublic && result.data.thumbnailLink,
       downloadLink: `https://drive.google.com/uc?export=download&id=${result.data.id}`,
     };
   };
-  static uploadOnDrive=  async (req, res) => {
+  static uploadOnDrive = async (req, res) => {
     try {
-      const { title, description, category, price ,discountPercent,discountPrice,actualPrice} = req.body;
-console.log(title, description, category, price);
+      const { title, description, category, price, discountPercent, discountPrice, actualPrice } = req.body;
+      console.log(title, description, category, price);
 
       // console.log('Request body:', req.body,name);
       // console.log('Files:', req.files);
       // return 
-      
+
       // 1. Create Google Drive folder
       const folderId = await this.createProductFolder(title);
 
@@ -198,7 +196,7 @@ console.log(title, description, category, price);
 
       console.log('Thumbnails:', thumbnails);
       console.log('Files:', files);
-      
+
       // 4. Save to DB
       const newProduct = await productModel.create({
         title,
@@ -206,7 +204,7 @@ console.log(title, description, category, price);
         category,
         price,
         'folder.id': folderId,
-        discountPercent,discountPrice,
+        discountPercent, discountPrice,
         thumbnails,
         files,
         actualPrice
@@ -219,32 +217,52 @@ console.log(title, description, category, price);
       res.status(500).json({ success: false, message: 'Server error' });
     }
   }
-
-  static getAllProducts=async(req,res)=>{
+  static getAllProducts = async (req, res) => {
     try {
-      const product=await productModel.find();
-      if(product.length>0){
-        return goodResponse({res,message:"record founded !!",data:{product},statusCode:200})
+      const product = await productModel.find();
+      if (product.length > 0) {
+        return goodResponse({ res, message: "record founded !!", data: { product }, statusCode: 200 })
       }
-      return badResponse({res,message:"no produsct are avalavial at this movement !!"})
+      return badResponse({ res, message: "no produsct are avalavial at this movement !!" })
     } catch (error) {
-      return badResponse({res,statusCode:500,message:"sever error"})
+      return badResponse({ res, statusCode: 500, message: "sever error" })
     }
   }
-  static getDriveData= async(req, res) =>{
+  static getDriveData = async (req, res) => {
     try {
-      const {admin}=req;
+      const { admin } = req;
 
-      await  this.getToken("",admin?._id)
-      if(!admin) return  badResponse({res,message:'Failed to fetch drive data',statusCode:403})
-       const drives=await AdminUser.findById(admin?._id,{password:0,twoFA:0,sessions:0}).populate({
-  path: "adminDrives",
-});
+      await this.getToken("", admin?._id)
+      if (!admin) return badResponse({ res, message: 'Failed to fetch drive data', statusCode: 403 })
+      const drives = await AdminUser.findById(admin?._id, { password: 0, twoFA: 0, sessions: 0 }).populate({
+        path: "adminDrives",
+      });
 
       //  console.log(drives);
-       return goodResponse({res,message:"record found!!",extra:{drives:drives?.adminDrives	|| []}})
+      return goodResponse({ res, message: "record found!!", extra: { drives: drives?.adminDrives || [] } })
     } catch (error) {
-      badResponse({res,message:'Failed to fetch drive data',statusCode:500})
+      badResponse({ res, message: 'Failed to fetch drive data', statusCode: 500 })
+    }
+  }
+  static getCategory = async (req, res) => {
+    try {
+      const { search } = req.query;
+      const regex = new RegExp(search, 'i'); // case-insensitive regex
+      const categories = await categoryModel.find({
+        $or: [
+          { name: regex },
+          { slug: regex },
+        ]
+      });
+      // const result =await categoryModel.find();
+      if (!categories) return badResponse({ res, message: "not found ", status: 404 });
+
+      return goodResponse({ res, extra: { categories } })
+
+    } catch (error) {
+      console.log(error);
+
+      return badResponse({ res, message: "server error !!", status: 500 });
     }
   }
 }

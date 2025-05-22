@@ -201,7 +201,7 @@ const { data, refetch,isLoading } = useGetProductsQuery(undefined, {
                 /> */}
                 {/* </AspectRatio> */}
                 
-            <span className="flex flex-col flex-1 p-2 sm:p-4">
+    <span className="flex flex-col flex-1 p-2 sm:p-4">
   <h3 className="text-lg truncate font-semibold mb-1">{product.title}</h3>
   <div className="flex items-center gap-2 mb-2">
     <span className="text-green-600 font-bold">{product.price}</span>

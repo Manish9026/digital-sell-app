@@ -91,10 +91,12 @@ import {
 } from "lucide-react";
 import { LoadingScreen } from '../../components/Shared/LoadingComponent';
 import { toast } from 'react-toastify';
-import { useUploadPoductOnDriveMutation } from '../../services/dashboad/driveServices';
+import { useGetCategoryQuery, useUploadPoductOnDriveMutation } from '../../services/dashboad/driveServices';
 import AIProductGenerator from './AiGen';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { lazy } from 'react';
 
+// const InputSearch =lazy(()=>import('../../components/Shared/InputSearch').then((m=>({default:m.InputSearch}))))
 const AnimatedInput = ({ label, icon: Icon,inputClass,lableClass,containerClass ,...props }) => (
   <div className="space-y-1 w-full">
     <label className={`${lableClass} text-sm font-medium light:text-gray-700 dark:text-gray-300`}>{label}</label>
@@ -107,6 +109,88 @@ const AnimatedInput = ({ label, icon: Icon,inputClass,lableClass,containerClass 
     </div>
   </div>
 );
+
+// import React, { useState, useEffect } from "react";
+// import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import {SearchCheck} from 'lucide-react'
+
+const dummyCategories = [
+  "Courses",
+  "eBooks",
+  "Design Assets",
+  "UI Kits",
+  "Web Development",
+  "Templates",
+  "Software Tools",
+  "Data Science",
+  "Machine Learning",
+];
+
+export default function SearchCategory({lableClass,label="Category"}) {
+  const [query, setQuery] = useState("");
+  const [filtered, setFiltered] = useState([]);
+  const {data,isLoading,refetch}=useGetCategoryQuery("",{
+    refetchOnMountOrArgChange:true,
+  })
+
+  console.log(data);
+  
+  useEffect(() => {
+    // if (query.trim().length > 0) {
+    //   const regex = new RegExp(query, "i");
+    //   setFiltered(data && data?.categories.filter((cat) => regex.test(cat.name)));
+    // } else {
+    //   setFiltered([]);
+    // }
+
+
+  }, [query]);
+
+  return (
+    <div className="relative w-full  mx-auto">
+      {/* Search Box */}
+      <div className="flex flex-col gap-2 ">
+         <label className={`${lableClass} text-sm font-medium light:text-gray-700 dark:text-gray-300`}>{label || "Category"}</label>
+<span className="flex flex-1 items-center bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-md px-4 py-3 shadow-sm transition focus-within:ring-2 focus-within:ring-blue-500">
+        <SearchCheck className="w-5 h-5 text-gray-400" />
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search categories..."
+          className="ml-3 w-full bg-transparent focus:outline-none text-sm text-gray-700 dark:text-white placeholder:text-gray-400"
+        />
+      </span>
+
+      </div>
+      
+
+      {/* Results Dropdown */}
+      <AnimatePresence>
+        {0 && data && data?.categories.length > 0 && (
+          <motion.ul
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            className="absolute z-10 w-full mt-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg shadow-lg overflow-hidden"
+          >
+            {data?.categories.map((item, index) => (
+              <li
+                key={index}
+                className="px-4 py-2 hover:bg-blue-100 dark:hover:bg-slate-700 cursor-pointer transition text-sm text-gray-800 dark:text-gray-100"
+
+                // onClick={()=>set}
+              >
+                {item?.name}
+              </li>
+            ))}
+          </motion.ul>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 
 const CourseUploadForm = () => {
   const [thumbnails, setThumbnails] = useState([]);
@@ -234,7 +318,9 @@ const CourseUploadForm = () => {
 <div className="grid grid-cols2 gap-2 lg:max-h-[600px]   min-h-[500px]">
       <div className="grid sm:grid-cols-2 gap-6">
         <AnimatedInput label="Course Name" name="name" value={form.name} onChange={handleChange} icon={Tag} placeholder="Ex: MERN Stack"/>
-        <AnimatedInput label="Category" name="category" value={form.category} onChange={handleChange} icon={BadgePercent} />
+        {/* <AnimatedInput label="Category" name="category" value={form.category} onChange={handleChange} icon={BadgePercent} />
+        <InputSearch/> */}
+<SearchCategory/>
       </div>
 
       <div className="grid sm:grid-cols-3 gap-6">
@@ -328,8 +414,6 @@ const CourseUploadForm = () => {
     </motion.form>
   );
 };
-
-
 
 export const AddProduct = () => {
   return (

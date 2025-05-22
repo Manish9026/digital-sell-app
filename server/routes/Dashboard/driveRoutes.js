@@ -44,6 +44,7 @@ driveOpDashboard.get('/files/:fileId/view', async (req, res) => {
   }
 });
 
+driveOpDashboard.get('/category',DriveController.getCategory)
 
 /*--------------------------------- drive Auth && setup routes -----------------------*/
 driveOpDashboard.post("/auth/google", verifyAdminToken, (req, res) => {

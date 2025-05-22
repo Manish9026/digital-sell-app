@@ -91,7 +91,12 @@ const productSchema = new mongoose.Schema(
   },
     title: { type: String, required: true },
     description: String,
-    category: String,
+     category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Category',
+      required: true,
+    },
+    tags: [String],
     price: { type: Number, required: true, default: 0 },
     discountPrice: { type: Number, default: 0 },
     discountPercent: { type: Number, default: 0 },
@@ -132,4 +137,32 @@ const productSchema = new mongoose.Schema(
   }
 );
 
+// models/Category.ts
+const CategorySchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
+    slug: {
+      type: String,
+      // required: true,
+      unique: true,
+      lowercase: true,
+    },
+    description: String,
+    icon: String, // optional icon for UI
+    parent: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Category',
+      default: null,
+    },
+  },
+  { timestamps: true }
+);
+export const categoryModel= connectDashboardDB.model('Category', CategorySchema);
+
+productSchema.index({ title: 'text', description: 'text', tags: 'text' });
 export const productModel = connectDashboardDB.model('digital-product', productSchema);
