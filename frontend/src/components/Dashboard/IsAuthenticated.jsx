@@ -9,7 +9,7 @@ import { ShieldCheck } from 'lucide-react';
 import { toast } from '../Shared/Toast';
 import { useRef } from 'react';
 
-const CheckingAuth = () => {
+export const CheckingAuth = () => {
   return (
     <div className="fixed dark:bg-primary light:bg-light  w-full h-full  flex items-center justify-center z-50 dark:text-white light:text-primary p-4">
       <motion.div

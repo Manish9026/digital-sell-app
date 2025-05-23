@@ -16,6 +16,7 @@ import { useSelector } from "react-redux";
 
 import { FileText, PlayCircle, Download, ShoppingBag } from "lucide-react";
 import { CheckCircle, Hourglass, CreditCard } from "lucide-react";
+import { IsUserAuthenticated } from "../../components/Store/IsUserAuthenticated";
 
  function Orders() {
   const orders = [
@@ -354,7 +355,8 @@ export default function ProfileTabs() {
   };
 
   return (
-    <div className="flex flex-col max-w-5xl flex-1 w-full mx-auto p-4  light:bg-light dark:bg-primary">
+    <IsUserAuthenticated>
+       <div className="flex flex-col max-w-5xl flex-1 w-full mx-auto p-4  light:bg-light dark:bg-primary">
       <div className="flex flex-wrap justify-center gap-2 mb-6">
         {tabs.map((tab) => (
           <button
@@ -387,5 +389,7 @@ export default function ProfileTabs() {
         </AnimatePresence>
       </div>
     </div>
+    </IsUserAuthenticated>
+   
   );
 }

@@ -79,14 +79,14 @@ export class Auth  {
       
         
         // Send cookies
-        res.cookie("accessToken", accessToken, {
+        res.cookie("uAccessToken", accessToken, {
           httpOnly: true,
           secure: true,
           sameSite: "None",
           maxAge: 15 * 60 * 1000,
         });
       
-        res.cookie("refreshToken", refreshToken, {
+        res.cookie("uRefreshToken", refreshToken, {
           httpOnly: true,
           secure: true,
           sameSite: "None",
@@ -102,7 +102,7 @@ export class Auth  {
       }
       };
     static refreshToken = async (req, res) => {
-  const token = req?.cookies?.refreshToken;
+  const token = req?.cookies?.uRefreshToken;
   const ip = req?.ip;
   const userAgent = req.headers['user-agent'];
 console.log(token,ip,userAgent);
@@ -136,14 +136,14 @@ console.log(token,ip,userAgent);
     await user.save();
 
     // Set new cookies
-    res.cookie("accessToken", accessToken, {
+    res.cookie("uAccessToken", accessToken, {
       httpOnly: true,
       secure: true,
       sameSite: "None",
       maxAge: 15 * 60 * 1000,
     });
 
-    res.cookie("refreshToken", newRefreshToken, {
+    res.cookie("uRefreshToken", newRefreshToken, {
       httpOnly: true,
       secure: true,
       sameSite: "None",
@@ -168,8 +168,16 @@ console.log(token,ip,userAgent);
       await user.save();
     }
   
-    res.clearCookie("accessToken");
-    res.clearCookie("refreshToken");
+    res.clearCookie("uAccessToken",{
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    });
+    res.clearCookie("uRefreshToken",{
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    });
   
     goodResponse({res,statusCode:200,message:"Logged out successfully",data:{isAuthenticated:false}})
     // res.status(200).json({ message: "Logged out successfully" });

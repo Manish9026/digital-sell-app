@@ -1,6 +1,6 @@
 
 
-import React, { lazy, Suspense } from 'react'
+import React, { lazy, Suspense, useEffect } from 'react'
 import { createBrowserRouter, RouterProvider, useLocation } from 'react-router-dom'
 import 'keen-slider/keen-slider.min.css';
 
@@ -21,6 +21,7 @@ const LoadingScreen = lazy(() => import('./components/Shared/LoadingComponent').
 const AddProductPage = lazy(() => import('./pages/dasboard/AddProduct').then(module => ({ default: module.AddProduct })));
 const AuthPage = lazy(() => import('./pages/dasboard/AuthPage').then(module => ({ default: module.AuthPage })));
 import { AuthDashboard, DashboardSetting, LazyLoadingDashboard } from './components/Dashboard/LazyComponent';
+import { useVerifyQuery } from './services/store/authServices';
 
 const DashboardLayout = lazy(() => import('./pages/dasboard/Layout'));
 const DashboardHome = lazy(() => import('./pages/dasboard/Home'));
@@ -56,11 +57,15 @@ const DashboardProtectedLayout = () => {
   );
 };
 const StoreProtectedLayout = () => {
+ 
   return (
-    <ProtectedRoute allowedRoles={["store"]}>
-      <ScrollToTop />
-      <Layout role="store" />
-    </ProtectedRoute>
+    // <ProtectedRoute allowedRoles={["store"]}>
+    <>
+    <ScrollToTop />
+    <Layout role="store" />
+    </>
+      
+    // </ProtectedRoute>
   );
 };
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { lazy, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PartyPopper } from 'lucide-react';
 
@@ -113,6 +113,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { usePaymentOrderMutation } from '../../services/store/paymentServices';
 import { useGetSingleProductQuery } from '../../services/store/productServices';
 import { url } from '../../utils/service';
+const IsUserAuthenticated=lazy(()=>import("../../components/Store/IsUserAuthenticated").then(m=>({default:m.IsUserAuthenticated})));
 
 // import { toast } from '@/hooks/use-toast';
 
@@ -133,35 +134,36 @@ const PreventReload=({children})=>{
 
   const [show,sets]=useState(false);
  const [allowBack, setAllowBack] = useState(true);
-useEffect(() => {
-    const handleBeforeUnload = (e) => {
-      e.preventDefault();
-      e.returnValue = ''; // Required for Chrome
-        sets(true)
-    };
+//  const {}=useSelector(state=)
+// useEffect(() => {
+//     const handleBeforeUnload = (e) => {
+//       e.preventDefault();
+//       e.returnValue = ''; // Required for Chrome
+//         sets(true)
+//     };
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
+//     window.addEventListener('beforeunload', handleBeforeUnload);
 
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, []);
+//     return () => {
+//       window.removeEventListener('beforeunload', handleBeforeUnload);
+//     };
+//   }, []);
 
- useEffect(() => {
-    const handlePopState = (event) => {
-      if (!allowBack) {
-        event.preventDefault();
-        sets(true);
-        window.history.pushState(null, null, location.pathname); // push back to stay on page
-      }
-    };
+//  useEffect(() => {
+//     const handlePopState = (event) => {
+//       if (!allowBack) {
+//         event.preventDefault();
+//         sets(true);
+//         window.history.pushState(null, null, location.pathname); // push back to stay on page
+//       }
+//     };
 
-    // Fake a new history entry so back triggers popstate
-    window.history.pushState(null, "", window.location.href);
-    window.addEventListener("popstate", handlePopState);
+//     // Fake a new history entry so back triggers popstate
+//     window.history.pushState(null, "", window.location.href);
+//     window.addEventListener("popstate", handlePopState);
 
-    return () => window.removeEventListener("popstate", handlePopState);
-  }, [allowBack]);
+//     return () => window.removeEventListener("popstate", handlePopState);
+//   }, [allowBack]);
 
   const handleStay = () => {
     sets(false);
@@ -228,7 +230,7 @@ export const PaymentInfo = () => {
 
 // // Example: Get a param by name
 // const prdId = queryParams.get('prdId');
-  const basePrice = product?.actualPrice;
+  const basePrice = product?.actualPrice || 0;
   const calculateDiscount = () => {
     if (!appliedCoupon) return 0;
     return appliedCoupon.type === 'percentage' 
@@ -304,7 +306,8 @@ export const PaymentInfo = () => {
 
 ' bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50'
   return (
-    <PreventReload>
+    <IsUserAuthenticated>
+      <PreventReload>
         <div className="min-h-screen dark:bg-primary dark:text-light light:text-primary light:bg-light p-4">
 
        
@@ -640,6 +643,8 @@ export const PaymentInfo = () => {
       </div>
     </div> 
     </PreventReload>
+    </IsUserAuthenticated>
+    
    
   );
 };

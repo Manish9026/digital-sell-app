@@ -27,8 +27,9 @@ const cartApi = createApi({
                     
                      notify({message:data?.message, type:"success",status:data?.status})
                 } catch (err) {
-                    console.error("Login error:", err);
-                    notify({message:err?.data?.message, type:"error",status:data?.status})
+                    const {error}=err;
+                    // // console.log("Login error:", err);
+                    notify({message:error?.data?.message, type:"error",status:false})
                 }
             },
         }),

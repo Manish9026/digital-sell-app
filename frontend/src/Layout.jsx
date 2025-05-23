@@ -1,10 +1,11 @@
 import React, { Suspense, useEffect } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 import Navbar from './components/Store/Navbar'
 // import DashboardLayout from './pages/dasboard/Layout.jsx';
 const DashboardLayout = React.lazy(() => import('./pages/dasboard/Layout.jsx'));
 import { classSwitch } from './components/Shared/ThemeToggleButton.jsx';
-// import { LazyLoadingDashboard } from './components/Dashboard/LazyComponent.jsx';
+import { useVerifyQuery } from './services/store/authServices.jsx';
+import { useDispatch, useSelector } from 'react-redux';
 const LazyLoadingDashboard = React.lazy(() => import('./components/Dashboard/LazyComponent.jsx').then(module => ({ default: module.LazyLoadingDashboard })));
 function Layout({role}) {
 
@@ -18,27 +19,30 @@ function Layout({role}) {
       script.async = true;
       document.body.appendChild(script);
     }, []);
+ const { data, refetch } = useVerifyQuery(undefined, {
+      refetchOnFocus: true,
+      refetchOnMountOrArgChange: false,
+    })
+    const {forceLogout} = useSelector((state) => state.authReducer);
+  const dispatch = useDispatch();
+  const navigate=useNavigate();
+
+  useEffect(() => {
+    if (forceLogout) {
+      dispatch({ type: 'auth/clearForceLogout' }); // clear flag
+      navigate('/user/login'); // ⬅ redirect
+    }
+  }, [forceLogout, dispatch, navigate]);
+
   return (
-    role=="store"?
     <div className='light:bg-light flex  flex-col overflow-auto min-h-screen min-w-screen max-w-screen dark:bg-primary   scroll-hide'>
 
     <Navbar/>
     <Outlet/>
 
     </div>
-    :
-    <div className='light:bg-light flex  flex-col overflow-auto  min-h-screen min-w-screen max-w-screen dark:bg-primary dark:text-light  scroll-hide  light:text-black'>
+    
 
-      <Suspense fallback={<LazyLoadingDashboard/>}>
-    <DashboardLayout/>
-      </Suspense>
-
-    </div>
-    // <div className='bg-slate-100 flex flex-col scroll-auto min-h-screen min-w-screen'>
-    // {/* <h1>dashboard</h1> */}
-    // {/* <Navbar/> */}
-    //     <Outlet/>
-    // </div>
   )
 }
 

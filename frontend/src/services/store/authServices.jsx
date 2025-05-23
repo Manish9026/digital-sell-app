@@ -115,7 +115,7 @@ export const authApi = createApi({
   }),
 })
 
-export const { useLoginMutation, useLogoutMutation,useRegisterMutation ,useVerifyQuery } = authApi
+export const { useLoginMutation, useLogoutMutation,useRegisterMutation ,useVerifyQuery ,useLazyVerifyQuery} = authApi
 
 // fallback base URL
 // const baseQuery = fetchBaseQuery({

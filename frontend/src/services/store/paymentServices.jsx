@@ -43,7 +43,13 @@ export const authBaseQuery = ({ defaultBaseUrl }) => {
          result = await rawBaseQuery(cleanedArgs, api, extraOptions);
         } else {
           api.dispatch({ type: 'auth/logout' });
-          window.location.href = '/user/login';
+          api.dispatch({ type: 'auth/forceLogout' });
+
+          // if(args?.navigate){
+          //   navigate('/user/login')
+          // }else{
+          //   window.location.href = '/user/login';
+          // }
           console.warn('Token refresh failed. Consider redirecting to login.')
           // Optional: api.dispatch(logout())
         }

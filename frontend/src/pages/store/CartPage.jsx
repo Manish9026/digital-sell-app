@@ -1,7 +1,7 @@
 // Install dependencies before using:
 // npm install framer-motion @heroicons/react
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, lazy } from "react";
 import { motion } from "framer-motion";
 import { ShoppingCartIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { useFetchCartQuery, useRemoveCartMutation } from "../../services/store/cartServices";
@@ -11,6 +11,7 @@ import { url } from "../../utils/service";
 import { ImSpinner2 } from 'react-icons/im';
 import { useNavigate } from "react-router-dom";
 import { setCartQyt } from "../../slices/globleSlice";
+const IsUserAuthenticated=lazy(()=>import("../../components/Store/IsUserAuthenticated").then(m=>({default:m.IsUserAuthenticated})));
 const sampleCart = [
   {
     id: 1,
@@ -59,7 +60,9 @@ const dispatch=useDispatch();
 
 
   return (
-    <div className="flex flex-col min-h-full  bg-light dark:bg-primary text-gray-900 dark:text-white p-6">
+
+    <IsUserAuthenticated>
+       <div className="flex flex-col min-h-full  bg-light dark:bg-primary text-gray-900 dark:text-white p-6">
       <h1 className="text-3xl font-bold mb-8 text-center light:text-primary flex items-center justify-center gap-2">
         <ShoppingCartIcon className="h-7 w-7" /> Your Cart
       </h1>
@@ -87,6 +90,8 @@ const dispatch=useDispatch();
         </div>
       )}
     </div>
+    </IsUserAuthenticated>
+   
   );
 }
 

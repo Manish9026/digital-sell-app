@@ -8,6 +8,7 @@ const authSlice=createSlice({
         refreshToken:null,
         isAuthenticated:false,
         role:null,
+        forceLogout: false,
     },
     reducers:{
         setCredentials:(state,{payload})=>{
@@ -22,7 +23,13 @@ const authSlice=createSlice({
             state.user={};
             state.isAuthenticated=false;
             state.role=null;
-        }
+        },
+        forceLogout: (state) => {
+      state.forceLogout = true;
+    },
+    clearForceLogout: (state) => {
+      state.forceLogout = false;
+    },
     }
 })
 
