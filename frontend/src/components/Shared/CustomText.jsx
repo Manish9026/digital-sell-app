@@ -17,4 +17,5 @@ const CustomText = ({
   )
 }
 
+export  {CustomText}
 export default CustomText

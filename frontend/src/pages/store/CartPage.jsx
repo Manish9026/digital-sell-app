@@ -5,11 +5,12 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ShoppingCartIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { useFetchCartQuery, useRemoveCartMutation } from "../../services/store/cartServices";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Image from "../../components/Shared/ImageLoading";
 import { url } from "../../utils/service";
 import { ImSpinner2 } from 'react-icons/im';
 import { useNavigate } from "react-router-dom";
+import { setCartQyt } from "../../slices/globleSlice";
 const sampleCart = [
   {
     id: 1,
@@ -32,14 +33,17 @@ export default function CartPage() {
 
   const [loading, setLoading] = useState(false);
   // const 
-
+const dispatch=useDispatch();
   const {data,isLoading,refetch}=useFetchCartQuery(undefined,{
     refetchOnFocus: true,
     refetchOnMountOrArgChange: true,
   })
   const cards=data?.data?.products;
-  useEffect(() => {
   
+  useEffect(() => {
+
+    if(cards)
+    dispatch(setCartQyt(cards?.length))
     // setCart(cart);
     // console.log(data);
 
@@ -114,7 +118,7 @@ const ProductCard=({item,refetch})=>{
               /> */}
               <div className="flex-1 capitalize">
                 <h3 className="text-lg  font-bold">{item?.title}</h3>
-                <p className="text-sm uppercase text-gray-600 dark:text-gray-300">{item?.category}</p>
+                <p className="text-sm uppercase text-gray-600 dark:text-gray-300">{typeof item?.category ==="object"?item?.category?.name:item?.category}</p>
                 <span className="text-indigo-600 dark:text-indigo-400 font-semibold mt-1">${item?.actualPrice}</span>
                 <span className="text-green-600 ml-4 dark:text-green-400 font-semibold text-xs mt-1 line-through">${item?.price}</span>
               </div>

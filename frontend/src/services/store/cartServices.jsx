@@ -2,6 +2,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import { authBaseQuery } from "./paymentServices";
 import { storeUserBaseUrl } from "../../utils/service";
 import { notify } from "../../utils/notification";
+import { setCartQyt } from "../../slices/globleSlice";
 
 const baseQuery = authBaseQuery({
     defaultBaseUrl: `${storeUserBaseUrl}/cart`, // e.g. http://localhost:5000
@@ -21,11 +22,13 @@ const cartApi = createApi({
                 try {
                     const { data } = await queryFulfilled;
                     console.log(data,'data');
+                    if(data?.status)
+                        dispatch(setCartQyt())
                     
                      notify({message:data?.message, type:"success",status:data?.status})
                 } catch (err) {
                     console.error("Login error:", err);
-                    notify({message:data?.message, type:"error",status:data?.status})
+                    notify({message:err?.data?.message, type:"error",status:data?.status})
                 }
             },
         }),

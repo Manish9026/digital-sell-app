@@ -163,8 +163,8 @@ export class DriveController {
   };
   static uploadOnDrive = async (req, res) => {
     try {
-      const { title, description, category, price, discountPercent, discountPrice, actualPrice } = req.body;
-      console.log(title, description, category, price);
+      const { title, description, category, price, discountPercent, discountPrice, actualPrice ,coupons} = req.body;
+      console.log(title, description, JSON.parse(category), price,JSON.parse(coupons));
 
       // console.log('Request body:', req.body,name);
       // console.log('Files:', req.files);
@@ -201,9 +201,10 @@ export class DriveController {
       const newProduct = await productModel.create({
         title,
         description,
-        category,
+        category:JSON.parse(category) || [],
         price,
         'folder.id': folderId,
+        coupons:JSON.parse(coupons) || [],
         discountPercent, discountPrice,
         thumbnails,
         files,

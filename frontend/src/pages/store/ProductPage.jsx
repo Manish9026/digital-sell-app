@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 import { useLoaderData ,useLocation, useNavigate, useParams} from "react-router-dom";
 import { useGetSingleProductQuery } from "../../services/store/productServices";
 import LoadingComponent, { LoadingScreen } from "../../components/Shared/LoadingComponent";
-import Image from "../../components/Shared/ImageLoading";
+// import Image from "../../components/Shared/ImageLoading";
+const Image =React.lazy(()=>import("../../components/Shared/ImageLoading").then(m=>({default:m.Image})));
 import { url } from "../../utils/service";
 import { usePaymentOrderMutation } from "../../services/store/paymentServices";
 const Button = ({
@@ -42,6 +43,8 @@ const Button = ({
     </button>
   );
 };
+
+
 
 export const ProductPage = () => {
     const [rating, setRating] = useState(4.5);
@@ -139,7 +142,8 @@ export const ProductPage = () => {
     };
 
     const handleBuyNow = async () => {
-      paymentOrder({productId:prdId,fileId:product?.files[0]?.id,amount:parseInt(product?.actualPrice),productName:product?.title,navigate}).unwrap()
+      navigate(`/product/payment-info?prdId=${prdId}`)
+      // paymentOrder({productId:prdId,fileId:product?.files[0]?.id,amount:parseInt(product?.actualPrice),productName:product?.title,navigate}).unwrap()
     }
 
   

@@ -25,6 +25,9 @@ const updateRefreshToken = async (req, decoded, token) => {
   try {
     const { id, sessionId } = decoded;
 
+    console.log("\n\n ------------------------genrating access token with refresh token------------------------------\n\n");
+    
+
     if (!id || !sessionId) throw new Error("Invalid token owner");
 
     const admin = await AdminUser.findById(id);
@@ -102,20 +105,27 @@ const verifyAdminToken = async (req, res, next) => {
 
     } catch (err) {
       // If failed, check if it's a tempToken
-      // console.log(err,"tempToken"); 
-      try {
+      console.log(err,"accesstoken"); 
+      try { 
+        console.log(refreshToken, process.env.ADMIN_REFRESH_TOKEN_SECRET);
         decoded = jwt.verify(refreshToken, process.env.ADMIN_REFRESH_TOKEN_SECRET);
+
+        console.log(decoded);
+        
+       
+        
         const result = await updateRefreshToken(req, decoded, refreshToken);
 
         // Assign fresh admin + decoded
         admin = result.admin;
         decoded = result.decoded;
       } catch (error) {
+          console.log(error?.message,error, "refreshtoken");
+
         try {
           decoded = jwt.verify(tempToken, process.env.ADMIN_TEMP_TOKEN_SECRET); // TEMP_SECRET
           req.twoFactorAuth = true; // Optional flag to detect it's a tempToken
         } catch (tempErr) {
-          console.log(error?.message,error, "tempErr");
 
           return badResponse({ res, message: error?.message || "Unauthorized: Invalid or expired token", statusCode: 401 });
         }

@@ -28,4 +28,5 @@ function Image({src,alt,imageClassName,loading,containerClassName}) {
   );
 }
 
-export default Image;
+export  {Image};
+export default Image

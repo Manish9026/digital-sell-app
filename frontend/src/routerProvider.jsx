@@ -21,6 +21,7 @@ const LoadingScreen = lazy(() => import('./components/Shared/LoadingComponent').
 const AddProductPage = lazy(() => import('./pages/dasboard/AddProduct').then(module => ({ default: module.AddProduct })));
 const AuthPage = lazy(() => import('./pages/dasboard/AuthPage').then(module => ({ default: module.AuthPage })));
 import { AuthDashboard, DashboardSetting, LazyLoadingDashboard } from './components/Dashboard/LazyComponent';
+
 const DashboardLayout = lazy(() => import('./pages/dasboard/Layout'));
 const DashboardHome = lazy(() => import('./pages/dasboard/Home'));
 const DashboardSettingLayout = lazy(() => import('./pages/dasboard/SettingPage').then(module => ({ default: module.SettingLayout })));
@@ -31,7 +32,7 @@ const StoreHome = lazy(() => import('./pages/store/Home'));
 const ProfilePage = lazy(() => import('./pages/store/ProfilePage'));
 const CartPage = lazy(() => import('./pages/store/CartPage'));
 const ProductPage = lazy(() => import('./pages/store/ProductPage').then(module => ({ default: module.ProductPage })));
-
+const PaymentInfo=lazy(()=>import("./pages/store/PaymentInfo").then(m=>({default:m.PaymentInfo})))
 const ProductCategory=lazy(()=>import("./pages/store/Category").then(m=>({default:m.CategoryPage})))
 const LoginForm = lazy(() => import('./components/Store/AuthForm').then(module => ({ default: module.LoginForm })));
 const RegistrationForm = lazy(() => import('./components/Store/AuthForm').then(module => ({ default: module.RegistrationForm })));
@@ -108,6 +109,11 @@ export function RoutesProvider() {
         {
           path: "/user/payment-success",
           element: <PaymentSuccessPage />
+        },
+        {
+          path:"/product/payment-info",
+          element:<PaymentInfo/>
+
         },
         {
           path: "/user/payment-waiting",

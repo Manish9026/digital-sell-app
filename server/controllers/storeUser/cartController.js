@@ -28,10 +28,10 @@ export class CartController {
               if (!alreadyInCart) {
                 cart.product.push({id:productObjectId});
                 await cart.save();        
-               return goodResponse({res,message:"Product added to cart",statusCode:200})
+               return goodResponse({res,message:"Product added to cart",statusCode:200,})
               }
 
-              return badResponse({res,message:"Product already in cart",statusCode:200})
+              return badResponse({res,message:"Product already in cart",statusCode:200,status:false})
         
             } else {
               // Create new cart for user

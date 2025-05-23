@@ -91,20 +91,32 @@ const productSchema = new mongoose.Schema(
   },
     title: { type: String, required: true },
     description: String,
-     category: {
-      type: mongoose.Schema.Types.ObjectId,
+    category: {
+       name:String,
+       id:{
+        type: mongoose.Schema.Types.ObjectId,
       ref: 'Category',
       required: true,
+       }  
     },
     tags: [String],
     price: { type: Number, required: true, default: 0 },
     discountPrice: { type: Number, default: 0 },
     discountPercent: { type: Number, default: 0 },
     actualPrice:{ type: Number, default: 0 },
-    couponCode: { type:[
-      { code: String, discountPercentage: Number, expiryDate: Date }
-    ] 
-      , default: [] },
+    coupons: [
+      {
+        name:{
+          type:String,
+          index:true
+        },
+        id:{
+          type:mongoose.Types.ObjectId,
+          ref:"coupens"
+        }
+
+      }
+    ],
 
     paidUser:{
       type:[{
@@ -163,6 +175,28 @@ const CategorySchema = new mongoose.Schema(
   { timestamps: true }
 );
 export const categoryModel= connectDashboardDB.model('Category', CategorySchema);
+
+// coupen schema 
+
+const couponSchema = new mongoose.Schema(
+  {
+    code: { type: String, unique: true, required: true },
+    discountType: { type: String, enum: ['percentage', 'fixed'], required: true },
+    discountValue: { type: Number, required: true },
+    applicableProducts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'digital-product',
+      },
+    ], // Empty = global coupon
+    usageLimit: Number,
+    usedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    expiresAt: Date,
+    isActive: { type: Boolean, default: true },
+  },
+  { timestamps: true }
+);
+export const couponModel=connectDashboardDB.model("coupens",couponSchema);
 
 productSchema.index({ title: 'text', description: 'text', tags: 'text' });
 export const productModel = connectDashboardDB.model('digital-product', productSchema);
