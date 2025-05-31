@@ -113,6 +113,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { usePaymentOrderMutation } from '../../services/store/paymentServices';
 import { useGetSingleProductQuery } from '../../services/store/productServices';
 import { url } from '../../utils/service';
+import { useLazyGetCouponsQuery } from '../../services/dashboad/dashProductServices';
 const IsUserAuthenticated=lazy(()=>import("../../components/Store/IsUserAuthenticated").then(m=>({default:m.IsUserAuthenticated})));
 
 // import { toast } from '@/hooks/use-toast';
@@ -204,8 +205,10 @@ useEffect(() => {
 export const PaymentInfo = () => {
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState(null);
-  const [isValidating, setIsValidating] = useState(false);
+  // const [isValidating, setIsValidating] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
+
+  const [coupon,{isLoading:isValidating}] =useLazyGetCouponsQuery();
   
     const [paymentOrder, { isLoading, }] = usePaymentOrderMutation();
   const navigate=useNavigate();
@@ -225,52 +228,83 @@ export const PaymentInfo = () => {
         refetchOnMountOrArgChange: false,
       })
     const product = data?.['data']?.product;
-// const queryParams = new URLSearchParams(location.search);
-// console.log(product,prdId);
 
-// // Example: Get a param by name
-// const prdId = queryParams.get('prdId');
   const basePrice = product?.actualPrice || 0;
-  const calculateDiscount = () => {
-    if (!appliedCoupon) return 0;
-    return appliedCoupon.type === 'percentage' 
-      ? (basePrice * appliedCoupon.discount) / 100
-      : appliedCoupon.discount;
-  };
+  const [offPrice,setOffPrice]=useState(0);
+  const [finalPrice,setFinalPrice]=useState(basePrice);
 
-  const finalPrice = basePrice - calculateDiscount();
+
+  useEffect(()=>{
+
+    if(appliedCoupon){
+calculateDiscount(basePrice,appliedCoupon?.discountType,appliedCoupon?.discountValue)
+    }
+    else{
+      setFinalPrice(basePrice)
+    }
+  },[appliedCoupon])
+
+  function calculateDiscount(originalPrice, discountType, discountValue,type) {
+  // if (!appliedCoupon) return 0; 
+  if (originalPrice <= 0 || discountValue <= 0) return originalPrice;
+
+  let discountedPrice = originalPrice;
+
+  if (discountType === 'percentage') {
+    discountedPrice = originalPrice - (originalPrice * discountValue) / 100;
+  } else if (discountType === 'fixed') {
+    discountedPrice = originalPrice - discountValue;
+  }
+
+  // Ensure the price doesn't go below zero
+  console.log("geyw",(originalPrice - discountedPrice),discountedPrice);
+  
+  setOffPrice( Math.max(0,(originalPrice - discountedPrice)));
+  setFinalPrice(prev=>(prev - (originalPrice - discountedPrice)) )
+  if(type=='off')
+  return Math.max(0,(originalPrice - discountedPrice))
+  return  Math.max(0, discountedPrice).toFixed(2)
+}
+
 
   const validateCoupon = async () => {
     if (!couponCode.trim()) return;
-    
-    setIsValidating(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const foundCoupon = validCoupons.find(
-      coupon => coupon.code.toLowerCase() === couponCode.toLowerCase()
-    );
-    
-    if (foundCoupon) {
-      setAppliedCoupon(foundCoupon);
-      setShowCelebration(true);
+
+    await coupon(couponCode).unwrap().then(res=>{
+      console.log(res)
+      let resCoupon=res?.coupons[0] || null 
+      if(resCoupon){
+       
+
+        setAppliedCoupon(resCoupon)
+        setShowCelebration(true);
+
       toast({
         title: "Coupon Applied!",
-        description: foundCoupon.description,
+        description:`50% off premium features`,
       });
-    } else {
-      toast({
+        
+
+      }
+
+    }
+    ).catch(err=>{
+
+       toast({
         title: "Invalid Coupon",
         description: "Please check your coupon code and try again.",
         variant: "destructive",
       });
+      console.log(err)
     }
+      
+    )
     
-    setIsValidating(false);
+  
   };
 
   const removeCoupon = () => {
+
     setAppliedCoupon(null);
     setCouponCode('');
     toast({
@@ -281,10 +315,17 @@ export const PaymentInfo = () => {
 
   const handleSubmit = async(e) => {
     e.preventDefault();
-
+    console.log({
+      products:product,
+      totalAmount:basePrice,
+      discountAmount:finalPrice,
+      appliedCoupon,
+      billingInfo:formData
+    });
+    
     console.log(formData);
     try {
-     await  paymentOrder({ productId: product?._id, fileId: product?.files[0]?.id, amount: parseInt(product?.actualPrice), productName: product?.title, navigate }).unwrap()
+     await  paymentOrder({ productId: product?._id, fileId: product?.files[0]?.id, amount: parseInt(finalPrice), productName: product?.title, navigate }).unwrap()
       toast({
       title: "Payment Processing",
       description: "Your payment is being processed...",
@@ -297,12 +338,6 @@ export const PaymentInfo = () => {
     
   };
 
-
- const handleBuyNow = async () => {
-
-
-    
-  }
 
 ' bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50'
   return (
@@ -390,9 +425,10 @@ export const PaymentInfo = () => {
                             <Tag className="h-4 w-4" />
                             Discount ({appliedCoupon.code})
                           </span>
-                          <span className="font-semibold">-${calculateDiscount().toFixed(2)}</span>
+                          <span className="font-semibold">-${offPrice || 0}</span>
                         </motion.div>
                       )}
+                      
                     </AnimatePresence>
                     
                     <div className="border-t pt-2 flex justify-between items-center">
@@ -403,7 +439,7 @@ export const PaymentInfo = () => {
                         animate={{ scale: 1 }}
                         className="font-bold text-2xl bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent"
                       >
-                        ${finalPrice.toFixed(2)}
+                        ${finalPrice?.toFixed(2)}
                       </motion.span>
                     </div>
                   </div>
@@ -425,9 +461,10 @@ export const PaymentInfo = () => {
                     <Input
                       placeholder="Enter coupon code"
                       value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value)}
+                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                       className="flex-1"
                       disabled={!!appliedCoupon}
+                      
                     />
                     <AnimatePresence mode="wait">
                       {!appliedCoupon ? (
@@ -483,7 +520,7 @@ export const PaymentInfo = () => {
                       >
                         <div className="flex items-center gap-2 text-green-700">
                           <Check className="h-4 w-4" />
-                          <span className="font-medium">{appliedCoupon.description}</span>
+                          <span className="font-medium">{appliedCoupon?.description || "Coupen Applied"}</span>
                         </div>
                       </motion.div>
                     )}

@@ -58,24 +58,26 @@ export class ProductController{
           res.status(500).send("Error fetching image");
         }
       }
- static getCoupons = async (req, res) => {
+    static getCoupons = async (req, res) => {
   try {
-    console.log("✅ /hello route hit:", req.method, req.originalUrl);
+
+    const {code}=req.query;
+
     
     let coupons = await couponModel.find({
       isActive: true,
+      code:code || "",
       $or: [
         { expiresAt: { $exists: false } },
         { expiresAt: { $gte: new Date() } },
       ],
-    });
+    },{usageLimit:0,usedBy:0});
 
     if (!coupons || coupons.length === 0) {
       return res.status(404).json({ message: "No active coupons found." });
     }
 
     return res.status(200).json({ message: "Coupons found", coupons });
-    
   } catch (error) {
     console.error("❌ Error in getCoupons:", error);
     return res.status(500).json({ message: "Server error" });

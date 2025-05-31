@@ -27,18 +27,63 @@ export const userCartModel= connectStoreUserDB.model('userCart', userCartSchema)
 
 
 /* user order schema && model */
-const orderSchema = new mongoose.Schema({
-    productId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'product',
+const orderSchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'storeUser',
+      required: true,
     },
-},{timestamps:{createdAt:true,updatedAt:false}});
-const userOrderSchema = new mongoose.Schema({
-    userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'storeUser',
+    products: [
+      {
+        productId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'product',
+          required: true,
+        },
+        quantity: { type: Number, required: true },
+        price: { type: Number, required: true },
+      },
+    ],
+    totalAmount: {
+      type: Number,
+      required: true,
     },
-    orders:[orderSchema],
-},{timestamps:true});
-
-export const userOrderModel= connectStoreUserDB.model('userOrder', userOrderSchema);
+    discountAmount: {
+      type: Number,
+      default: 0,
+    },
+    appliedCoupen: {
+        code:String,
+        id:mongoose.Schema.Types.ObjectId,
+        
+    },
+    paymentStatus: {
+      type: String,
+      enum: ['pending', 'paid', 'failed'],
+      default: 'pending',
+    },
+    orderStatus: {
+      type: String,
+      enum: ['processing', 'shipped', 'delivered', 'cancelled'],
+      default: 'processing',
+    },
+    paymentMethod: {
+      type: String,
+      enum: ['COD', 'Razorpay', 'Stripe', 'PayPal'],
+      required: true,
+    },
+    shippingAddress: {
+      fullName: { type: String, required: true },
+      addressLine1: { type: String, required: true },
+      addressLine2: { type: String },
+      city: { type: String, required: true },
+      state: { type: String, required: true },
+      postalCode: { type: String, required: true },
+      country: { type: String, required: true },
+      phone: { type: String, required: true },
+    },
+  },
+  { timestamps: true }
+);
+export const userOrderModel= connectStoreUserDB.model('userOrder', orderSchema);

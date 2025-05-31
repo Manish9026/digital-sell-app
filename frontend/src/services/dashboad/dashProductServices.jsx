@@ -10,8 +10,8 @@ const dashProductApi=createApi({
         endpoints:(builders)=>({
 
         getCoupons:builders.query({
-                query:()=>({
-                    url:"/coupons",
+                query:(code)=>({
+                    url:`/coupons?code=${code}`,
                     method:"GET"
                 })
             })
